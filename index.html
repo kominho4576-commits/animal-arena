@@ -1439,13 +1439,17 @@ const Input = (() => {
 
   document.addEventListener('touchstart', e=>{
     Sfx.unlock();
+    let grabbed=false;
     for(const t of e.changedTouches){
-      if(t.clientX <= innerWidth*0.42 && joyId===null) grabJoy(t);
-      else if(t.clientX > innerWidth*0.42 && lookId===null){ lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
+      if(t.clientX <= innerWidth*0.42 && joyId===null){ grabJoy(t); grabbed=true; }
+      else if(t.clientX > innerWidth*0.42 && lookId===null){ lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; grabbed=true; }
     }
+    // iOS: 조이스틱/조준 터치를 잡았으면 기본 제스처(스크롤·가장자리 스와이프) 차단
+    // -> 이걸 안 하면 iOS가 드래그를 페이지 제스처로 가로채 touchmove가 안 옴
+    if(grabbed && e.cancelable) e.preventDefault();
   },{passive:false});
   document.addEventListener('touchmove', e=>{
-    e.preventDefault();
+    if(joyId!==null || lookId!==null){ if(e.cancelable) e.preventDefault(); }
     for(const t of e.changedTouches){
       if(t.identifier===joyId) setJoy(t);
       else if(t.identifier===lookId){
@@ -1911,12 +1915,14 @@ const ULTIMATES = {
   sleepgas:    { name:'수면 가스',   cd:12, desc:'수면 가스로 적을 둔화' },
   boarbomb:    { name:'폭주 자폭',   cd:12, desc:'폭주 돌진 후 큰 폭발' },
   giant:       { name:'거대화',      cd:14, desc:'잠시 거대화해 강해짐' },
+  henmother:   { name:'어미닭 소환', cd:13, desc:'어미 닭을 소환해 적을 쪼아 공격' },
+  foxclone:    { name:'환영 분신',   cd:13, desc:'분신 여우 2마리를 소환 (체력 낮음)' },
 };
 /* ---------------- ANIMAL CHARACTER MODELS ---------------- */
 /* species table: palette + ear style + tail style */
 const SPECIES = {
   rabbit: { name:'토끼', main:0xf5f7ff, belly:0xffffff, inner:0xffb7c9, nose:0xff8fa8, ear:'long',   tail:'puff',  swatch:'#f5f7ff', snout:'small', build:'slim',   face:'buckteeth', cls:'jumper', ult:'leap' },
-  fox:    { name:'여우', main:0xff9950, belly:0xffe8cc, inner:0x664433, nose:0x332222, ear:'point',  tail:'bushy', swatch:'#ff9950', snout:'long',  build:'slim',   face:'sly', cls:'speed', ult:'dash' },
+  fox:    { name:'여우', main:0xff9950, belly:0xffe8cc, inner:0x664433, nose:0x332222, ear:'point',  tail:'bushy', swatch:'#ff9950', snout:'long',  build:'slim',   face:'sly', cls:'speed', ult:'foxclone' },
   cat:    { name:'고양이', main:0x9aa7b4, belly:0xe8edf2, inner:0xf0a8bf, nose:0xf0809a, ear:'point',  tail:'long',  swatch:'#9aa7b4', snout:'flat',  build:'normal', face:'whisker', cls:'speed', ult:'shadowstrike' },
   bear:   { name:'곰',   main:0x8a6244, belly:0xc9a884, inner:0x5a3c28, nose:0x2a1a10, ear:'round',  tail:'none',  swatch:'#8a6244', snout:'round', build:'bulky',  face:'plain', cls:'tank', ult:'slam' },
   panda:  { name:'판다', main:0xf3f3f3, belly:0xffffff, inner:0x2a2a2a, nose:0x1a1a1a, ear:'round',  tail:'none',  swatch:'#f3f3f3', patch:true, snout:'round', build:'bulky', face:'plain', cls:'tank', ult:'shield' },
@@ -1924,8 +1930,8 @@ const SPECIES = {
   dog:    { name:'강아지', main:0xe8c48a, belly:0xfff0d8, inner:0x8a5a30, nose:0x2a1a10, ear:'floppy', tail:'bushy', swatch:'#e8c48a', snout:'long',  build:'normal', face:'tongue', cls:'balance', ult:'heal' },
   tiger:  { name:'호랑이', main:0xff9838, belly:0xfff0dc, inner:0x3a2410, nose:0x2a1a10, ear:'round',  tail:'long',  swatch:'#ff9838', stripes:true, snout:'round', build:'bulky', face:'fierce', cls:'tank', ult:'rush' },
   koala:  { name:'코알라', main:0xa8b4bd, belly:0xe4ecf0, inner:0x4a5560, nose:0x2a3038, ear:'fluffy', tail:'none',  swatch:'#a8b4bd', snout:'bignose', build:'bulky', face:'plain', cls:'tank', ult:'sleepgas' },
-  pig:    { name:'돼지', main:0xffb3c8, belly:0xffd8e2, inner:0xe0708f, nose:0xe86d92, ear:'point',  tail:'puff',  swatch:'#ffb3c8', snout:'snout', build:'squat', face:'plain', cls:'balance', ult:'boarbomb' },
-  chick:  { name:'병아리', main:0xffe14d, belly:0xfff2a0, inner:0xe0a020, nose:0xff9a2e, ear:'none',   tail:'none',  swatch:'#ffe14d', beak:true, snout:'none', build:'tiny', face:'plain', cls:'speed', ult:'giant' },
+  pig:    { name:'돼지', main:0xffb3c8, belly:0xffd8e2, inner:0xe0708f, nose:0xe86d92, ear:'point',  tail:'puff',  swatch:'#ffb3c8', snout:'snout', build:'squat', face:'plain', cls:'balance', ult:'giant' },
+  chick:  { name:'병아리', main:0xffe14d, belly:0xfff2a0, inner:0xe0a020, nose:0xff9a2e, ear:'none',   tail:'none',  swatch:'#ffe14d', beak:true, snout:'none', build:'tiny', face:'plain', cls:'speed', ult:'henmother' },
   wolf:   { name:'늑대', main:0x8a95a3, belly:0xd0d8e0, inner:0x3a4048, nose:0x1a1e24, ear:'point',  tail:'bushy', swatch:'#8a95a3', snout:'long',  build:'normal', face:'fierce', cls:'balance', ult:'wolfpack' },
 };
 const PLAYER_SPECIES = ['rabbit','cat','bear','panda','frog','dog','tiger','koala','pig','chick','wolf','fox']; // 선택 가능한 캐릭터
@@ -2047,10 +2053,18 @@ function buildAnimal(kind){
       const i2=sphere(0.09,inner); i2.position.set(0,0,0.08); e.add(i2);
       e.position.set(sx,0.42,-0.02); return e; };
     earG.add(mkEar(-0.34)); earG.add(mkEar(0.34)); head.add(earG); parts.ears=earG;
-  } else if(S.ear==='floppy'){ // 강아지 늘어진 귀
+  } else if(S.ear==='floppy'){ // 강아지 늘어진 귀 (머리 옆에서 아래로 축 늘어짐)
     const earG=new THREE.Group();
-    const mkEar=(sx)=>{ const e=sphere(0.12,inner); e.scale.set(0.65,1.7,0.5); e.position.set(sx,0.08,0); return e; };
-    earG.add(mkEar(-0.4)); earG.add(mkEar(0.4)); head.add(earG); parts.ears=earG;
+    const mkEar=(sx)=>{
+      const e=sphere(0.2, main); // 몸통색으로 잘 보이게, 크게
+      e.scale.set(0.55,1.5,0.75); // 납작하고 길게 늘어진 형태
+      e.position.set(sx*0.62, -0.12, 0.05); // 머리 옆면, 살짝 아래로
+      e.rotation.z=sx*0.25; // 바깥으로 살짝 벌어져 늘어짐
+      // 안쪽 귀 (연한색)
+      const inn=sphere(0.13, belly); inn.scale.set(0.6,1.3,0.5); inn.position.set(0,-0.02,0.09); e.add(inn);
+      return e;
+    };
+    earG.add(mkEar(-1)); earG.add(mkEar(1)); head.add(earG); parts.ears=earG;
   } else if(S.ear==='fluffy'){ // 코알라 복슬 귀
     const earG=new THREE.Group();
     const mkEar=(sx)=>{ const e=sphere(0.22,main); const f=sphere(0.15,belly); f.position.set(0,0,0.08); e.add(f); e.position.set(sx,0.28,-0.05); return e; };
@@ -2407,7 +2421,107 @@ const Projectiles = (() => {
   return {fire,update,clear,explode};
 })();
 
-/* ---------------- WEAPON PICKUPS ---------------- */
+/* ---------------- 소환수 (어미닭 · 여우 분신) ---------------- */
+const Summons = (() => {
+  let list=[];
+  // 어미 닭 모델 (플레이어보다 약간 큼, 흰 몸 + 빨간 볏)
+  function buildHen(){
+    const g=new THREE.Group();
+    const bodyMat=new THREE.MeshLambertMaterial({color:0xf5f5f5});
+    const body=new THREE.Mesh(new THREE.SphereGeometry(0.62,12,10), bodyMat); body.position.y=0.7; body.scale.z=1.2; g.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.34,10,8), bodyMat); head.position.set(0,1.35,0.42); g.add(head);
+    // 볏 (빨강)
+    const combMat=new THREE.MeshLambertMaterial({color:0xe53535});
+    const comb=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.22,0.34), combMat); comb.position.set(0,1.66,0.42); g.add(comb);
+    // 부리 (주황)
+    const beak=new THREE.Mesh(new THREE.ConeGeometry(0.11,0.28,4), new THREE.MeshLambertMaterial({color:0xff9a2e}));
+    beak.rotation.x=Math.PI/2; beak.position.set(0,1.32,0.78); g.add(beak);
+    // 볼살 (빨강)
+    const wattle=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.16,0.1), combMat); wattle.position.set(0,1.16,0.66); g.add(wattle);
+    // 눈
+    for(const sx of [-1,1]){ const eye=new THREE.Mesh(new THREE.SphereGeometry(0.06,6,6), new THREE.MeshBasicMaterial({color:0x222222})); eye.position.set(sx*0.16,1.4,0.66); g.add(eye); }
+    // 다리
+    const legMat=new THREE.MeshLambertMaterial({color:0xff9a2e});
+    for(const sx of [-1,1]){ const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.4,6), legMat); leg.position.set(sx*0.2,0.2,0); g.add(leg); }
+    // 날개
+    for(const sx of [-1,1]){ const wing=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.4,0.6), bodyMat); wing.position.set(sx*0.6,0.72,0); g.add(wing); }
+    g.userData.beak=beak; g.userData.head=head;
+    return g;
+  }
+  function spawnHen(owner){
+    const g=buildHen();
+    g.position.set(owner.pos.x, 0, owner.pos.z);
+    scene.add(g);
+    list.push({ m:g, kind:'hen', owner, hp:60, maxHp:60, pos:{x:owner.pos.x,z:owner.pos.z}, y:0,
+      atkCd:0, life:16, peckT:0, bob:Math.random()*6, spd:4.2, range:1.7, dmg:14 });
+    FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xffe14d,14,5,.5,1.3);
+  }
+  function spawnFoxClones(owner){
+    for(let i=0;i<2;i++){
+      const built=buildAnimal('fox'); const g=built.group;
+      g.scale.setScalar(0.92);
+      const ang=owner.yaw+(i===0?-0.6:0.6);
+      const ox=owner.pos.x+Math.sin(ang)*1.4, oz=owner.pos.z+Math.cos(ang)*1.4;
+      g.position.set(ox,0,oz); scene.add(g);
+      // 분신은 반투명 느낌 (환영)
+      g.traverse(o=>{ if(o.material){ try{ o.material=o.material.clone(); o.material.transparent=true; o.material.opacity=0.82; }catch(e){} } });
+      list.push({ m:g, kind:'foxclone', owner, hp:35, maxHp:35, pos:{x:ox,z:oz}, y:0, parts:built.parts,
+        atkCd:0, life:14, bob:Math.random()*6, spd:6.0, range:8, dmg:16, fireCd:0 });
+    }
+    FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xff9950,16,6,.5,1.4);
+  }
+  // 소환수가 데미지 받음 (적 공격에 의해). true 반환 시 사망.
+  function damageAt(x,z,radius,dmg,fromOwner){
+    let hit=false;
+    for(const s of list){
+      if(s.owner===fromOwner) continue; // 자기 주인 공격엔 안 맞음
+      const dd=Math.hypot(s.pos.x-x, s.pos.z-z);
+      if(dd<radius+0.5){ s.hp-=dmg; hit=true; FX.impact(new THREE.Vector3(s.pos.x,s.y+0.8,s.pos.z),0xffffff,false); }
+    }
+    return hit;
+  }
+  function update(dt, chars){
+    for(let i=list.length-1;i>=0;i--){
+      const s=list[i]; s.life-=dt; s.bob+=dt*6;
+      if(s.hp<=0 || s.life<=0){
+        FX.spark(new THREE.Vector3(s.pos.x,s.y+0.6,s.pos.z), s.kind==='hen'?0xf5f5f5:0xff9950, 12,5,.5,1.2);
+        scene.remove(s.m); list.splice(i,1); continue;
+      }
+      // 타겟: 주인의 적
+      const target = chars.find(c=>c && !c.dead && c!==s.owner && (c===Game.player||c===Game.bot));
+      if(!target){ continue; }
+      const dx=target.pos.x-s.pos.x, dz=target.pos.z-s.pos.z;
+      const dist=Math.hypot(dx,dz)||1e-6;
+      if(s.kind==='hen'){
+        // 닭: 적에게 접근해서 부리로 쪼기
+        if(dist>s.range){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
+        s.m.rotation.y=Math.atan2(dx,dz);
+        s.atkCd-=dt;
+        if(dist<=s.range && s.atkCd<=0){ s.atkCd=0.9; s.peckT=0.25; target.takeDamage(s.dmg,s.owner); FX.spark(new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z),0xff9a2e,8,5,.3,.9); }
+        // 쪼기 애니메이션 (머리 앞뒤)
+        if(s.peckT>0){ s.peckT-=dt; if(s.m.userData.head) s.m.userData.head.position.z=0.42+Math.sin((0.25-s.peckT)/0.25*Math.PI)*0.25; }
+        s.m.position.set(s.pos.x, Math.abs(Math.sin(s.bob))*0.08, s.pos.z);
+      } else if(s.kind==='foxclone'){
+        // 여우 분신: 적에게 접근하며 원거리 견제 (석궁 발사)
+        const ideal=6;
+        if(dist>ideal+1){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
+        else if(dist<ideal-1){ s.pos.x-=dx/dist*s.spd*dt; s.pos.z-=dz/dist*s.spd*dt; }
+        s.m.rotation.y=Math.atan2(dx,dz)+Math.PI;
+        s.fireCd-=dt;
+        if(dist<s.range && s.fireCd<=0){ s.fireCd=1.1;
+          const d2=new THREE.Vector3(dx/dist,0.02,dz/dist);
+          Projectiles.fire('crossbow', new THREE.Vector3(s.pos.x,s.y+1,s.pos.z), d2, s.owner);
+        }
+        // 다리 흔들기
+        if(s.parts){ const sw=Math.sin(s.bob)*0.3; if(s.parts.legL)s.parts.legL.rotation.x=sw; if(s.parts.legR)s.parts.legR.rotation.x=-sw; }
+        s.m.position.set(s.pos.x, Math.abs(Math.sin(s.bob*0.5))*0.05, s.pos.z);
+      }
+    }
+  }
+  function clear(){ for(const s of list) scene.remove(s.m); list.length=0; }
+  function count(){ return list.length; }
+  return { spawnHen, spawnFoxClones, damageAt, update, clear, count };
+})();
 const Pickups = (() => {
   const list=[];
   let __pkRng = Math.random;
@@ -2966,6 +3080,14 @@ class Character {
         const mx=CFG.maxHP*(this.maxHpMult||1); this.hp=Math.min(mx,this.hp+40);
         if(this.group){ this.group.scale.set(1.7,1.7,1.7); } // 균일 확대 (위로도 커짐)
         FX.ring(at,0xffe14d,0.3,3,.5); FX.spark(at,0xfff2a0,14,6,.5,1.3); Sfx.pickup(); break;
+      }
+      case 'henmother': { // 병아리: 어미 닭 소환 (적을 쪼아 공격, 적 공격에 파괴됨)
+        Summons.spawnHen(this);
+        FX.ring(at,0xffe14d,0.3,2.6,.45); Sfx.pickup(); break;
+      }
+      case 'foxclone': { // 여우: 환영 분신 2마리 (체력 낮음, 원거리 견제)
+        Summons.spawnFoxClones(this);
+        FX.ring(at,0xff9950,0.3,2.6,.45); FX.afterimage(this.pos.x,this.pos.z,this.pos.x,this.pos.z,this.pos.y,0xff9950); Sfx.roll(this.isPlayer?null:this.pos); break;
       }
     }
     if(this.isPlayer) Game.msg(U.name+'!');
@@ -3618,7 +3740,7 @@ const Game = (() => {
     // clean old
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
-    Projectiles.clear();
+    Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
     buildArena(); // fresh random symmetric layout each match
     const pSpec = selectedSpecies || 'rabbit';
@@ -3650,7 +3772,7 @@ const Game = (() => {
     lastDiff='train';
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
-    Projectiles.clear();
+    Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
     buildArena();
     const pSpec = selectedSpecies || 'rabbit';
@@ -3972,6 +4094,7 @@ const Game = (() => {
       player.update(simDt,chars);
       bot.update(simDt,chars);
       Projectiles.update(simDt,chars);
+      Summons.update(simDt,chars);
       Pickups.update(simDt,time);
       FX.update(dt);
       if(killCam){ killCamUpdate(dt); if(killCam.t>=killCam.dur && !killCam.shown){ killCam.shown=true; if(killCam.pvp) pvpFinish(); else finishGame(); } }
@@ -4648,7 +4771,7 @@ const Game = (() => {
     lastDiff='pvp';
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
-    Projectiles.clear();
+    Projectiles.clear(); Summons.clear();
     buildArena(Net.seed); // 양쪽 동일한 맵
     const pSpec = selectedSpecies || 'rabbit';
     player=new Player(pSpec);
