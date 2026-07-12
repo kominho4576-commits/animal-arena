@@ -11,7 +11,15 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
-<title>ANIMAL ARENA - 1v1 TPS (PC)</title>
+<title>ANIMAL ARENA</title>
+<meta name="description" content="동물 캐릭터로 즐기는 1:1 3인칭 슈팅 게임! 12종 동물과 랭킹전으로 최고의 자리에 도전하세요.">
+<meta property="og:title" content="ANIMAL ARENA">
+<meta property="og:description" content="동물 캐릭터로 즐기는 1:1 3인칭 슈팅 게임! 12종 동물과 랭킹전으로 최고의 자리에 도전하세요.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ANIMAL ARENA">
+<meta name="twitter:description" content="동물 캐릭터로 즐기는 1:1 3인칭 슈팅 게임!">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
@@ -35,7 +43,9 @@
   --bg0:#070d18; --bg1:#0c1626; --pn:rgba(9,17,32,.82); --pnb:rgba(120,200,255,.22);
   --tx:#eaf6ff; --tx2:#8fb2cc;
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:'Noto Sans KR','Segoe UI',sans-serif;touch-action:none;position:fixed;color:var(--tx)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:'Noto Sans KR','Segoe UI',sans-serif;touch-action:none;position:fixed;color:var(--tx);overscroll-behavior:none;-webkit-overflow-scrolling:auto;-webkit-user-select:none;-webkit-touch-callout:none}
+/* iOS: 캔버스/조작부 터치 제스처 완전 차단 */
+#c,#joyBase,.btn,#hud{touch-action:none;-webkit-user-select:none;-webkit-touch-callout:none}
 #c{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
 #hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
 button{font-family:inherit;cursor:pointer}
@@ -192,7 +202,7 @@ body.has-touch #abilityRow{display:none!important}
   mask-image:radial-gradient(ellipse at center,rgba(0,0,0,.9),transparent 75%);}
 .ovl::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
 .ovl>*{position:relative;z-index:1}
-#settingsOvl{z-index:60}
+#settingsOvl{z-index:60;touch-action:pan-y}
 #pauseOvl,#settingsOvl{background:rgba(5,10,19,.78);backdrop-filter:blur(7px)}
 #pauseOvl::before,#settingsOvl::before{opacity:.25}
 
@@ -415,7 +425,7 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .pResume:hover{border-color:var(--gn);box-shadow:0 0 20px rgba(62,245,138,.3)}
 .pQuit{border-color:rgba(255,77,94,.45);color:#ffc9cf;background:linear-gradient(180deg,rgba(84,25,32,.85),rgba(40,12,16,.92))}
 .pQuit:hover{border-color:var(--rd);box-shadow:0 0 20px rgba(255,77,94,.25)}
-.setPanel{display:flex;flex-direction:column;gap:6px;width:310px;margin-top:18px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:16px}
+.setPanel{display:flex;flex-direction:column;gap:6px;width:310px;margin-top:18px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:16px;max-height:70vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
 .setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0f8;font-size:14px;padding:9px 4px;border-bottom:1px solid rgba(125,243,255,.08);font-weight:700}
 .setRow:last-child{border-bottom:none}
 .setRow input[type=range]{flex:1;accent-color:var(--cy)}
@@ -1431,6 +1441,12 @@ const Input = (() => {
 
   document.addEventListener('touchstart', e=>{
     Sfx.unlock();
+    // iOS: 게임 중엔 기본 제스처(가장자리 스와이프=뒤로가기, 스크롤, 확대) 차단
+    // 단, 설정/일시정지 오버레이가 열려있으면 스크롤 허용
+    const ovlOpen = $('settingsOvl').style.display==='flex' || $('pauseOvl').style.display==='flex' || $('confirmOvl').style.display==='flex';
+    if(document.body.classList.contains('playing') && !ovlOpen && e.target && e.target.tagName!=='INPUT'){
+      e.preventDefault();
+    }
     for(const t of e.changedTouches){
       if(t.clientX <= innerWidth*0.42 && joyId===null) grabJoy(t);
       else if(t.clientX > innerWidth*0.42 && lookId===null){ lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
@@ -4845,10 +4861,16 @@ const Game = (() => {
 })();
 /* platform detection: enable PC mode (hide touch UI, show keybind guide) */
 (function detectPC(){
-  const isPC = !('ontouchstart' in window) && matchMedia('(pointer:fine)').matches;
-  if(isPC){ document.body.classList.add('pc'); window.__PC_ALWAYS_AIM=true; }
-  // 터치 가능한 기기(마우스 겸용 태블릿 포함)엔 모바일 버튼도 보이게
-  if(('ontouchstart' in window) || navigator.maxTouchPoints>0){ document.body.classList.add('has-touch'); }
+  const hasTouch = ('ontouchstart' in window) || navigator.maxTouchPoints>0 || matchMedia('(pointer:coarse)').matches;
+  const isPC = !hasTouch && matchMedia('(pointer:fine)').matches;
+  if(hasTouch){
+    // 터치 기기: 모바일 조작(조이스틱·버튼) 항상 표시. PC 모드로 절대 전환 안 함.
+    document.body.classList.add('has-touch');
+    document.body.classList.remove('pc');
+    window.__PC_ALWAYS_AIM=false;
+  } else if(isPC){
+    document.body.classList.add('pc'); window.__PC_ALWAYS_AIM=true;
+  }
   // 모바일 전체화면 (주소창 숨김)
   window.__wantFullscreen=false;
   function lockLandscape(){
@@ -4903,7 +4925,9 @@ const Game = (() => {
     }
   }, {passive:true});
   // re-check on first input in case of hybrid devices
-  window.addEventListener('keydown',()=>{ if(!('ontouchstart' in window)){ document.body.classList.add('pc'); window.__PC_ALWAYS_AIM=true; } },{once:true});
+  // (제거됨) 예전엔 keydown 발생 시 PC 모드로 전환했으나,
+  // iOS에서 닉네임 입력 시 화면 키보드가 keydown을 발생시켜 조이스틱이 사라지는 버그가 있었음.
+  // 터치 기기에서는 절대 PC 모드로 바꾸지 않음.
   // 게임 초기화 완료 -> 로딩 화면 닫기
   if(window.__finishLoad) window.__finishLoad();
 })();
