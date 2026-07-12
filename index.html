@@ -273,6 +273,7 @@ body.pc #keyGuide{display:block}
 .mcAI{background:linear-gradient(135deg,#1c6a96,#0d1e30)}
 .mcPVP{background:linear-gradient(135deg,#96701c,#0d1e30)}
 .mcTrain{background:linear-gradient(135deg,#1c9660,#0d1e30)}
+.mcRank{background:linear-gradient(135deg,#8e3ad0,#0d1e30);font-size:26px}
 .mcName{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px}
 .mcDesc{font-size:12px;color:#a7bccf;line-height:1.55;text-align:center}
 
@@ -473,6 +474,23 @@ body.killcam #killCamLabel{opacity:1}
 .mItem:hover .mArrow{opacity:1;left:8px}
 .mItem:active{transform:scale(.97)}
 .mItem.play .mTxt{color:var(--yl)}
+/* 로비 티어 배지 */
+#lbTier{display:flex;align-items:center;gap:12px;width:100%;max-width:320px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:10px 16px}
+.ltIcon{width:46px;height:46px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.ltIcon::before{content:"";position:absolute;inset:0;background:var(--tierCol,#cd7f4d);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);box-shadow:0 0 14px var(--tierGlow,rgba(205,127,77,.5))}
+.ltIcon::after{content:"";position:absolute;inset:6px;background:rgba(8,15,28,.55);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%)}
+.ltIcon span{position:relative;z-index:1;font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--tierCol,#cd7f4d);text-shadow:0 0 8px var(--tierGlow)}
+.ltInfo{flex:1;min-width:0}
+.ltName{font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--tierCol,#fff);letter-spacing:1px}
+.ltRp{font-size:12px;color:#8fb2cc;font-weight:700;margin:1px 0 4px}
+.ltBar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.ltBarFill{height:100%;background:var(--tierCol,#cd7f4d);border-radius:3px;transition:width .4s;box-shadow:0 0 8px var(--tierGlow)}
+/* 랭킹전 승리화면 RP 표시 */
+#winRp{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 14px}
+.wrpDelta{font-family:'Black Han Sans',sans-serif;font-size:32px;letter-spacing:1px}
+.wrpDelta.up{color:#3ef58a;text-shadow:0 0 16px rgba(62,245,138,.5)}
+.wrpDelta.down{color:#ff5252;text-shadow:0 0 16px rgba(255,82,82,.5)}
+.wrpTotal{font-size:14px;color:#cfe0ee;font-weight:700;letter-spacing:1px}
 /* iOS 홈화면 추가 안내 배너 */
 #iosInstall{position:fixed;left:0;right:0;bottom:0;z-index:10000;display:flex;justify-content:center;padding:10px;pointer-events:none;animation:iosUp .4s ease}
 @keyframes iosUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -790,6 +808,14 @@ body.has-touch .mExitOnly{display:block}
       </div>
     </div>
     <div class="lbRight">
+      <div id="lbTier">
+        <div class="ltIcon" id="ltIcon"></div>
+        <div class="ltInfo">
+          <div class="ltName" id="ltName">브론즈</div>
+          <div class="ltRp" id="ltRp">0 RP</div>
+          <div class="ltBar"><div class="ltBarFill" id="ltBarFill"></div></div>
+        </div>
+      </div>
       <div id="lbStats">
         <div class="lsRow"><span class="lsNum" id="lsWins">0</span><span class="lsLbl">승</span><span class="lsNum" id="lsLosses">0</span><span class="lsLbl">패</span><span class="lsNum" id="lsRate">0%</span><span class="lsLbl">승률</span></div>
         <div class="lsRow2"><span>K/D <b id="lsKD">0</b></span><span>연승 <b id="lsStreak">0</b></span><span>최고 <b id="lsBest">0</b></span></div>
@@ -888,6 +914,11 @@ body.has-touch .mExitOnly{display:block}
       <div class="mcArt mcPVP">PVP</div>
       <div class="mcName">PVP 대전</div>
       <div class="mcDesc">실제 플레이어와 1:1<br>랜덤 매칭 · 온라인</div>
+    </button>
+    <button class="modeCard" id="modeRank">
+      <div class="mcArt mcRank">RANK</div>
+      <div class="mcName">랭킹전</div>
+      <div class="mcDesc">승패로 RP 획득 · 손실<br>티어 경쟁 · 온라인</div>
     </button>
     <button class="modeCard" id="modeTrain">
       <div class="mcArt mcTrain">훈련</div>
@@ -997,6 +1028,7 @@ body.has-touch .mExitOnly{display:block}
 <div class="ovl" id="winOvl">
   <div id="winTitle">VICTORY</div>
   <div id="winSub"></div>
+  <div id="winRp" style="display:none"></div>
   <button id="restart">다시 하기</button>
 </div>
 <div id="rotate">가로 모드로<br>돌려주세요</div>
@@ -1115,6 +1147,41 @@ const Stats = {
   winRate(){ const t=this.wins+this.losses+this.draws; return t>0 ? Math.round(this.wins/t*100) : 0; }
 };
 Stats.load();
+
+/* ---------------- 랭킹전 (RP·티어) ---------------- */
+const TIERS = [
+  { key:'bronze',   name:'브론즈',   min:0,    color:'#cd7f4d', glow:'rgba(205,127,77,.5)' },
+  { key:'silver',   name:'실버',     min:400,  color:'#b8c4d0', glow:'rgba(184,196,208,.5)' },
+  { key:'gold',     name:'골드',     min:800,  color:'#ffd24a', glow:'rgba(255,210,74,.5)' },
+  { key:'platinum', name:'플래티넘', min:1200, color:'#3ad6b0', glow:'rgba(58,214,176,.55)' },
+  { key:'diamond',  name:'다이아',   min:1600, color:'#5cc6ff', glow:'rgba(92,198,255,.6)' },
+  { key:'master',   name:'마스터',   min:2000, color:'#c264ff', glow:'rgba(194,100,255,.65)' }
+];
+const Rank = {
+  rp:0, rankWins:0, rankLosses:0, placed:false,
+  load(){ try{ const s=JSON.parse(localStorage.getItem('aa_rank')||'{}'); Object.assign(this,s); }catch(e){} },
+  save(){ try{ localStorage.setItem('aa_rank', JSON.stringify({rp:this.rp,rankWins:this.rankWins,rankLosses:this.rankLosses,placed:this.placed})); }catch(e){} },
+  tier(){ let t=TIERS[0]; for(const x of TIERS){ if(this.rp>=x.min) t=x; } return t; },
+  nextTier(){ const cur=this.tier(); const i=TIERS.indexOf(cur); return i<TIERS.length-1?TIERS[i+1]:null; },
+  // 티어 내 진행률 (0~1)
+  progress(){ const cur=this.tier(), nxt=this.nextTier(); if(!nxt) return 1; return Math.max(0,Math.min(1,(this.rp-cur.min)/(nxt.min-cur.min))); },
+  // 점수차(margin)로 획득/손실 RP 계산
+  gain(won, margin){
+    margin=Math.max(0,Math.min(5,margin||0));
+    let delta;
+    if(won){ delta = 20 + margin*3; }        // 승: 20(접전)~35(완승)
+    else   { delta = -(14 + margin*3); }      // 패: -14(접전)~-29(완패)
+    const before=this.rp;
+    this.rp=Math.max(0, this.rp+delta);
+    this.placed=true;
+    if(won) this.rankWins++; else this.rankLosses++;
+    this.save();
+    return { delta, before, after:this.rp, tierBefore:tierAt(before), tierAfter:this.tier() };
+  },
+  reset(){ this.rp=0; this.rankWins=0; this.rankLosses=0; this.placed=false; this.save(); }
+};
+function tierAt(rp){ let t=TIERS[0]; for(const x of TIERS){ if(rp>=x.min) t=x; } return t; }
+Rank.load();
 
 /* ---------------- KEY BINDS (조작키 커스텀) ---------------- */
 const KeyBinds = {
@@ -2049,45 +2116,47 @@ const FX = (() => {
     scene.add(m); parts.push({m,v,t:.42,life:.42,grow:5.5,fl:true});
   }
   function boom(pos){
-    const m=new THREE.Mesh(new THREE.SphereGeometry(1,10,8),new THREE.MeshBasicMaterial({color:0xffb040,transparent:true,opacity:.85}));
-    m.position.copy(pos); scene.add(m); booms.push({m,t:.35});
-    spark(pos,0xff7043,14,7,.5,1.6); spark(pos,0x555555,8,3,.8,1.8);
-    // 폭발 충격파 링
-    ring(pos, 0xffcc66, 0.5, 4.5, 0.4);
-    spark(pos,0xffe27a,10,9,.35,1.1);
+    const m=new THREE.Mesh(new THREE.SphereGeometry(1.6,10,8),new THREE.MeshBasicMaterial({color:0xffb040,transparent:true,opacity:.85}));
+    m.position.copy(pos); scene.add(m); booms.push({m,t:.4});
+    spark(pos,0xff7043,22,10,.6,2.4); spark(pos,0x555555,12,4,.9,2.6);
+    // 폭발 충격파 링 (2겹)
+    ring(pos, 0xffcc66, 0.6, 7, 0.45);
+    ring(pos, 0xff8844, 0.4, 5, 0.35);
+    spark(pos,0xffe27a,16,13,.4,1.6);
   }
   // ---- 머즐플래시 (총구 화염) ----
   const flashGeo=new THREE.SphereGeometry(1,6,5);
   function muzzle(pos,dir,color,scale=1){
+    scale*=1.6; // 모바일 가시성: 크게
     // 밝은 중심 플래시
     const m=new THREE.Mesh(flashGeo,new THREE.MeshBasicMaterial({color:color||0xfff2a0,transparent:true,opacity:.95}));
     m.position.copy(pos); m.scale.set(0.28*scale,0.28*scale,0.5*scale);
     m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), dir.clone().normalize());
-    scene.add(m); flashes.push({m,t:0.06,life:0.06});
+    scene.add(m); flashes.push({m,t:0.07,life:0.07});
     // 바깥 노란 링
     const m2=new THREE.Mesh(flashGeo,new THREE.MeshBasicMaterial({color:0xffb040,transparent:true,opacity:.7}));
     m2.position.copy(pos); m2.scale.setScalar(0.18*scale);
-    scene.add(m2); flashes.push({m:m2,t:0.08,life:0.08,grow:6*scale});
+    scene.add(m2); flashes.push({m:m2,t:0.09,life:0.09,grow:7*scale});
     // 튀는 불똥
-    spark(pos, 0xffd24a, 3, 6, .18, .7);
+    spark(pos, 0xffd24a, 4, 7, .2, 1.0);
   }
   // ---- 근접 휘두르기 슬래시 아크 ----
   function slash(pos,yaw,color){
     const arc=new THREE.Mesh(
-      new THREE.RingGeometry(0.9,1.7,16,1,-0.9,1.8),
-      new THREE.MeshBasicMaterial({color:color||0xffffff,transparent:true,opacity:.75,side:THREE.DoubleSide}));
+      new THREE.RingGeometry(1.3,2.5,18,1,-0.9,1.8),
+      new THREE.MeshBasicMaterial({color:color||0xffffff,transparent:true,opacity:.8,side:THREE.DoubleSide}));
     arc.position.copy(pos); arc.position.y+=0.9;
     arc.rotation.y=yaw; arc.rotation.x=Math.PI/2 - 0.5;
-    scene.add(arc); slashes.push({m:arc,t:0.18,life:0.18,yaw});
+    scene.add(arc); slashes.push({m:arc,t:0.2,life:0.2,yaw});
   }
   // ---- 피격 임팩트 (플래시 + 파편) ----
   function impact(pos,color,big){
-    // 순간 밝은 플래시 구
-    const m=new THREE.Mesh(flashGeo,new THREE.MeshBasicMaterial({color:color||0xffffff,transparent:true,opacity:.9}));
-    m.position.copy(pos); m.scale.setScalar(big?0.35:0.22);
-    scene.add(m); flashes.push({m,t:0.09,life:0.09,grow:big?8:5});
-    spark(pos,color||0xff8866, big?10:6, big?8:6, .3, big?1.2:.9);
-    ring(pos, color||0xffffff, 0.15, big?1.6:1.0, 0.22);
+    // 순간 밝은 플래시 구 (모바일 가시성: 크게)
+    const m=new THREE.Mesh(flashGeo,new THREE.MeshBasicMaterial({color:color||0xffffff,transparent:true,opacity:.92}));
+    m.position.copy(pos); m.scale.setScalar(big?0.55:0.36);
+    scene.add(m); flashes.push({m,t:0.11,life:0.11,grow:big?12:8});
+    spark(pos,color||0xff8866, big?16:10, big?10:8, .35, big?1.8:1.3);
+    ring(pos, color||0xffffff, 0.2, big?2.6:1.7, 0.26);
   }
   // ---- 확장 링 (충격파) ----
   function ring(pos,color,r0,r1,life){
@@ -2109,7 +2178,7 @@ const FX = (() => {
       p.m.material.opacity=Math.max(0,p.t/p.life);
       if(p.t<=0){ scene.remove(p.m); p.m.material.dispose(); parts.splice(i,1);} }
     for(let i=booms.length-1;i>=0;i--){ const b=booms[i]; b.t-=dt;
-      b.m.scale.setScalar(1+(0.35-b.t)*10); b.m.material.opacity=b.t/0.35*0.85;
+      b.m.scale.setScalar(1+(0.4-b.t)*12); b.m.material.opacity=b.t/0.4*0.85;
       if(b.t<=0){ scene.remove(b.m); booms.splice(i,1);} }
     // 머즐플래시
     for(let i=flashes.length-1;i>=0;i--){ const f=flashes[i]; f.t-=dt;
@@ -3521,7 +3590,7 @@ class NetOpponent extends Character {
 /* ---------------- GAME ---------------- */
 const Game = (() => {
   let player=null, bot=null, chars=[];
-  let running=false, time=0, msgT=0, paused=false, lastDiff='normal', pvpMode=false, trainingMode=false;
+  let running=false, time=0, msgT=0, paused=false, lastDiff='normal', pvpMode=false, trainingMode=false, rankedMode=false;
   let killCam=null; // {t, victim, won, angle} — 마지막 킬 슬로우모션 연출
   const $=id=>document.getElementById(id);
 
@@ -3638,6 +3707,20 @@ const Game = (() => {
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
     $('winSub').textContent=`${player.kills} : ${bot.kills}  ·  ${fmtTime(time)}`;
+    // 랭킹전: RP 변동 표시
+    const rpEl=$('winRp');
+    if(rankedMode && rpEl){
+      const margin=Math.abs(player.kills-bot.kills);
+      const res=Rank.gain(won, margin);
+      const sign=res.delta>=0?'+':'';
+      rpEl.style.display='block';
+      rpEl.innerHTML=`<span class="wrpDelta ${res.delta>=0?'up':'down'}">${sign}${res.delta} RP</span><span class="wrpTotal">${res.after} RP · ${res.tierAfter.name}</span>`;
+      // 티어 변동 알림
+      if(res.tierAfter.key!==res.tierBefore.key){
+        const up=res.tierAfter.min>res.tierBefore.min;
+        setTimeout(()=>Game.msg&&Game.msg((up?'티어 승급! ':'티어 강등 ')+res.tierAfter.name), 400);
+      }
+    } else if(rpEl){ rpEl.style.display='none'; }
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     won?Sfx.win():Sfx.lose();
@@ -3925,6 +4008,16 @@ const Game = (() => {
     const set=(k,v)=>{ const e=$(k); if(e) e.textContent=v; };
     set('lsWins',Stats.wins); set('lsLosses',Stats.losses); set('lsRate',Stats.winRate()+'%');
     set('lsKD',Stats.kd()); set('lsStreak',Stats.streak); set('lsBest',Stats.bestStreak);
+    updateTierBadge();
+  }
+  function updateTierBadge(){
+    const t=Rank.tier(); const tierEl=$('lbTier'); if(!tierEl) return;
+    tierEl.style.setProperty('--tierCol', t.color);
+    tierEl.style.setProperty('--tierGlow', t.glow);
+    const icon=$('ltIcon'); if(icon) icon.innerHTML='<span>'+t.name.charAt(0)+'</span>';
+    const nm=$('ltName'); if(nm) nm.textContent=t.name;
+    const rp=$('ltRp'); if(rp){ const nxt=Rank.nextTier(); rp.textContent = nxt ? (Rank.rp+' / '+nxt.min+' RP') : (Rank.rp+' RP · 최고 티어'); }
+    const bar=$('ltBarFill'); if(bar) bar.style.width=(Rank.progress()*100)+'%';
   }
   // 화면 콘텐츠를 뷰포트에 맞게 스케일 (짤림/스크롤 방지) — 전체를 한 덩어리로 축소
   function fitScreen(id){
@@ -4279,11 +4372,11 @@ const Game = (() => {
   function refreshAbilityKeys(){ const el=$('abRollKey'); if(el) el.textContent=KeyBinds.label(KeyBinds.map.roll); const pk=$('pickKey'); if(pk) pk.textContent=KeyBinds.label(KeyBinds.map.pick); const uk=$('abUltKey'); if(uk) uk.textContent=KeyBinds.label(KeyBinds.map.ult); }
   refreshAbilityKeys();
   bindBtn('modeBack',()=>showScreen('lobby'));
-  bindBtn('modeAI',()=>{ showScreen('diffScr'); });
-  bindBtn('modeTrain',()=>{ startTraining(); });
-  bindBtn('modePVP',()=>{ openPvpOverlay('pvpConfirm'); });
-  bindBtn('modePVP',()=>{ showScreen('pvpConfirm'); });
-  bindBtn('pvpRandom',()=>{ startNet('random'); });
+  bindBtn('modeAI',()=>{ rankedMode=false; showScreen('diffScr'); });
+  bindBtn('modeTrain',()=>{ rankedMode=false; startTraining(); });
+  bindBtn('modePVP',()=>{ rankedMode=false; showScreen('pvpConfirm'); });
+  bindBtn('modeRank',()=>{ rankedMode=true; startNet('random'); }); // 랭킹전: 바로 랜덤 매칭
+  bindBtn('pvpRandom',()=>{ rankedMode=false; startNet('random'); });
   bindBtn('pvpCreate',()=>{ startNet('create'); });
   bindBtn('pvpJoin',()=>{ $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
   bindBtn('pvpCancel',()=>{ showScreen('modeScr'); });
@@ -4316,7 +4409,7 @@ const Game = (() => {
   });
 
   /* restart -> back to lobby */
-  $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; BGM.setScene('menu'); showScreen('lobby'); });
+  $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; rankedMode=false; BGM.setScene('menu'); showScreen('lobby'); });
 
   /* ===== PVP: 매치메이킹 + 넷코드 ===== */
   let mmTimer=null, mmWs=null;

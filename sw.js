@@ -1,5 +1,5 @@
 // Animal Arena Service Worker
-const CACHE = 'animal-arena-v1';
+const CACHE = 'animal-arena-v2';
 const ASSETS = [
   './',
   './index.html',
