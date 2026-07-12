@@ -200,7 +200,7 @@ body.has-touch #abilityRow{display:none!important}
   mask-image:radial-gradient(ellipse at center,rgba(0,0,0,.9),transparent 75%);}
 .ovl::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
 .ovl>*{position:relative;z-index:1}
-#settingsOvl{z-index:60;touch-action:pan-y}
+#settingsOvl{z-index:60}
 #pauseOvl,#settingsOvl{background:rgba(5,10,19,.78);backdrop-filter:blur(7px)}
 #pauseOvl::before,#settingsOvl::before{opacity:.25}
 
@@ -329,7 +329,7 @@ body.pc #keyGuide{display:block}
 }
 /* 설정·게임설정 화면 반응형 (짧은 화면에서 안 잘리게) */
 @media (max-height:620px){
-  .setPanel{margin-top:8px;padding:10px 14px;gap:2px;max-height:82vh;overflow-y:auto}
+  .setPanel{margin-top:6px;padding:8px 12px;gap:2px}
   .setRow{font-size:12px;padding:6px 4px}
   .diffBtn{padding:12px 20px;font-size:17px}
   .diffBtn small{font-size:9px;margin-top:2px}
@@ -423,8 +423,8 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .pResume:hover{border-color:var(--gn);box-shadow:0 0 20px rgba(62,245,138,.3)}
 .pQuit{border-color:rgba(255,77,94,.45);color:#ffc9cf;background:linear-gradient(180deg,rgba(84,25,32,.85),rgba(40,12,16,.92))}
 .pQuit:hover{border-color:var(--rd);box-shadow:0 0 20px rgba(255,77,94,.25)}
-.setPanel{display:flex;flex-direction:column;gap:6px;width:310px;margin-top:18px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:16px;max-height:70vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
-.setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0f8;font-size:14px;padding:9px 4px;border-bottom:1px solid rgba(125,243,255,.08);font-weight:700}
+.setPanel{display:flex;flex-direction:column;gap:3px;width:300px;margin-top:10px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:10px 14px}
+.setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0f8;font-size:13px;padding:6px 4px;border-bottom:1px solid rgba(125,243,255,.08);font-weight:700}
 .setRow:last-child{border-bottom:none}
 .setRow input[type=range]{flex:1;accent-color:var(--cy)}
 .setRow input[type=checkbox]{width:22px;height:22px;accent-color:var(--gn)}
@@ -760,7 +760,7 @@ body.has-touch .mExitOnly{display:block}
   </div>
 </div>
 <div class="ovl" id="settingsOvl" style="display:none">
-  <h1 style="font-size:26px">설정</h1>
+  <h1 style="font-size:22px;margin-bottom:2px">설정</h1>
   <div class="setPanel">
     <label class="setRow"><span>효과음</span><input type="checkbox" id="sSfx" checked></label>
     <label class="setRow"><span>배경음악</span><input type="checkbox" id="sBgm" checked></label>
@@ -769,7 +769,7 @@ body.has-touch .mExitOnly{display:block}
     <label class="setRow"><span>화면 흔들림</span><input type="checkbox" id="sShake" checked></label>
     <label class="setRow"><span>그래픽 품질</span><select id="sQual"><option value="high">높음</option><option value="low">낮음(저사양)</option></select></label>
   </div>
-  <div style="display:flex;gap:12px;margin-top:14px;align-items:center">
+  <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
     <button class="pBtn pResume" id="sClose">확인</button>
     <button class="pBtn" id="sResetStats" style="border-color:rgba(255,100,110,.5);color:#ff8a94">전적 초기화</button>
   </div>
@@ -1445,11 +1445,7 @@ const Input = (() => {
     }
   },{passive:false});
   document.addEventListener('touchmove', e=>{
-    // 조이스틱/조준 터치를 추적 중일 때만 기본 동작(스크롤/제스처) 차단.
-    // 그 외(설정 스크롤 등)는 브라우저 기본 스크롤 허용.
-    if(joyId!==null || lookId!==null){
-      if(e.cancelable) e.preventDefault();
-    }
+    e.preventDefault();
     for(const t of e.changedTouches){
       if(t.identifier===joyId) setJoy(t);
       else if(t.identifier===lookId){
