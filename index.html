@@ -165,7 +165,7 @@ body.has-touch #abilityRow{display:none!important}
 #cross.head div{background:#ffdd44;box-shadow:0 0 8px rgba(255,221,68,1)}
 
 /* mobile joystick / buttons (hidden on PC) */
-#joyBase{position:absolute;z-index:20;left:34px;bottom:calc(env(safe-area-inset-bottom,0px) + 34px);width:128px;height:128px;border-radius:50%;background:rgba(15,18,24,.4);border:1px solid rgba(255,255,255,.18);pointer-events:auto}
+#joyBase{position:absolute;z-index:20;left:52px;bottom:calc(env(safe-area-inset-bottom,0px) + 34px);width:128px;height:128px;border-radius:50%;background:rgba(15,18,24,.4);border:1px solid rgba(255,255,255,.18);pointer-events:auto}
 #joyKnob{position:absolute;left:39px;top:39px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 #joyHint{position:absolute;width:100%;text-align:center;bottom:-20px;font-size:9px;color:rgba(255,255,255,.55);letter-spacing:1px}
 .btn{position:absolute;z-index:20;border-radius:50%;pointer-events:auto;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.18);background:rgba(15,18,24,.5);backdrop-filter:blur(2px);box-shadow:0 2px 8px rgba(0,0,0,.4);transition:transform .06s,background .06s}
@@ -1436,24 +1436,33 @@ const Input = (() => {
   function resetJoy(){
     knob.style.left=(JR-KR)+'px'; knob.style.top=(JR-KR)+'px';
     st.move.x=0; st.move.y=0; st.mag=0;
-    joyBase.style.left='34px'; joyBase.style.top='auto'; joyBase.style.bottom='';
+    joyBase.style.left='52px'; joyBase.style.top='auto'; joyBase.style.bottom='';
   }
 
   document.addEventListener('touchstart', e=>{
     Sfx.unlock();
     // iOS: 게임 중엔 기본 제스처(가장자리 스와이프=뒤로가기, 스크롤, 확대) 차단
-    // 단, 설정/일시정지 오버레이가 열려있으면 스크롤 허용
     const ovlOpen = $('settingsOvl').style.display==='flex' || $('pauseOvl').style.display==='flex' || $('confirmOvl').style.display==='flex';
-    if(document.body.classList.contains('playing') && !ovlOpen && e.target && e.target.tagName!=='INPUT'){
+    const playing = document.body.classList.contains('playing');
+    if(playing && !ovlOpen && e.target && e.target.tagName!=='INPUT'){
       e.preventDefault();
     }
     for(const t of e.changedTouches){
-      if(t.clientX <= innerWidth*0.42 && joyId===null) grabJoy(t);
-      else if(t.clientX > innerWidth*0.42 && lookId===null){ lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
+      // iOS 왼쪽 가장자리(뒤로가기 제스처 영역)에서 시작한 터치는 시스템이 가로채므로
+      // 살짝 안쪽(edge 이후)부터 조이스틱 인식. 조이스틱은 화면 왼쪽 절반 어디를 눌러도 그 자리에 생성.
+      const EDGE = 22;
+      if(t.clientX <= innerWidth*0.45 && joyId===null){
+        if(t.clientX < EDGE) continue; // 가장자리 터치는 무시 (iOS가 삼킴)
+        grabJoy(t);
+      }
+      else if(t.clientX > innerWidth*0.45 && lookId===null){ lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
     }
   },{passive:false});
   document.addEventListener('touchmove', e=>{
-    e.preventDefault();
+    // 설정/일시정지 등 오버레이가 열려있으면 스크롤 허용 (preventDefault 안 함)
+    const ovlOpen = $('settingsOvl').style.display==='flex' || $('pauseOvl').style.display==='flex' || $('confirmOvl').style.display==='flex';
+    const scrollable = e.target && e.target.closest && e.target.closest('.setPanel,.ovl.scr,#lbStats,.tutCard');
+    if(!ovlOpen && !scrollable){ e.preventDefault(); } // 전투 중에만 기본 스크롤 차단
     for(const t of e.changedTouches){
       if(t.identifier===joyId) setJoy(t);
       else if(t.identifier===lookId){
