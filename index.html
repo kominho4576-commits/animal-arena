@@ -44,6 +44,7 @@
   --tx:#eaf6ff; --tx2:#8fb2cc;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-family:'Noto Sans KR','Segoe UI',sans-serif;touch-action:none;position:fixed;color:var(--tx)}
+@supports(height:100dvh){html,body{height:100dvh}}
 #c{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
 #hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
 button{font-family:inherit;cursor:pointer}
@@ -1236,7 +1237,7 @@ const Sfx = (() => {
       comp.attack.value = 0.002; comp.release.value = 0.12;
       master.connect(comp); comp.connect(ctx.destination);
     }
-    if(ctx.state==='suspended') ctx.resume();
+    if(ctx.state!=='running') ctx.resume();
     return ctx;
   }
   function out(){ ac(); return master; }
@@ -1314,7 +1315,7 @@ const Sfx = (() => {
   return {
     unlock(){ try{ ac(); }catch(e){} },
     _suspend(){ try{ if(ctx&&ctx.state==='running') ctx.suspend(); }catch(e){} },
-    _resume(){ try{ if(ctx&&ctx.state==='suspended') ctx.resume(); }catch(e){} },
+    _resume(){ try{ if(ctx&&ctx.state!=='running') ctx.resume(); }catch(e){} },
     setListener,
     shoot(w,pos){
       if(w==='sniper') { tone(900,120,0.28,'sawtooth',0.20,0,pos); noise(0.15,0.15,2000,pos); }
@@ -1388,13 +1389,13 @@ const BGM = (() => {
   }
   return {
     _suspend(){ try{ this._wasPlaying=playing; if(timer){ clearTimeout(timer); timer=null; } playing=false; if(ctx&&ctx.state==='running') ctx.suspend(); }catch(e){} },
-    _resume(){ try{ if(ctx&&ctx.state==='suspended') ctx.resume(); if(this._wasPlaying && !playing && Settings.bgm){ playing=true; step=0; tick(); } }catch(e){} },
+    _resume(){ try{ if(ctx&&ctx.state!=='running') ctx.resume(); if(this._wasPlaying && !playing && Settings.bgm){ playing=true; step=0; tick(); } }catch(e){} },
     start(which){
       scene=which||'menu';
       if(!Settings.bgm){ return; }
       if(document.hidden){ this._wasPlaying=true; return; } // 백그라운드면 시작 보류
       if(!ensure()) return;
-      if(ctx.state==='suspended') ctx.resume();
+      if(ctx.state!=='running') ctx.resume();
       if(playing){ return; }
       playing=true; step=0; tick();
     },
@@ -1404,6 +1405,28 @@ const BGM = (() => {
     setEnabled(on){ if(on){ this.start(scene); } else { this.stop(); } },
     unlock(){ if(Settings.bgm) this.start(scene); }
   };
+})();
+
+/* ---- iOS 오디오 픽스: 무음 <audio> 루프 재생으로 오디오 세션을 '재생' 모드로 전환
+   (무음 스위치 ON이어도 소리 나게) + 모든 터치 종료 시 컨텍스트 resume ---- */
+(function iosAudioFix(){
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  if(!isIOS) return;
+  const SILENT='data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==';
+  let el=null;
+  function arm(){
+    try{
+      if(!el){
+        el=document.createElement('audio');
+        el.setAttribute('playsinline',''); el.setAttribute('webkit-playsinline','');
+        el.loop=true; el.src=SILENT; el.volume=0.01;
+      }
+      if(el.paused){ const p=el.play(); if(p&&p.catch) p.catch(()=>{}); }
+    }catch(e){}
+    try{ Sfx.unlock(); Sfx._resume(); BGM._resume(); }catch(e){}
+  }
+  window.addEventListener('touchend',arm,{passive:true});
+  window.addEventListener('click',arm);
 })();
 
 /* ---------------- INPUT (touch) ---------------- */
@@ -1437,11 +1460,19 @@ const Input = (() => {
     joyBase.style.left='34px'; joyBase.style.top='auto'; joyBase.style.bottom='';
   }
 
+  // iOS 사파리: 터치이벤트가 시스템 제스처에 자주 끊김 -> 포인터 이벤트로 조이스틱/조준 처리
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  const USE_PTR = IS_IOS && !!window.PointerEvent;
+
   document.addEventListener('touchstart', e=>{
     Sfx.unlock();
     // 게임 플레이 중이 아니면(타이틀/로비/메뉴) 터치를 가로채지 않음
     // -> preventDefault가 click 이벤트를 죽여 타이틀 터치가 안 먹히는 버그 방지
     if(!document.body.classList.contains('playing')) return;
+    if(USE_PTR){ // iOS: 입력 로직은 pointer 이벤트가 담당, 여기선 사파리 기본 제스처만 차단
+      if(e.cancelable && !(e.target && e.target.closest && e.target.closest('button,.btn'))) e.preventDefault();
+      return;
+    }
     let grabbed=false;
     for(const t of e.changedTouches){
       if(t.clientX <= innerWidth*0.42 && joyId===null){ grabJoy(t); grabbed=true; }
@@ -1452,6 +1483,7 @@ const Input = (() => {
     if(grabbed && e.cancelable) e.preventDefault();
   },{passive:false});
   document.addEventListener('touchmove', e=>{
+    if(USE_PTR){ if(document.body.classList.contains('playing') && e.cancelable) e.preventDefault(); return; }
     if(joyId!==null || lookId!==null){ if(e.cancelable) e.preventDefault(); }
     for(const t of e.changedTouches){
       if(t.identifier===joyId) setJoy(t);
@@ -1462,6 +1494,7 @@ const Input = (() => {
     }
   },{passive:false});
   function endT(e){
+    if(USE_PTR) return; // iOS는 pointerup/pointercancel에서 처리
     for(const t of e.changedTouches){
       if(t.identifier===joyId){ joyId=null; resetJoy(); }
       if(t.identifier===lookId){ lookId=null; lookLast=null; }
@@ -1469,11 +1502,37 @@ const Input = (() => {
   }
   document.addEventListener('touchend',endT); document.addEventListener('touchcancel',endT);
 
+  /* ---- iOS 전용: 포인터 이벤트 기반 조이스틱/조준 ---- */
+  if(USE_PTR){
+    document.addEventListener('pointerdown', e=>{
+      if(e.pointerType!=='touch') return;
+      Sfx.unlock();
+      if(!document.body.classList.contains('playing')) return;
+      if(e.target && e.target.closest && e.target.closest('button,.btn')) return; // 버튼은 자체 핸들러 (bFire의 조준은 아래 bindHold에서)
+      if(e.clientX <= innerWidth*0.42 && joyId===null){ grabJoy({identifier:e.pointerId, clientX:e.clientX, clientY:e.clientY}); }
+      else if(e.clientX > innerWidth*0.42 && lookId===null){ lookId=e.pointerId; lookLast={x:e.clientX,y:e.clientY}; }
+    });
+    document.addEventListener('pointermove', e=>{
+      if(e.pointerType!=='touch') return;
+      if(e.pointerId===joyId) setJoy(e);
+      else if(e.pointerId===lookId && lookLast){
+        st.look.dx += e.clientX-lookLast.x; st.look.dy += e.clientY-lookLast.y;
+        lookLast={x:e.clientX,y:e.clientY};
+      }
+    });
+    const endP=e=>{
+      if(e.pointerId===joyId){ joyId=null; resetJoy(); }
+      if(e.pointerId===lookId){ lookId=null; lookLast=null; }
+    };
+    document.addEventListener('pointerup',endP); document.addEventListener('pointercancel',endP);
+  }
+
   function bindHold(id,key,alsoLook){
     const b=document.getElementById(id);
     b.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); Sfx.unlock(); st[key]=true; b.classList.add('on');
-      if(alsoLook && lookId===null){ const t=e.changedTouches[0]; lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
+      if(alsoLook && !USE_PTR && lookId===null){ const t=e.changedTouches[0]; lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
     },{passive:false});
+    if(alsoLook && USE_PTR){ b.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch' && lookId===null){ lookId=e.pointerId; lookLast={x:e.clientX,y:e.clientY}; } }); }
     const off=e=>{ e.preventDefault(); st[key]=false; b.classList.remove('on'); };
     b.addEventListener('touchend',off); b.addEventListener('touchcancel',off);
   }
@@ -1481,8 +1540,9 @@ const Input = (() => {
   function bindHoldMulti(id,keys,alsoLook){
     const b=document.getElementById(id);
     b.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); Sfx.unlock(); keys.forEach(k=>st[k]=true); b.classList.add('on');
-      if(alsoLook && lookId===null){ const t=e.changedTouches[0]; lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
+      if(alsoLook && !USE_PTR && lookId===null){ const t=e.changedTouches[0]; lookId=t.identifier; lookLast={x:t.clientX,y:t.clientY}; }
     },{passive:false});
+    if(alsoLook && USE_PTR){ b.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch' && lookId===null){ lookId=e.pointerId; lookLast={x:e.clientX,y:e.clientY}; } }); }
     const off=e=>{ e.preventDefault(); keys.forEach(k=>st[k]=false); b.classList.remove('on'); };
     b.addEventListener('touchend',off); b.addEventListener('touchcancel',off);
   }
@@ -1606,19 +1666,26 @@ const Input = (() => {
 
 /* ---------------- THREE SETUP ---------------- */
 const renderer = new THREE.WebGLRenderer({ canvas:document.getElementById('c'), antialias:false, powerPreference:'high-performance' });
+// iOS 사파리: innerHeight가 툴바 접힘을 늦게 반영 -> visualViewport 기준으로 캔버스 크기 계산 (하단 검은띠 방지)
+function vpW(){ return Math.round((window.visualViewport && visualViewport.width) || innerWidth); }
+function vpH(){ return Math.round((window.visualViewport && visualViewport.height) || innerHeight); }
 function applyQuality(){
   const cap = Settings.quality==='low' ? 1 : 2;
   renderer.setPixelRatio(Math.min(devicePixelRatio,cap));
-  renderer.setSize(innerWidth,innerHeight);
+  renderer.setSize(vpW(),vpH());
 }
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
+renderer.setSize(vpW(),vpH());
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x9fd8ff);
 scene.fog = new THREE.Fog(0x9fd8ff, 45, 90);
-const camera = new THREE.PerspectiveCamera(CFG.fov, innerWidth/innerHeight, 0.1, 200);
+const camera = new THREE.PerspectiveCamera(CFG.fov, vpW()/vpH(), 0.1, 200);
 applyQuality();
-addEventListener('resize',()=>{ applyQuality(); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); });
+function refitView(){ applyQuality(); camera.aspect=vpW()/vpH(); camera.updateProjectionMatrix(); }
+addEventListener('resize',refitView);
+if(window.visualViewport) visualViewport.addEventListener('resize',refitView);
+// 방향 전환/툴바 애니메이션 직후 값이 늦게 확정되는 iOS 대응: 지연 재적용
+addEventListener('orientationchange',()=>{ setTimeout(refitView,250); setTimeout(refitView,700); });
 
 const hemi = new THREE.HemisphereLight(0xfff6e0, 0x6a9a5a, 0.95); scene.add(hemi);
 const sun = new THREE.DirectionalLight(0xfff2cc, 0.85); sun.position.set(18,30,10); scene.add(sun);
