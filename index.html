@@ -209,7 +209,7 @@ body.has-touch #abilityRow{display:none!important}
 .lbCols{display:flex;gap:24px;align-items:stretch;max-width:780px;margin-top:16px}
 .lbPreview{display:flex;flex-direction:column;align-items:center;min-width:232px}
 .lbPvLabel{display:none}
-#pvCanvas{width:min(300px,38vw);height:min(340px,52vh);display:block}
+#pvCanvas{width:min(280px,34vw);height:min(300px,44vh);display:block}
 .lbPvName{font-family:'Black Han Sans',sans-serif;color:#8fb2cc;font-size:14px;margin-top:2px;letter-spacing:2px}
 .lbNickWrap{display:flex;flex-direction:column;align-items:center;margin-top:-4px}
 .lbNick{font-family:'Black Han Sans',sans-serif;color:#fff;font-size:26px;letter-spacing:2px;text-shadow:0 0 16px rgba(49,230,255,.35);cursor:pointer;padding:4px 12px;border-radius:8px;transition:background .15s;display:flex;align-items:center;gap:8px}
@@ -249,19 +249,28 @@ body.pc #keyGuide{display:block}
 #keyGuide kbd{background:linear-gradient(180deg,#2e4258,#1a2939);border:1px solid rgba(255,255,255,.22);border-bottom:3px solid rgba(0,0,0,.5);border-radius:4px;padding:2px 7px;font-size:11px;font-family:inherit;color:#fff;min-width:14px;text-align:center;font-weight:700;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 
 /* ===== mode select ===== */
-.modeCards{display:flex;gap:22px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:96vw}
+.modeCards{display:flex;gap:14px;margin-top:24px;flex-wrap:nowrap;justify-content:center;max-width:98vw}
 @media (max-height:620px){
-  .modeCards{margin-top:12px;gap:14px}
-  .modeCard{width:190px;padding:16px 14px;gap:7px}
-  .modeIcon{width:64px;height:64px;font-size:26px}
-  .modeCard h3{font-size:18px}
-  .modeCard .mDesc{font-size:11px}
+  .modeCards{margin-top:12px;gap:10px}
+  .modeCard{width:160px;padding:14px 8px;gap:7px}
+  .mcArt{width:72px;height:72px;font-size:24px}
+  .mcName{font-size:17px}
+  .mcDesc{font-size:11px}
 }
-@media (max-width:680px){
-  .modeCard{width:150px;padding:14px 10px}
-  .modeIcon{width:58px;height:58px;font-size:22px}
+@media (max-width:760px){
+  .modeCards{gap:8px}
+  .modeCard{width:144px;padding:14px 6px}
+  .mcArt{width:64px;height:64px;font-size:20px}
+  .mcName{font-size:16px}
+  .mcDesc{font-size:10px}
 }
-.modeCard{width:236px;padding:26px 18px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);color:#fff;transition:transform .14s,border-color .14s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:11px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%)}
+@media (max-width:560px){
+  .modeCard{width:116px;padding:12px 4px}
+  .mcArt{width:52px;height:52px;font-size:17px}
+  .mcName{font-size:13px;letter-spacing:0}
+  .mcDesc{font-size:8.5px;line-height:1.4}
+}
+.modeCard{width:184px;padding:22px 10px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);color:#fff;transition:transform .14s,border-color .14s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
 .modeCard::before{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.09),transparent);transition:left .45s;pointer-events:none}
 .modeCard:hover{transform:translateY(-6px)}
 .modeCard:hover::before{left:120%}
@@ -462,11 +471,11 @@ body.killcam #killCamLabel{opacity:1}
 .lbLayout{display:flex;gap:64px;align-items:center;max-width:1000px}
 .lbLeft{display:flex;flex-direction:column;align-items:flex-start;min-width:340px}
 .lbLeft .lbTitle{font-size:40px;margin-bottom:16px;text-align:left}
-.lbMenu{display:flex;flex-direction:column;gap:2px;align-items:stretch}
-.mItem{position:relative;background:none;border:none;color:#fff;text-align:left;padding:6px 20px 6px 34px;display:block;transition:transform .1s}
-.mItem .mTxt{font-family:'Black Han Sans',sans-serif;font-size:26px;letter-spacing:2px;position:relative;z-index:1;display:inline-block}
+.lbMenu{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.mItem{position:relative;background:none;border:none;color:#fff;text-align:left;padding:8px 20px 8px 34px;display:block;transition:transform .1s}
+.mItem .mTxt{font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;position:relative;z-index:1;display:inline-block}
 .mItem .mTxt small{display:block;font-family:'Noto Sans KR',sans-serif;font-size:10px;color:#8fb2cc;letter-spacing:1.5px;font-weight:700;margin-top:0}
-.mItem .mArrow{position:absolute;left:2px;top:11px;font-size:20px;color:#0a0f18;opacity:0;transition:opacity .12s,left .12s;z-index:1}
+.mItem .mArrow{position:absolute;left:2px;top:12px;font-size:20px;color:#0a0f18;opacity:0;transition:opacity .12s,left .12s;z-index:1}
 .mItem::before{content:"";position:absolute;left:0;top:6px;bottom:6px;right:26%;background:linear-gradient(90deg,var(--yl),rgba(255,216,61,.85));transform:skew(-10deg) scaleX(0);transform-origin:left;transition:transform .16s cubic-bezier(.2,.9,.3,1);border-radius:2px}
 .mItem:hover::before{transform:skew(-10deg) scaleX(1)}
 .mItem:hover .mTxt{color:#0a0f18}
@@ -475,8 +484,8 @@ body.killcam #killCamLabel{opacity:1}
 .mItem:active{transform:scale(.97)}
 .mItem.play .mTxt{color:var(--yl)}
 /* 로비 티어 배지 */
-#lbTier{display:flex;align-items:center;gap:12px;width:100%;max-width:320px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:10px 16px}
-.ltIcon{width:46px;height:46px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+#lbTier{display:flex;align-items:center;gap:10px;width:100%;max-width:320px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:7px 14px}
+.ltIcon{width:40px;height:40px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
 .ltIcon::before{content:"";position:absolute;inset:0;background:var(--tierCol,#cd7f4d);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);box-shadow:0 0 14px var(--tierGlow,rgba(205,127,77,.5))}
 .ltIcon::after{content:"";position:absolute;inset:6px;background:rgba(8,15,28,.55);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%)}
 .ltIcon span{position:relative;z-index:1;font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--tierCol,#cd7f4d);text-shadow:0 0 8px var(--tierGlow)}
@@ -518,7 +527,7 @@ body.killcam #killCamLabel{opacity:1}
 .tutDots .td.on{background:var(--cy);width:22px;border-radius:5px}
 .tutBtns{display:flex;gap:12px;justify-content:center;margin-top:4px}
 /* 로비 전적 패널 */
-#lbStats{width:100%;max-width:320px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:10px 16px}
+#lbStats{width:100%;max-width:320px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:7px 14px}
 .lsRow{display:flex;align-items:baseline;gap:6px;margin-bottom:4px;justify-content:center}
 .lsNum{font-family:'Black Han Sans',sans-serif;font-size:20px;color:#fff}
 .lsRow .lsNum:nth-child(1){color:var(--gn)} .lsRow .lsNum:nth-child(3){color:var(--rd)} .lsRow .lsNum:nth-child(5){color:var(--cy2)}
@@ -539,7 +548,7 @@ body.has-touch .mExitOnly{display:block}
 .mExitOnly .mTxt{color:#ff7a8a}
 .mExitOnly:hover::before{background:linear-gradient(90deg,#ff5c6c,rgba(255,92,108,.85))}
 .mItem.play:hover .mTxt{color:#0a0f18}
-.lbRight{display:flex;flex-direction:column;gap:10px;align-items:center}
+.lbRight{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center}
 .lbRight .lbPick{text-align:left;width:100%;max-width:340px}
 #keyGuide{margin-top:26px;max-width:360px}
 
@@ -799,12 +808,12 @@ body.has-touch .mExitOnly{display:block}
     <div class="lbLeft">
       <h1 class="lbTitle">ANIMAL <span>ARENA</span></h1>
       <div class="lbMenu">
-        <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY<small>게임 시작</small></span></button>
-        <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택<small>동물 12종</small></span></button>
-        <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정<small>키 커스터마이징</small></span></button>
-        <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정<small>사운드 · 그래픽</small></span></button>
-        <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼<small>조작법 안내</small></span></button>
-        <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료<small>앱 닫기</small></span></button>
+        <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY</span></button>
+        <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택</span></button>
+        <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정</span></button>
+        <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정</span></button>
+        <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼</span></button>
+        <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료</span></button>
       </div>
     </div>
     <div class="lbRight">
