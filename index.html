@@ -2460,6 +2460,19 @@ const Projectiles = (() => {
           dead=true; break;
         }
       }
+      // summon hit (소환수 직격)
+      if(!dead){
+        for(const s of Summons.all()){
+          if(s.owner===p.owner) continue;
+          const r = s.kind==='hen'?0.72:0.55;
+          const dx=pos.x-s.pos.x, dy=pos.y-(s.y+0.8), dz=pos.z-s.pos.z;
+          if(dx*dx+dy*dy+dz*dz < r*r+0.15){
+            if(w.type==='arc'){ explode(pos,p.owner,chars,w); }
+            else { Summons.hurt(s,w.dmg); Sfx.hit(pos); if(p.owner.isPlayer) Game.hitMark(); }
+            dead=true; break;
+          }
+        }
+      }
       // world hit
       if(!dead){
         let solid = pos.y<=0.05;
@@ -2477,6 +2490,8 @@ const Projectiles = (() => {
   function explode(pos,owner,chars,w){
     FX.boom(pos); Sfx.boom(pos);
     const aoe=w.aoe||3.2;
+    // 폭발 범위 내 소환수 피해
+    Summons.damageAt(pos.x,pos.z,aoe,w.dmg*0.8,owner);
     for(const c of chars){
       if(c.dead||c.invuln>0) continue;
       const d=Math.hypot(pos.x-c.pos.x, pos.y-(c.pos.y+0.8), pos.z-c.pos.z);
@@ -2550,6 +2565,26 @@ const Summons = (() => {
     }
     return hit;
   }
+  // 개별 피격 (히트스캔/근접/투사체 직격용). 사망 처리는 update의 hp<=0에서.
+  function hurt(s,dmg){
+    s.hp-=dmg;
+    FX.impact(new THREE.Vector3(s.pos.x,s.y+0.8,s.pos.z), s.kind==='hen'?0xffb0b0:0xffc8a0, false);
+  }
+  // 히트스캔 광선 vs 소환수 구체 판정: 가장 가까운 소환수 반환 (maxD보다 가까울 때만)
+  function rayHit(origin,dir,range,fromOwner,maxD){
+    let best=null, bestD=(maxD!==undefined?maxD:range);
+    for(const s of list){
+      if(s.owner===fromOwner) continue;
+      const r = s.kind==='hen'?0.72:0.55, sy = s.kind==='hen'?0.85:0.8;
+      const ox=s.pos.x-origin.x, oy=s.y+sy-origin.y, oz=s.pos.z-origin.z;
+      const t=ox*dir.x+oy*dir.y+oz*dir.z;
+      if(t<0||t>range) continue;
+      const p2=(ox*ox+oy*oy+oz*oz)-t*t;
+      if(p2<r*r && t<bestD){ bestD=t; best=s; }
+    }
+    return best?{s:best,d:bestD}:null;
+  }
+  function all(){ return list; }
   function update(dt, chars){
     for(let i=list.length-1;i>=0;i--){
       const s=list[i]; s.life-=dt; s.bob+=dt*6;
@@ -2590,7 +2625,7 @@ const Summons = (() => {
   }
   function clear(){ for(const s of list) scene.remove(s.m); list.length=0; }
   function count(){ return list.length; }
-  return { spawnHen, spawnFoxClones, damageAt, update, clear, count };
+  return { spawnHen, spawnFoxClones, damageAt, hurt, rayHit, all, update, clear, count };
 })();
 const Pickups = (() => {
   const list=[];
@@ -2781,6 +2816,16 @@ class Character {
           }
         }
       }
+      // 소환수도 근접 범위에 들어오면 피격
+      for(const s of Summons.all()){
+        if(s.owner===this) continue;
+        const dx=s.pos.x-this.pos.x, dz=s.pos.z-this.pos.z, d=Math.hypot(dx,dz);
+        if(d<w.range+0.4){
+          const ang=Math.atan2(dx,dz);
+          let diff=Math.abs(((ang-this.yaw)+Math.PI*3)%(Math.PI*2)-Math.PI);
+          if(diff<1.1){ Summons.hurt(s,w.dmg); Sfx.hit(new THREE.Vector3(s.pos.x,s.y+0.8,s.pos.z)); if(this.isPlayer) Game.hitMark(); }
+        }
+      }
       return true;
     }
     // ranged: consume ammo
@@ -2813,6 +2858,17 @@ class Character {
           if(to.dot(flat)>0.75 && !losBlocked(this.pos,c.pos,Math.min(this.eyeY,c.eyeY))){
             c.takeDamage(w.dmg,this); if(this.isPlayer) Game.hitMark();
           }
+        }
+      }
+      // 소환수도 화염 콘 안이면 피격
+      for(const s of Summons.all()){
+        if(s.owner===this) continue;
+        const to=new THREE.Vector3(s.pos.x-this.pos.x,0,s.pos.z-this.pos.z);
+        const d=to.length();
+        if(d<w.range){
+          to.normalize();
+          const flat=dir.clone(); flat.y=0; flat.normalize();
+          if(to.dot(flat)>0.75) Summons.hurt(s,w.dmg);
         }
       }
     }
@@ -2848,6 +2904,16 @@ class Character {
         const p2=oc.lengthSq()-t*t;
         if(p2<r*r && t<bestD){ bestD=t; bestC=c; bestHead=isHead; }
       }
+    }
+    // 소환수 피격 판정: 캐릭터/벽보다 소환수가 더 가까우면 소환수가 맞음
+    const sh = Summons.rayHit(origin,dir,w.range,this,bestD);
+    if(sh){
+      const end2=origin.clone().addScaledVector(dir,sh.d);
+      FX.tracer(origin,end2);
+      Summons.hurt(sh.s, w.dmg);
+      Sfx.hit(end2);
+      if(this.isPlayer) Game.hitMark();
+      return;
     }
     const end=origin.clone().addScaledVector(dir,Math.min(bestD,w.range));
     FX.tracer(origin,end);
@@ -2894,6 +2960,15 @@ class Character {
           if(c.hp<=0 && wasAlive){ c.hp=0; c.die(this); }
         }
       }
+    }
+    // 빔 경로상 소환수도 피격 (관통)
+    for(const s of Summons.all()){
+      if(s.owner===this) continue;
+      const ox=s.pos.x-origin.x, oy=s.y+0.8-origin.y, oz=s.pos.z-origin.z;
+      const t=ox*dir.x+oy*dir.y+oz*dir.z;
+      if(t<0||t>w.range) continue;
+      const perp=(ox*ox+oy*oy+oz*oz)-t*t;
+      if(perp < 1.1*1.1) Summons.hurt(s,w.dmg);
     }
   }
   takeDamage(dmg,attacker,isHead){
