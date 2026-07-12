@@ -1439,6 +1439,9 @@ const Input = (() => {
 
   document.addEventListener('touchstart', e=>{
     Sfx.unlock();
+    // 게임 플레이 중이 아니면(타이틀/로비/메뉴) 터치를 가로채지 않음
+    // -> preventDefault가 click 이벤트를 죽여 타이틀 터치가 안 먹히는 버그 방지
+    if(!document.body.classList.contains('playing')) return;
     let grabbed=false;
     for(const t of e.changedTouches){
       if(t.clientX <= innerWidth*0.42 && joyId===null){ grabJoy(t); grabbed=true; }
@@ -4474,6 +4477,7 @@ const Game = (() => {
   });
   addEventListener('keydown',e=>{ if(e.code!=='Escape') leaveTitle(); });
   $('titleScr').addEventListener('click',leaveTitle);
+  $('titleScr').addEventListener('touchend',e=>{ e.preventDefault(); leaveTitle(); },{passive:false});
 
   /* ===== 조작키 설정 화면 ===== */
   const KEY_ACTIONS=[['forward','앞으로 이동'],['back','뒤로 이동'],['left','왼쪽 이동'],['right','오른쪽 이동'],['jump','점프'],['roll','구르기 (회피)'],['crouch','앉기 (홀드)'],['pick','줍기 / 버리기'],['ult','궁극기']];
