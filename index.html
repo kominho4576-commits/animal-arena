@@ -2611,7 +2611,7 @@ const Summons = (() => {
         const ideal=6;
         if(dist>ideal+1){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
         else if(dist<ideal-1){ s.pos.x-=dx/dist*s.spd*dt; s.pos.z-=dz/dist*s.spd*dt; }
-        s.m.rotation.y=Math.atan2(dx,dz)+Math.PI;
+        s.m.rotation.y=Math.atan2(dx,dz); // 캐릭터 모델은 +z가 정면 (닭과 동일)
         s.fireCd-=dt;
         if(dist<s.range && s.fireCd<=0){ s.fireCd=1.1;
           const d2=new THREE.Vector3(dx/dist,0.02,dz/dist);
