@@ -54,6 +54,15 @@ button{font-family:inherit;cursor:pointer}
 .tchip{background:linear-gradient(180deg,rgba(14,26,46,.92),rgba(8,15,28,.88));border:1px solid var(--pnb);border-top:2px solid rgba(125,243,255,.55);border-radius:4px;padding:5px 18px;color:#fff;text-align:center;backdrop-filter:blur(6px);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);min-width:120px;box-shadow:0 4px 18px rgba(0,0,0,.45)}
 #timer{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px;color:var(--yl);min-width:92px;text-shadow:0 0 12px rgba(255,216,61,.45);line-height:1.1}
 .score-lbl{font-size:8.5px;color:var(--tx2);letter-spacing:2.5px;font-weight:700}
+/* 개인전 순위표 */
+#ffaBoard{min-width:150px;padding:5px 14px}
+.ffaRow{display:flex;align-items:center;gap:7px;font-size:11.5px;line-height:1.45;color:var(--tx);text-align:left}
+.ffaRow .fr{width:12px;font-family:'Black Han Sans',sans-serif;font-size:12px;color:var(--tx2)}
+.ffaRow .fn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88px}
+.ffaRow .fk{font-family:'Black Han Sans',sans-serif;font-size:13px;min-width:14px;text-align:right}
+.ffaRow.me .fn,.ffaRow.me .fk{color:var(--cy);text-shadow:0 0 10px rgba(49,230,255,.5)}
+.ffaRow.top .fr{color:var(--yl)}
+.ffaRow.dead2{opacity:.45}
 #scoreP{color:var(--cy);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(49,230,255,.6)}
 #scoreB{color:var(--rd);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(255,77,94,.6)}
 #scoreMid{color:#5b7288;font-size:16px;margin:0 7px}
@@ -703,7 +712,8 @@ body.has-touch .mExitOnly{display:block}
   <div id="fpsBox"><span id="fpsVal">60</span> FPS</div>
   <div id="topbar">
     <div class="tchip"><div class="score-lbl">TIME</div><div id="timer">00:00</div></div>
-    <div class="tchip"><div class="score-lbl">SCORE · 5킬 승리</div><div><span id="scoreP">0</span><span id="scoreMid">:</span><span id="scoreB">0</span></div></div>
+    <div class="tchip" id="scoreChip"><div class="score-lbl">SCORE · 5킬 승리</div><div><span id="scoreP">0</span><span id="scoreMid">:</span><span id="scoreB">0</span></div></div>
+    <div class="tchip" id="ffaBoard" style="display:none"><div class="score-lbl">순위 · 5킬 승리</div><div id="ffaRows"></div></div>
   </div>
   <div id="killFeed"></div>
   <div id="cross"><div class="ch" id="chL"></div><div class="ch" id="chR"></div><div class="cv" id="chT"></div><div class="cv" id="chB"></div><div id="chDot"></div></div>
@@ -766,7 +776,7 @@ body.has-touch .mExitOnly{display:block}
     <label class="setRow"><span>효과음</span><input type="checkbox" id="sSfx" checked></label>
     <label class="setRow"><span>배경음악</span><input type="checkbox" id="sBgm" checked></label>
     <label class="setRow"><span>배경음악 볼륨</span><input type="range" id="sBgmVol" min="0" max="100" value="50"><span class="setVal" id="sBgmVolVal">50</span></label>
-    <label class="setRow"><span>조준 감도</span><input type="range" id="sSens" min="40" max="300" value="100"><span class="setVal" id="sSensVal">1.0</span></label>
+    <label class="setRow"><span>조준 감도</span><input type="range" id="sSens" min="10" max="300" value="100"><span class="setVal" id="sSensVal">1.0</span></label>
     <label class="setRow"><span>화면 흔들림</span><input type="checkbox" id="sShake" checked></label>
     <label class="setRow"><span>그래픽 품질</span><select id="sQual"><option value="high">높음</option><option value="low">낮음(저사양)</option></select></label>
   </div>
@@ -899,6 +909,7 @@ body.has-touch .mExitOnly{display:block}
     <div class="cfSub">플레이 방식을 선택하세요</div>
     <div class="cfBtns">
       <button class="cfBtn ok" id="pvpRandom">랜덤 매칭</button>
+      <button class="cfBtn" id="pvpFFA">개인전 (최대 5인)</button>
       <button class="cfBtn" id="pvpCreate">방 만들기</button>
       <button class="cfBtn" id="pvpJoin">코드 입장</button>
       <button class="cfBtn" id="pvpCancel">취소</button>
@@ -1081,7 +1092,7 @@ body.has-touch .mExitOnly{display:block}
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>window.__PVP_SERVER = "wss://animal-arena-server.onrender.com";</script>
+<script>window.__PVP_SERVER = "wss://animal-arena-server-mwjl.onrender.com";</script>
 <script>
 'use strict';
 /* =====================================================================
@@ -2952,7 +2963,7 @@ class Character {
         // PVP: 원격 상대면 데미지 전송, 아니면 직접 적용
         if(c.isNet && this.isPlayer && Game.pvpActive&&Game.pvpActive()){
           if(this.gainUlt) this.gainUlt(w.dmg*CFG.ultDmgRate);
-          Game.netHitOpp&&Game.netHitOpp(w.dmg);
+          Game.netHitOpp&&Game.netHitOpp(w.dmg, c);
         } else {
           const wasAlive=!c.dead && c.hp>0;
           c.hp-=w.dmg; c.hurtT=0.25;
@@ -2982,7 +2993,7 @@ class Character {
       if(isHead||dmg>=40){ Game.doHitStop(0.06); Game.shake(0.3); }
       if(isHead) Sfx.headshot?Sfx.headshot():Sfx.hit(this.pos); else Sfx.hit(this.pos);
       if(!this.dead) this.hurtT=0.25; // 즉각적인 피격 움찔(로컬)
-      Game.netHitOpp(dmg);
+      Game.netHitOpp(dmg, this);
       return;
     }
     // difficulty: bot deals scaled damage to the player
@@ -3034,7 +3045,7 @@ class Character {
     // reset any death/hurt pose
     if(this.parts){ if(this.parts.body)this.parts.body.rotation.x=0; if(this.parts.head)this.parts.head.rotation.x=0; }
     this.group.rotation.z=0; this.group.scale.y=1;
-    const other=this.isPlayer?Game.bot:Game.player;
+    const other=(this.isPlayer?Game.bot:Game.player)||this; // FFA에서 상대 전원 이탈 직후 널 가드
     // farthest of 4 corners from opponent
     const spots=[[-16,-8],[16,-8],[-16,8],[16,8],[0,0]];
     let best=spots[0],bd=-1;
@@ -3801,6 +3812,7 @@ class NetOpponent extends Character {
   // 서버에서 받은 상태 적용
   applyState(s){
     if(s.x!==undefined){ this.netPos.set(s.x, s.y||0, s.z); }
+    if(s.k!==undefined) this.kills=s.k;
     if(s.yaw!==undefined) this.netYaw=s.yaw;
     if(s.mv!==undefined) this.netMoving=!!s.mv;
     if(s.hp!==undefined){
@@ -4014,8 +4026,36 @@ const Game = (() => {
     killCam=null;
   }
   function updateScore(){
+    const ffa = typeof Net!=='undefined' && Net.ffa;
+    // 순위표는 개인전 + 봇전(AI 데스매치)에서 사용, 그 외(1대1 PVP·타임어택 등)는 기존 스코어 칩
+    const board = ffa || (!pvpMode && !trainingMode && gameMode==='deathmatch' && !!bot);
+    $('scoreChip').style.display = board ? 'none' : '';
+    $('ffaBoard').style.display = board ? '' : 'none';
     $('scoreP').textContent=player.kills;
-    $('scoreB').textContent=bot.kills;
+    if(ffa){ let top=0; for(const p of Net.peers){ top=Math.max(top,p.kills||0); } $('scoreB').textContent=top; }
+    else $('scoreB').textContent=bot?bot.kills:0;
+    if(board) updateFFABoard();
+  }
+  // 개인전 순위표: 나+상대 전원을 킬 내림차순으로 (닉네임은 textContent로만 삽입 — 인젝션 방지)
+  function updateFFABoard(){
+    const host=$('ffaRows'); if(!host) return;
+    const rows=[{me:true,name:'나',kills:player.kills||0,dead:player.dead}];
+    if(typeof Net!=='undefined' && Net.ffa){
+      for(const p of Net.peers) rows.push({me:false,name:p.name||'상대',kills:p.kills||0,dead:p.dead});
+    } else if(bot){
+      rows.push({me:false,name:bot.name||(SPECIES[bot.kind]?SPECIES[bot.kind].name:'봇'),kills:bot.kills||0,dead:bot.dead});
+    }
+    rows.sort((a,b)=> (b.kills-a.kills) || (a.me?-1:b.me?1:0)); // 동점이면 내가 위
+    host.innerHTML='';
+    rows.forEach((r,i)=>{
+      const div=document.createElement('div');
+      div.className='ffaRow'+(r.me?' me':'')+(i===0?' top':'')+(r.dead?' dead2':'');
+      const fr=document.createElement('span'); fr.className='fr'; fr.textContent=(i+1);
+      const fn=document.createElement('span'); fn.className='fn'; fn.textContent=r.name;
+      const fk=document.createElement('span'); fk.className='fk'; fk.textContent=r.kills;
+      div.appendChild(fr); div.appendChild(fn); div.appendChild(fk);
+      host.appendChild(div);
+    });
   }
   function fmtTime(t){
     const m=Math.floor(t/60),s=Math.floor(t%60);
@@ -4237,7 +4277,22 @@ const Game = (() => {
       }
       time+=simDt;
       player.update(simDt,chars);
-      bot.update(simDt,chars);
+      if(Net.ffa){
+        for(const p of Net.peers) p.update(simDt,chars);
+        Net._boardT=(Net._boardT||0)+dt;
+        if(Net._boardT>0.5){ Net._boardT=0; updateScore(); } // 상대 킬 수(state 동기화) 반영
+        // 가장 가까운 생존 상대를 bot 자리에 -> 기존 적 HP바/조준보조/리스폰 로직 재사용
+        let near=null, nd=1e9;
+        for(const p of Net.peers){ if(p.dead) continue; const dd=Math.hypot(p.pos.x-player.pos.x,p.pos.z-player.pos.z); if(dd<nd){ nd=dd; near=p; } }
+        if(near){ bot=near; Game.bot=near; Net.opp=near; }
+      }
+      else if(bot){
+        bot.update(simDt,chars);
+        if(!pvpMode && !trainingMode && gameMode==='deathmatch'){
+          Net._boardT=(Net._boardT||0)+dt;
+          if(Net._boardT>0.5){ Net._boardT=0; updateScore(); } // 사망 흐림 등 상태 반영
+        }
+      }
       Projectiles.update(simDt,chars);
       Summons.update(simDt,chars);
       Pickups.update(simDt,time);
@@ -4670,6 +4725,7 @@ const Game = (() => {
   bindBtn('modePVP',()=>{ rankedMode=false; showScreen('pvpConfirm'); });
   bindBtn('modeRank',()=>{ rankedMode=true; startNet('random'); }); // 랭킹전: 바로 랜덤 매칭
   bindBtn('pvpRandom',()=>{ rankedMode=false; startNet('random'); });
+  bindBtn('pvpFFA',()=>{ rankedMode=false; startNet('ffa'); });
   bindBtn('pvpCreate',()=>{ startNet('create'); });
   bindBtn('pvpJoin',()=>{ $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
   bindBtn('pvpCancel',()=>{ showScreen('modeScr'); });
@@ -4707,7 +4763,7 @@ const Game = (() => {
   /* ===== PVP: 매치메이킹 + 넷코드 ===== */
   let mmTimer=null, mmWs=null;
   const Net = { ws:null, role:null, room:null, opp:null, seed:0, connected:false, lastSend:0, ended:false, oppNick:'', _pendingOppSpecies:null, ping:0 };
-  function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; }
+  function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; Net.ffa=false; Net.myIdx=0; Net.peers=[]; Net.peerByIdx={}; Net._ffaPlayers=null; }
 
   function startNet(mode, code){
     Sfx.unlock();
@@ -4722,6 +4778,7 @@ const Game = (() => {
     } else {
       showScreen('matchScr');
       if(mode==='join'){ $('matchTitle').textContent='방 입장 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='코드 '+code; }
+      else if(mode==='ffa'){ $('matchTitle').textContent='개인전 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='최대 5인 · 각자도생'; }
       else { $('matchTitle').textContent='랜덤 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='1 vs 1 · 랜덤 상대'; }
     }
     const MM_URL = window.__PVP_SERVER || null;
@@ -4744,6 +4801,7 @@ const Game = (() => {
       mmWs.onopen=()=>{
         if(mode==='create'){ $('rhStatusText').textContent='방 생성 중...'; mmWs.send(JSON.stringify({type:'createroom',species:selectedSpecies,nick:playerNick})); }
         else if(mode==='join'){ $('matchStatus').textContent='방 입장 중...'; mmWs.send(JSON.stringify({type:'joinroom',species:selectedSpecies,nick:playerNick,code:code})); }
+        else if(mode==='ffa'){ $('matchStatus').textContent='플레이어를 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_ffa',species:selectedSpecies,nick:playerNick})); }
         else { $('matchStatus').textContent='상대를 찾는 중...'; mmWs.send(JSON.stringify({type:'queue',species:selectedSpecies,nick:playerNick})); }
       };
       mmWs.onmessage=(ev)=>{
@@ -4761,6 +4819,33 @@ const Game = (() => {
     switch(d.type){
       case 'queued':
         $('matchStatus').textContent='상대를 찾는 중...'; break;
+      case 'ffa_wait': {
+        // 개인전 대기 현황: 인원수 + 시작까지 남은 초 (새 인원 입장 시 10초 리셋)
+        $('matchStatus').textContent='대기 인원 '+d.count+' / 5';
+        $('matchSub').textContent = d.secs>=0 ? (d.secs+'초 후 시작 · 5명 차면 즉시 시작') : '2명 이상 모이면 시작합니다';
+        break; }
+      case 'ffa_matched': {
+        Net.connected=true; Net.ffa=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
+        Net.role = d.idx===0 ? 'host' : 'guest'; // 픽업 리스폰 권위(idx 0) — 기존 host 게이팅 재사용
+        Net._ffaPlayers=d.players||[];
+        gameMode='deathmatch'; selectedMap='random';
+        $('matchStatus').textContent='매칭 완료! '+Net._ffaPlayers.length+'명';
+        $('matchSub').textContent='잠시 후 시작합니다';
+        setTimeout(()=>startFFA(), 700);
+        break; }
+      case 'peer_left': {
+        if(!Net.ffa) break;
+        const p=Net.peerByIdx[d.idx];
+        if(p){
+          scene.remove(p.group);
+          Net.peers=Net.peers.filter(x=>x!==p); delete Net.peerByIdx[d.idx];
+          chars=chars.filter(x=>x!==p);
+          msg((p.name||'상대')+' 님이 나갔습니다');
+          if(bot===p){ bot=Net.peers[0]||null; Game.bot=bot; Net.opp=bot; }
+          // 전원 이탈 -> 종료
+          if(Net.peers.length===0 && running && !Net.ended){ onOpponentLeft(); }
+        }
+        break; }
       case 'room_created':
         // 방 생성됨 -> 전용 화면에 코드 표시하고 친구 대기
         $('rhCode').textContent=d.code;
@@ -4805,6 +4890,7 @@ const Game = (() => {
         }
         break;
       case 'state':
+        if(Net.ffa){ const p=Net.peerByIdx[d.from]; if(p && !killCam) p.applyState(d); break; }
         if(Net.opp && !killCam) Net.opp.applyState(d); // 데스캠 중엔 상태 갱신 무시 (연출 고정)
         break;
       case 'fire':
@@ -4815,6 +4901,22 @@ const Game = (() => {
         }
         break;
       case 'hit':
+        if(Net.ffa){
+          if(d.to!==undefined && d.to!==Net.myIdx) break; // 내가 대상이 아님
+          if(player && !player.dead && player.invuln<=0){
+            const attacker=Net.peerByIdx[d.from];
+            player.hp-=d.dmg; player.hurtT=0.25; showDamage(); Sfx.hurt(); shake(0.25);
+            if(player.hp<=0){
+              player.hp=0; player.die(attacker||Net.opp, true);
+              Net.myDeaths=(Net.myDeaths||0)+1;
+              if(attacker){ attacker.kills=(attacker.kills||0)+1; }
+              updateScore(); killBanner('사망','#ff5252');
+              // 죽인 사람에게만 킬 확정 통지 (서버가 to로 라우팅)
+              if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',to:d.from,did:Net.myDeaths}));
+            }
+          }
+          break;
+        }
         // 죽었거나 무적(리스폰 직후) 상태면 데미지 무시 — 중복 죽음/킬 카운트 방지
         if(player && !player.dead && player.invuln<=0){
           player.hp-=d.dmg; player.hurtT=0.25; showDamage(); Sfx.hurt(); shake(0.25);
@@ -4830,6 +4932,23 @@ const Game = (() => {
         }
         break;
       case 'kill':
+        if(Net.ffa){
+          if(d.to!==undefined && d.to!==Net.myIdx) break;
+          const key=(d.from||0)+':'+(d.did||0);
+          if(!Net._seenDeaths) Net._seenDeaths={};
+          if(d.did && Net._seenDeaths[key]) break; // 중복 방지 (발신자별 죽음번호)
+          if(d.did) Net._seenDeaths[key]=true;
+          player.kills++; updateScore(); killBanner('처치!','#3ef58a'); Sfx.kill();
+          const victim=Net.peerByIdx[d.from];
+          if(victim) addKillFeed(player.kind, victim.kind, player.weapon);
+          if(player.kills>=CFG.killTarget){
+            // 승자가 전체에 종료 브로드캐스트
+            if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerIdx:Net.myIdx})); }catch(e){} }
+            if(victim){ Net.opp=victim; } // 킬캠 대상
+            pvpWin(true);
+          }
+          break;
+        }
         // 상대가 "내가 너를 죽였다(죽음번호 did)"고 알림 -> 새 죽음번호일 때만 킬 +1
         if(d.who==='opp' && player){
           const did = d.did||0;
@@ -4852,15 +4971,17 @@ const Game = (() => {
       case 'opponent_left':
         onOpponentLeft(); break;
       case 'gameover':
+        if(Net.ffa){ if(running){ const w=Net.peerByIdx[d.winnerIdx]; if(w) Net.opp=w; pvpWin(d.winnerIdx===Net.myIdx); } break; }
         // 상대가 경기 종료를 알림 (상대가 이겼거나 졌음) — 아직 결과창 안 떴으면 표시
         if(running){ pvpWin(!!d.youWon); }
         break;
       case 'ult':
         // 상대 궁극기 시각 효과
-        if(Net.opp){ const at=new THREE.Vector3(Net.opp.pos.x,Net.opp.pos.y+1,Net.opp.pos.z);
+        { const src=Net.ffa ? Net.peerByIdx[d.from] : Net.opp;
+        if(src){ const at=new THREE.Vector3(src.pos.x,src.pos.y+1,src.pos.z);
           const col={dash:0x7df3ff,blink:0xb388ff,leap:0x7dffb0,heal:0x3ef58a,regen:0x3ef58a,rapid:0xffd24a,quickdraw:0xffd24a,frenzy:0xff5252,shield:0x66d9ff,cloak:0x9aa7b4,bomb:0xff9040,turret:0xcfd4d9}[d.kind]||0xffffff;
           FX.ring(at,col,0.3,2.5,.4); FX.spark(at,col,10,5,.5,1.1);
-        }
+        } }
         break;
       case 'pong':
         Net.ping=Math.round(performance.now()-d.t); break;
@@ -4907,6 +5028,49 @@ const Game = (() => {
       setTimeout(()=>{ ovl.style.display='none'; cb&&cb(); }, 1100);
     }, 3200);
   }
+  // ===== 개인전(FFA) 시작 =====
+  const FFA_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11]]; // idx별 시작 위치 (최대 5인)
+  function startFFA(){
+    if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
+    currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length];
+    showMapRoulette(currentMap, ()=>_startFFAMatch());
+  }
+  function _startFFAMatch(){
+    lastDiff='pvp';
+    if(player){ scene.remove(player.group); }
+    if(bot){ scene.remove(bot.group); }
+    if(Net.peers) Net.peers.forEach(p=>scene.remove(p.group));
+    Projectiles.clear(); Summons.clear();
+    buildArena(Net.seed);
+    const pSpec = selectedSpecies || 'rabbit';
+    player=new Player(pSpec);
+    const sp=FFA_SPAWNS[Net.myIdx]||FFA_SPAWNS[0];
+    player.pos.set(sp[0],0,sp[1]);
+    // 원격 플레이어 퍼펫 생성
+    Net.peers=[]; Net.peerByIdx={};
+    for(const info of Net._ffaPlayers){
+      if(info.idx===Net.myIdx) continue;
+      const o=new NetOpponent(info.species||'fox');
+      o.netIdx=info.idx;
+      o.name=info.nick||(SPECIES[info.species]?SPECIES[info.species].name:'상대');
+      const s=FFA_SPAWNS[info.idx]||[14,0];
+      o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
+      Net.peers.push(o); Net.peerByIdx[info.idx]=o;
+    }
+    Net.opp=Net.peers[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
+    chars=[player, ...Net.peers];
+    Pickups.init(Net.seed);
+    time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
+    const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
+    setProfileAvatar(pSpec);
+    const feed=$('killFeed'); if(feed) feed.innerHTML='';
+    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    $('winOvl').style.display='none';
+    updateHUD(); updateScore();
+    if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
+  }
+
   function startPVP(oppSpecies){
     if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
     currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length]; // 시드로 맵 결정 (양쪽 동일)
@@ -4957,7 +5121,7 @@ const Game = (() => {
     Net.ended=true;
     // 상대에게 경기 종료 통보 (승패 동기화) — 각자 로컬 데스캠 후 결과창
     if(Net.ws && Net.ws.readyState===1){
-      try{ Net.ws.send(JSON.stringify({type:'gameover', youWon: !won })); }catch(e){}
+      try{ if(!Net.ffa) Net.ws.send(JSON.stringify({type:'gameover', youWon: !won })); }catch(e){}
       setTimeout(()=>{ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} }, 3400);
     }
     // 데스캠: 이겼으면 죽는 상대(Net.opp)를, 졌으면 죽는 나(player)를 클로즈업
@@ -4998,6 +5162,7 @@ const Game = (() => {
     Net.lastSend=now;
     Net.ws.send(JSON.stringify({ type:'state',
       x:+player.pos.x.toFixed(2), y:+player.pos.y.toFixed(2), z:+player.pos.z.toFixed(2),
+      k:player.kills||0,
       yaw:+player.yaw.toFixed(3), mv:player._moving?1:0, hp:Math.round(player.hp),
       wep:player.weapon||null, crouch:player.crouching?1:0, inv:player.invuln>0?1:0,
       roll:player.rolling?1:0, rf:player.rolling?+(player.rollForward||0).toFixed(2):0, rr:player.rolling?+(player.rollRight||0).toFixed(2):0, rt:player.rolling?+player.rollT.toFixed(2):0 }));
@@ -5011,10 +5176,12 @@ const Game = (() => {
   }
   function explodeAt(pos, owner, w){ Projectiles.explode(pos, owner, [player,bot].filter(Boolean), w); }
   function netUlt(kind){ if(pvpMode && Net.ws && Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'ult', kind})); }
-  function netHitOpp(dmg){
+  function netHitOpp(dmg, target){
     // 내 총알이 상대를 맞힘 -> 상대 클라이언트가 데미지 적용하도록 전송
     if(pvpMode && Net.ws && Net.ws.readyState===1){
-      Net.ws.send(JSON.stringify({type:'hit', dmg:+dmg.toFixed(1)}));
+      const m={type:'hit', dmg:+dmg.toFixed(1)};
+      if(Net.ffa && target && target.netIdx!==undefined) m.to=target.netIdx; // FFA: 맞은 대상 지정
+      Net.ws.send(JSON.stringify(m));
     }
   }
   function netPickupTake(idx){
