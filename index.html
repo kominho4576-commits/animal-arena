@@ -267,28 +267,28 @@ body.pc #keyGuide{display:block}
 #keyGuide kbd{background:linear-gradient(180deg,#2e4258,#1a2939);border:1px solid rgba(255,255,255,.22);border-bottom:3px solid rgba(0,0,0,.5);border-radius:4px;padding:2px 7px;font-size:11px;font-family:inherit;color:#fff;min-width:14px;text-align:center;font-weight:700;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 
 /* ===== mode select ===== */
-.modeCards{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;justify-content:center;max-width:98vw}
+.modeCards{display:flex;gap:14px;margin-top:16px;flex-wrap:nowrap;justify-content:center;width:min(97vw,1010px)}
 @media (max-height:620px){
   .modeCards{margin-top:12px;gap:10px}
-  .modeCard{width:160px;padding:14px 8px;gap:7px}
-  .mcArt{width:72px;height:72px;font-size:24px}
+  .modeCard{max-width:160px;padding:14px 6px;gap:7px}
+  .mcArt{width:min(72px,72%);height:auto;font-size:24px}
   .mcName{font-size:17px}
   .mcDesc{font-size:11px}
 }
 @media (max-width:760px){
   .modeCards{gap:8px}
-  .modeCard{width:144px;padding:14px 6px}
-  .mcArt{width:64px;height:64px;font-size:20px}
+  .modeCard{max-width:144px;padding:14px 5px}
+  .mcArt{width:min(64px,72%);height:auto;font-size:20px}
   .mcName{font-size:16px}
   .mcDesc{font-size:10px}
 }
 @media (max-width:560px){
-  .modeCard{width:116px;padding:12px 4px}
-  .mcArt{width:52px;height:52px;font-size:17px}
+  .modeCard{max-width:116px;padding:12px 3px}
+  .mcArt{width:min(52px,72%);height:auto;font-size:17px}
   .mcName{font-size:13px;letter-spacing:0}
   .mcDesc{font-size:8.5px;line-height:1.4}
 }
-.modeCard{width:180px;padding:16px 10px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);color:#fff;transition:transform .14s,border-color .14s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
+.modeCard{flex:1 1 0;min-width:0;max-width:180px;padding:16px 8px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);color:#fff;transition:transform .14s,border-color .14s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
 .modeCard::before{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.09),transparent);transition:left .45s;pointer-events:none}
 .modeCard:hover{transform:translateY(-6px)}
 .modeCard:hover::before{left:120%}
@@ -296,13 +296,13 @@ body.pc #keyGuide{display:block}
 #modeAI:hover{border-color:var(--cy);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(49,230,255,.25)}
 #modePVP:hover{border-color:var(--yl);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(255,216,61,.25)}
 #modeTrain:hover{border-color:var(--gn);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(62,245,138,.25)}
-.mcArt{width:84px;height:84px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08) inset;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.mcArt{width:min(84px,72%);aspect-ratio:1/1;height:auto;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08) inset;text-shadow:0 2px 8px rgba(0,0,0,.4)}
 .mcAI{background:linear-gradient(135deg,#1c6a96,#0d1e30)}
 .mcPVP{background:linear-gradient(135deg,#96701c,#0d1e30)}
 .mcTrain{background:linear-gradient(135deg,#1c9660,#0d1e30)}
 .mcRank{background:linear-gradient(135deg,#8e3ad0,#0d1e30);font-size:26px}
 .mcName{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px}
-.mcDesc{font-size:12px;color:#a7bccf;line-height:1.55;text-align:center}
+.mcDesc{font-size:12px;color:#a7bccf;line-height:1.55;text-align:center;word-break:keep-all}
 
 /* ===== matchmaking ===== */
 .matchSpin{width:66px;height:66px;border-radius:50%;border:5px solid rgba(125,243,255,.12);border-top-color:var(--cy);margin:26px 0 18px;box-shadow:0 0 24px rgba(49,230,255,.2);animation:spin .85s linear infinite}
