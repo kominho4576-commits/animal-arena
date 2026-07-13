@@ -267,7 +267,7 @@ body.pc #keyGuide{display:block}
 #keyGuide kbd{background:linear-gradient(180deg,#2e4258,#1a2939);border:1px solid rgba(255,255,255,.22);border-bottom:3px solid rgba(0,0,0,.5);border-radius:4px;padding:2px 7px;font-size:11px;font-family:inherit;color:#fff;min-width:14px;text-align:center;font-weight:700;box-shadow:0 2px 5px rgba(0,0,0,.35)}
 
 /* ===== mode select ===== */
-.modeCards{display:flex;gap:14px;margin-top:16px;flex-wrap:nowrap;justify-content:center;max-width:98vw}
+.modeCards{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap;justify-content:center;max-width:98vw}
 @media (max-height:620px){
   .modeCards{margin-top:12px;gap:10px}
   .modeCard{width:160px;padding:14px 8px;gap:7px}
@@ -940,6 +940,11 @@ body.has-touch .mExitOnly{display:block}
       <div class="mcArt mcAI">AI</div>
       <div class="mcName">AI 대전</div>
       <div class="mcDesc">인공지능 봇과 1:1<br>오프라인 · 난이도 선택</div>
+    </button>
+    <button class="modeCard" id="modeAIFFA">
+      <div class="mcArt mcAI">5인</div>
+      <div class="mcName">AI 개인전</div>
+      <div class="mcDesc">봇 4마리와 각자도생<br>오프라인 · 선착 5킬</div>
     </button>
     <button class="modeCard" id="modePVP">
       <div class="mcArt mcPVP">PVP</div>
@@ -1997,7 +2002,7 @@ const ULTIMATES = {
   boarbomb:    { name:'폭주 자폭',   cd:12, desc:'폭주 돌진 후 큰 폭발' },
   giant:       { name:'거대화',      cd:14, desc:'잠시 거대화해 강해짐' },
   henmother:   { name:'어미닭 소환', cd:13, desc:'어미 닭을 소환해 적을 쪼아 공격' },
-  foxclone:    { name:'환영 분신',   cd:13, desc:'분신 여우 2마리를 소환 (체력 낮음)' },
+  foxclone:    { name:'환영 분신',   cd:13, desc:'달려들어 할퀴는 분신 여우 2마리 소환 (체력 낮음)' },
 };
 /* ---------------- ANIMAL CHARACTER MODELS ---------------- */
 /* species table: palette + ear style + tail style */
@@ -2546,10 +2551,11 @@ const Summons = (() => {
   }
   function spawnHen(owner){
     const g=buildHen();
+    g.scale.setScalar(1.5); // 어미닭 1.5배 크기
     g.position.set(owner.pos.x, 0, owner.pos.z);
     scene.add(g);
     list.push({ m:g, kind:'hen', owner, hp:60, maxHp:60, pos:{x:owner.pos.x,z:owner.pos.z}, y:0,
-      atkCd:0, life:16, peckT:0, bob:Math.random()*6, spd:4.2, range:1.7, dmg:14 });
+      atkCd:0, life:16, peckT:0, bob:Math.random()*6, spd:4.2, range:2.3, dmg:14 }); // 사거리도 덩치에 맞게
     FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xffe14d,14,5,.5,1.3);
   }
   function spawnFoxClones(owner){
@@ -2562,7 +2568,7 @@ const Summons = (() => {
       // 분신은 반투명 느낌 (환영)
       g.traverse(o=>{ if(o.material){ try{ o.material=o.material.clone(); o.material.transparent=true; o.material.opacity=0.82; }catch(e){} } });
       list.push({ m:g, kind:'foxclone', owner, hp:35, maxHp:35, pos:{x:ox,z:oz}, y:0, parts:built.parts,
-        atkCd:0, life:14, bob:Math.random()*6, spd:6.0, range:8, dmg:16, fireCd:0 });
+        atkCd:0, life:14, bob:Math.random()*6, spd:6.8, range:1.6, dmg:14, slashT:0 }); // 근접형: 달려들어 할퀴기
     }
     FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xff9950,16,6,.5,1.4);
   }
@@ -2586,7 +2592,7 @@ const Summons = (() => {
     let best=null, bestD=(maxD!==undefined?maxD:range);
     for(const s of list){
       if(s.owner===fromOwner) continue;
-      const r = s.kind==='hen'?0.72:0.55, sy = s.kind==='hen'?0.85:0.8;
+      const r = s.kind==='hen'?1.05:0.55, sy = s.kind==='hen'?1.25:0.8; // 어미닭 1.5배 스케일 반영
       const ox=s.pos.x-origin.x, oy=s.y+sy-origin.y, oz=s.pos.z-origin.z;
       const t=ox*dir.x+oy*dir.y+oz*dir.z;
       if(t<0||t>range) continue;
@@ -2596,6 +2602,8 @@ const Summons = (() => {
     return best?{s:best,d:bestD}:null;
   }
   function all(){ return list; }
+  // 해당 주인의 살아있는 소환물 존재 여부 (궁 게이지 차단용)
+  function hasOwner(owner){ for(const s of list){ if(s.owner===owner) return true; } return false; }
   function update(dt, chars){
     for(let i=list.length-1;i>=0;i--){
       const s=list[i]; s.life-=dt; s.bob+=dt*6;
@@ -2604,7 +2612,7 @@ const Summons = (() => {
         scene.remove(s.m); list.splice(i,1); continue;
       }
       // 타겟: 주인의 적
-      const target = chars.find(c=>c && !c.dead && c!==s.owner && (c===Game.player||c===Game.bot));
+      const target = chars.find(c=>c && !c.dead && c!==s.owner);
       if(!target){ continue; }
       const dx=target.pos.x-s.pos.x, dz=target.pos.z-s.pos.z;
       const dist=Math.hypot(dx,dz)||1e-6;
@@ -2618,17 +2626,24 @@ const Summons = (() => {
         if(s.peckT>0){ s.peckT-=dt; if(s.m.userData.head) s.m.userData.head.position.z=0.42+Math.sin((0.25-s.peckT)/0.25*Math.PI)*0.25; }
         s.m.position.set(s.pos.x, Math.abs(Math.sin(s.bob))*0.08, s.pos.z);
       } else if(s.kind==='foxclone'){
-        // 여우 분신: 적에게 접근하며 원거리 견제 (석궁 발사)
-        const ideal=6;
-        if(dist>ideal+1){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
-        else if(dist<ideal-1){ s.pos.x-=dx/dist*s.spd*dt; s.pos.z-=dz/dist*s.spd*dt; }
+        // 여우 분신: 적에게 달려들어 근접 할퀴기
+        if(dist>s.range*0.85){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
         s.m.rotation.y=Math.atan2(dx,dz); // 캐릭터 모델은 +z가 정면 (닭과 동일)
-        s.fireCd-=dt;
-        if(dist<s.range && s.fireCd<=0){ s.fireCd=1.1;
-          const d2=new THREE.Vector3(dx/dist,0.02,dz/dist);
-          Projectiles.fire('crossbow', new THREE.Vector3(s.pos.x,s.y+1,s.pos.z), d2, s.owner);
+        s.atkCd-=dt;
+        if(dist<=s.range && s.atkCd<=0){
+          s.atkCd=0.7; s.slashT=0.22;
+          target.takeDamage(s.dmg, s.owner);
+          const at=new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z);
+          FX.spark(at,0xff9950,10,5,.3,1.0); Sfx.hit(at);
         }
-        // 다리 흔들기
+        // 할퀴기 모션: 양팔 휘두르기, 평시엔 다리 흔들기
+        if(s.slashT>0){
+          s.slashT-=dt;
+          const k=Math.sin((0.22-s.slashT)/0.22*Math.PI);
+          if(s.parts){ if(s.parts.armL)s.parts.armL.rotation.x=-k*1.7; if(s.parts.armR)s.parts.armR.rotation.x=-k*1.7; }
+        } else if(s.parts){
+          if(s.parts.armL)s.parts.armL.rotation.x=0; if(s.parts.armR)s.parts.armR.rotation.x=0;
+        }
         if(s.parts){ const sw=Math.sin(s.bob)*0.3; if(s.parts.legL)s.parts.legL.rotation.x=sw; if(s.parts.legR)s.parts.legR.rotation.x=-sw; }
         s.m.position.set(s.pos.x, Math.abs(Math.sin(s.bob*0.5))*0.05, s.pos.z);
       }
@@ -2636,7 +2651,7 @@ const Summons = (() => {
   }
   function clear(){ for(const s of list) scene.remove(s.m); list.length=0; }
   function count(){ return list.length; }
-  return { spawnHen, spawnFoxClones, damageAt, hurt, rayHit, all, update, clear, count };
+  return { spawnHen, spawnFoxClones, damageAt, hurt, rayHit, all, hasOwner, update, clear, count };
 })();
 const Pickups = (() => {
   const list=[];
@@ -2754,7 +2769,11 @@ class Character {
     this.stunT=0; this.slowT=0;
   }
   get eyeY(){ return this.crouching?0.85:1.42; }
-  gainUlt(amt){ if(this.ultActive>0) return; this.ultCharge=Math.min(this.ultMax, this.ultCharge+amt); }
+  gainUlt(amt){
+    if(this.ultActive>0) return;
+    if(Summons.hasOwner(this)) return; // 소환물(어미닭/분신) 생존 중엔 궁 게이지 충전 불가
+    this.ultCharge=Math.min(this.ultMax, this.ultCharge+amt);
+  }
   equip(id,ammo){
     this.weapon=id; this.ammo=ammo;
     if(this.wepMesh){ this.parts.hand.remove(this.wepMesh); this.wepMesh=null; }
@@ -3065,8 +3084,8 @@ class Character {
     this.punchT-=dt; this.hurtT-=dt;
     // 캐릭터끼리 겹침 방지 (최소 간격 유지)
     if(!this.dead){
-      const other=this.isPlayer?Game.bot:(this===Game.bot?Game.player:null);
-      if(other && !other.dead){
+      for(const other of (Game.chars||[])){
+        if(!other || other===this || other.dead) continue;
         const dx=this.pos.x-other.pos.x, dz=this.pos.z-other.pos.z;
         const d=Math.hypot(dx,dz), minGap=1.6; // 최소 간격 (근접 무기 사거리보다 좁게, 겹침만 방지)
         if(d<minGap && d>0.001){
@@ -3089,7 +3108,7 @@ class Character {
       FX.ring(at,0x7dffb0,0.3,5,.4); FX.spark(at,0xa8ff6e,16,8,.5,1.4);
       Game.shake&&Game.shake(0.7);
       // 착지 지점 주변 충격파 데미지 + 기절
-      const chars2=[Game.player,Game.bot];
+      const chars2=(Game.chars&&Game.chars.length)?Game.chars:[Game.player,Game.bot];
       for(const c of chars2){ if(!c||c===this||c.dead||c.invuln>0) continue;
         const d=Math.hypot(c.pos.x-this.pos.x,c.pos.z-this.pos.z);
         if(d<5){ c.takeDamage(70*(1-d/5)+15,this); c.stunT=Math.max(c.stunT||0,0.8); } }
@@ -3141,7 +3160,7 @@ class Character {
     this.ultCharge=0; // 발동하면 게이지 리셋
     const fwd=new THREE.Vector3(Math.sin(this.yaw),0,Math.cos(this.yaw));
     const at=new THREE.Vector3(this.pos.x,this.pos.y+1,this.pos.z);
-    const enemies=()=>[Game.player,Game.bot].filter(c=>c&&c!==this&&!c.dead);
+    const enemies=()=>(Game.chars&&Game.chars.length?Game.chars:[Game.player,Game.bot]).filter(c=>c&&c!==this&&!c.dead);
     // 돌진 경로(선분) 근처의 적을 판정 (지나쳐도 맞도록)
     const hitAlongPath=(sx,sz,ex,ez,radius,dmg,extra)=>{
       const vx=ex-sx, vz=ez-sz; const len2=vx*vx+vz*vz||1e-6;
@@ -3552,11 +3571,23 @@ class AIBot extends Character {
     this.lastPos=new THREE.Vector3(); this.stuckT=0;
     this.noProgressT=0; this.lastEnemyHp=CFG.maxHP; this.rushT=0;
   }
+  // 가장 가까운 생존 적 선택 (AI 개인전: 플레이어든 다른 봇이든 전부 적)
+  pickTarget(){
+    const list=Game.chars||[];
+    let best=Game.player, bd=1e9;
+    for(const c of list){
+      if(!c || c===this || c.dead) continue;
+      const dd=Math.hypot(c.pos.x-this.pos.x, c.pos.z-this.pos.z);
+      if(dd<bd){ bd=dd; best=c; }
+    }
+    return best||Game.player;
+  }
   onShotAt(attacker){
     // chance to dodge roll when hit
     if(!this.dead && Math.random()<this.d.rollCh && this.rollCd<=0){
       const perp=Math.random()<.5?1:-1;
-      const dx=Game.player.pos.x-this.pos.x, dz=Game.player.pos.z-this.pos.z;
+      const t=(attacker&&!attacker.dead)?attacker:this.pickTarget(); // 맞은 방향 기준 회피
+      const dx=t.pos.x-this.pos.x, dz=t.pos.z-this.pos.z;
       const l=Math.hypot(dx,dz)||1;
       this.tryRoll(-dz/l*perp, dx/l*perp);
     }
@@ -3585,7 +3616,7 @@ class AIBot extends Character {
       this.invuln-=dt; if(this.hurtT>0)this.hurtT-=dt;
       return;
     }
-    const P=Game.player;
+    const P=this.pickTarget();
     this.stateT-=dt; this.reactT-=dt; this.strafeT-=dt; this.repathT-=dt;
     // 봇도 궁극기 사용 (근접 상황에서, 쿨다운 준비되면)
     if(this.ultCharge>=this.ultMax && !P.dead){
@@ -3757,12 +3788,33 @@ class AIBot extends Character {
     this.animate(dt,moving&&!this.rolling);
   }
   currentSpeed(sprint){ return (this.crouching?CFG.crouchSpd:(sprint?CFG.sprint:CFG.walk))*this.baseSpd*(this.slowT>0?0.45:1); }
+  // 나에게 적대적인 소환물 중 가장 가까운 것
+  nearestEnemySummon(){
+    let best=null, bd=1e9;
+    for(const s of Summons.all()){
+      if(s.owner===this) continue;
+      const d=Math.hypot(s.pos.x-this.pos.x, s.pos.z-this.pos.z);
+      if(d<bd){ bd=d; best=s; }
+    }
+    return best;
+  }
+  // 소환물이 현재 타겟보다 가까우면 조준 대상을 소환물로 교체 (의사 타겟 프록시)
+  retargetSummon(P){
+    const sn=this.nearestEnemySummon();
+    if(!sn) return P;
+    const dS=Math.hypot(sn.pos.x-this.pos.x, sn.pos.z-this.pos.z);
+    const dP=Math.hypot(P.pos.x-this.pos.x, P.pos.z-this.pos.z);
+    if(dS<dP) return { pos:{x:sn.pos.x, y:sn.y, z:sn.pos.z}, eyeY:0.85, crouching:false };
+    return P;
+  }
   faceAndMelee(P,chars,dt){
+    P=this.retargetSummon(P); // 소환물이 더 가까우면 그쪽을 침
     const t=Math.atan2(P.pos.x-this.pos.x,P.pos.z-this.pos.z);
     this.yaw=t;
     if(this.reactT<=0){ this.fire(new THREE.Vector3(Math.sin(t),0,Math.cos(t)),chars); this.reactT=this.d.react*0.5; }
   }
   tryShootAt(P,chars){
+    P=this.retargetSummon(P); // 소환물이 더 가까우면 그쪽을 쏨
     const w=this.weaponDef();
     const eye=Math.min(this.eyeY,P.eyeY);
     if(losBlocked(this.pos,P.pos,eye)) return;
@@ -3887,16 +3939,18 @@ class NetOpponent extends Character {
 
 /* ---------------- GAME ---------------- */
 const Game = (() => {
-  let player=null, bot=null, chars=[];
+  let player=null, bot=null, chars=[], aiBots=[]; // aiBots: AI 개인전의 봇들 (2마리 이상일 때만 다인전)
   let running=false, time=0, msgT=0, paused=false, lastDiff='normal', pvpMode=false, trainingMode=false, rankedMode=false;
   let killCam=null; // {t, victim, won, angle} — 마지막 킬 슬로우모션 연출
   const $=id=>document.getElementById(id);
 
-  function start(diff){
+  function start(diff, aiFfa){
     lastDiff=diff;
     // clean old
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
     Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
     buildArena(); // fresh random symmetric layout each match
@@ -3904,9 +3958,27 @@ const Game = (() => {
     // bot picks a visibly different species
     const botPool = PLAYER_SPECIES.filter(s=>s!==pSpec);
     const bSpec = botPool[Math.floor(Math.random()*botPool.length)];
-    player=new Player(pSpec); bot=new AIBot(diff,bSpec);
-    Game.player=player; Game.bot=bot;
-    chars=[player,bot];
+    player=new Player(pSpec);
+    if(aiFfa){
+      // AI 개인전: 나 + 봇 4마리, 종족 서로 다르게, 5지점 분산 스폰
+      const AI_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11]];
+      player.pos.set(AI_SPAWNS[0][0],0,AI_SPAWNS[0][1]);
+      const pool=botPool.slice();
+      for(let i=0;i<4;i++){
+        const sp=pool.splice(Math.floor(Math.random()*pool.length),1)[0]||'fox';
+        const b=new AIBot(diff,sp);
+        b.name=SPECIES[sp]?SPECIES[sp].name:'봇';
+        b.pos.set(AI_SPAWNS[i+1][0],0,AI_SPAWNS[i+1][1]);
+        aiBots.push(b);
+      }
+      bot=aiBots[0];
+      Game.player=player; Game.bot=bot;
+      chars=[player,...aiBots];
+    } else {
+      bot=new AIBot(diff,bSpec);
+      Game.player=player; Game.bot=bot;
+      chars=[player,bot];
+    }
     Pickups.init();
     time=0; running=true; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
     document.body.classList.add('playing'); BGM.start('battle'); BGM.setScene('battle');
@@ -3929,6 +4001,8 @@ const Game = (() => {
     lastDiff='train';
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
     Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
     buildArena();
@@ -3954,7 +4028,8 @@ const Game = (() => {
   }
   function onKill(killer,victim){
     if(killer.isPlayer){ msg('처치! +1'); killBanner('처치!','#3ef58a'); doHitStop(0.09); shake(0.5); vibrate([0,40,30,40]); Sfx.kill(); }
-    else { msg('당했다...'); killBanner('사망','#ff5252'); shake(0.7); vibrate(120); }
+    else if(victim && victim.isPlayer){ msg('당했다...'); killBanner('사망','#ff5252'); shake(0.7); vibrate(120); }
+    // 봇끼리 킬: 킬피드만 (die()에서 처리)
     updateScore();
     if(!trainingMode && gameMode==='deathmatch' && killer.kills>=CFG.killTarget){
       // 데스매치: 마지막 킬 -> 킬캠(슬로우모션 + 죽는 캐릭터 클로즈업)
@@ -4001,10 +4076,11 @@ const Game = (() => {
     document.body.classList.remove('killcam');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
     const won=killCam?killCam.won:false;
-    if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||bot.kills||0); }
+    const topBotK = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : (bot?bot.kills:0);
+    if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0); }
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    $('winSub').textContent=`${player.kills} : ${bot.kills}  ·  ${fmtTime(time)}`;
+    $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`;
     // 랭킹전: RP 변동 표시
     const rpEl=$('winRp');
     if(rankedMode && rpEl){
@@ -4033,6 +4109,7 @@ const Game = (() => {
     $('ffaBoard').style.display = board ? '' : 'none';
     $('scoreP').textContent=player.kills;
     if(ffa){ let top=0; for(const p of Net.peers){ top=Math.max(top,p.kills||0); } $('scoreB').textContent=top; }
+    else if(aiBots.length>1){ let top=0; for(const b of aiBots){ top=Math.max(top,b.kills||0); } $('scoreB').textContent=top; }
     else $('scoreB').textContent=bot?bot.kills:0;
     if(board) updateFFABoard();
   }
@@ -4042,6 +4119,8 @@ const Game = (() => {
     const rows=[{me:true,name:'나',kills:player.kills||0,dead:player.dead}];
     if(typeof Net!=='undefined' && Net.ffa){
       for(const p of Net.peers) rows.push({me:false,name:p.name||'상대',kills:p.kills||0,dead:p.dead});
+    } else if(aiBots.length>1){
+      for(const b of aiBots) rows.push({me:false,name:b.name||(SPECIES[b.kind]?SPECIES[b.kind].name:'봇'),kills:b.kills||0,dead:b.dead});
     } else if(bot){
       rows.push({me:false,name:bot.name||(SPECIES[bot.kind]?SPECIES[bot.kind].name:'봇'),kills:bot.kills||0,dead:bot.dead});
     }
@@ -4285,6 +4364,15 @@ const Game = (() => {
         let near=null, nd=1e9;
         for(const p of Net.peers){ if(p.dead) continue; const dd=Math.hypot(p.pos.x-player.pos.x,p.pos.z-player.pos.z); if(dd<nd){ nd=dd; near=p; } }
         if(near){ bot=near; Game.bot=near; Net.opp=near; }
+      }
+      else if(aiBots.length>1){ // AI 개인전
+        for(const b of aiBots) b.update(simDt,chars);
+        // 가장 가까운 생존 봇을 bot 자리에 -> 적 HP바/조준보조/리스폰 로직 재사용
+        let near=null, nd=1e9;
+        for(const b of aiBots){ if(b.dead) continue; const dd=Math.hypot(b.pos.x-player.pos.x,b.pos.z-player.pos.z); if(dd<nd){ nd=dd; near=b; } }
+        if(near){ bot=near; Game.bot=near; }
+        Net._boardT=(Net._boardT||0)+dt;
+        if(Net._boardT>0.5){ Net._boardT=0; updateScore(); }
       }
       else if(bot){
         bot.update(simDt,chars);
@@ -4720,7 +4808,9 @@ const Game = (() => {
   function refreshAbilityKeys(){ const el=$('abRollKey'); if(el) el.textContent=KeyBinds.label(KeyBinds.map.roll); const pk=$('pickKey'); if(pk) pk.textContent=KeyBinds.label(KeyBinds.map.pick); const uk=$('abUltKey'); if(uk) uk.textContent=KeyBinds.label(KeyBinds.map.ult); }
   refreshAbilityKeys();
   bindBtn('modeBack',()=>showScreen('lobby'));
-  bindBtn('modeAI',()=>{ rankedMode=false; showScreen('diffScr'); });
+  let aiFfaPick=false; // 난이도 화면 진입 경로 (1대1 vs 개인전)
+  bindBtn('modeAI',()=>{ rankedMode=false; aiFfaPick=false; showScreen('diffScr'); });
+  bindBtn('modeAIFFA',()=>{ rankedMode=false; aiFfaPick=true; showScreen('diffScr'); });
   bindBtn('modeTrain',()=>{ rankedMode=false; startTraining(); });
   bindBtn('modePVP',()=>{ rankedMode=false; showScreen('pvpConfirm'); });
   bindBtn('modeRank',()=>{ rankedMode=true; startNet('random'); }); // 랭킹전: 바로 랜덤 매칭
@@ -4751,7 +4841,7 @@ const Game = (() => {
   bindBtn('matchCancel',()=>{ stopMatchmaking(); showScreen('modeScr'); });
 
   /* difficulty -> start AI game */
-  const startDiff=d=>()=>{ Sfx.unlock(); SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';}); start(d); };
+  const startDiff=d=>()=>{ Sfx.unlock(); SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';}); start(d, aiFfaPick); };
   ['dEasy','dNorm','dHard'].forEach((id,i)=>{
     const d=['easy','normal','hard'][i];
     $(id).addEventListener('click',startDiff(d));
@@ -5039,6 +5129,8 @@ const Game = (() => {
     lastDiff='pvp';
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
     if(Net.peers) Net.peers.forEach(p=>scene.remove(p.group));
     Projectiles.clear(); Summons.clear();
     buildArena(Net.seed);
@@ -5081,6 +5173,8 @@ const Game = (() => {
     lastDiff='pvp';
     if(player){ scene.remove(player.group); }
     if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
     Projectiles.clear(); Summons.clear();
     buildArena(Net.seed); // 양쪽 동일한 맵
     const pSpec = selectedSpecies || 'rabbit';
@@ -5280,7 +5374,7 @@ const Game = (() => {
   // start lobby preview once DOM ready
   setTimeout(initPreview, 60);
 
-  return { start, onKill, hitMark, showDamage, msg, doHitStop, shake, dmgNumber, killBanner, addKillFeed, showScreen, crosshairAimPoint, netHitOpp, netFireEvt:netFire, netPickupTake, netPickupRespawn, explodeAt, netUlt, isHost:()=>Net.role==='host', pvpActive:()=>pvpMode, inKillCam:()=>!!killCam, isTraining:()=>trainingMode, getMode:()=>gameMode, get player(){return player}, set player(v){player=v}, get bot(){return bot}, set bot(v){bot=v} };
+  return { start, onKill, hitMark, showDamage, msg, doHitStop, shake, dmgNumber, killBanner, addKillFeed, showScreen, crosshairAimPoint, netHitOpp, netFireEvt:netFire, netPickupTake, netPickupRespawn, explodeAt, netUlt, isHost:()=>Net.role==='host', pvpActive:()=>pvpMode, inKillCam:()=>!!killCam, isTraining:()=>trainingMode, getMode:()=>gameMode, get player(){return player}, set player(v){player=v}, get bot(){return bot}, set bot(v){bot=v}, get chars(){return chars} };
 })();
 
 /* idle camera before game starts */
