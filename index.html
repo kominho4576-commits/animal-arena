@@ -464,6 +464,19 @@ body.killcam::after{bottom:0}
 @keyframes barIn{from{height:0}to{height:11vh}}
 #killCamLabel{position:fixed;left:0;right:0;top:14vh;text-align:center;z-index:41;font-family:'Black Han Sans',sans-serif;font-size:26px;letter-spacing:4px;color:#fff;text-shadow:0 3px 10px #000,0 0 22px rgba(49,230,255,.4);opacity:0;pointer-events:none;transition:opacity .4s}
 body.killcam #killCamLabel{opacity:1}
+/* 개인전 최종 순위 (킬캠 중 표시) */
+#ffaFinal{position:fixed;z-index:45;top:13vh;left:50%;transform:translateX(-50%);display:none;flex-direction:column;
+  background:linear-gradient(180deg,rgba(14,26,46,.94),rgba(8,15,28,.92));border:1px solid var(--pnb);border-top:2px solid rgba(125,243,255,.65);
+  border-radius:6px;padding:10px 22px;min-width:210px;box-shadow:0 8px 30px rgba(0,0,0,.55);backdrop-filter:blur(6px);
+  opacity:0;animation:ffaFinIn .5s ease-out .5s both}
+@keyframes ffaFinIn{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+#ffaFinal .ffLbl{font-size:10px;color:var(--tx2);letter-spacing:3px;font-weight:700;text-align:center;margin-bottom:6px}
+#ffaFinal .ffaRow{font-size:14px;line-height:1.7;gap:10px}
+#ffaFinal .ffaRow .fn{max-width:130px}
+#ffaFinal .ffaRow .fk{font-size:16px}
+/* 결과창 순위 목록 */
+#winStandings{display:none;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 20px;border:1px solid var(--pnb);border-radius:6px;background:rgba(8,15,28,.6)}
+#winStandings .ffaRow{font-size:14px;line-height:1.7;gap:10px}
 
 /* ===== 타이틀 화면 ===== */
 #titleScr{background:radial-gradient(ellipse at 50% 20%, #1a3050 0%, var(--bg0) 65%)}
@@ -1061,9 +1074,11 @@ body.has-touch .mExitOnly{display:block}
 </div>
 
 <div class="ovl" id="menu" style="display:none"></div>
+<div id="ffaFinal"><div class="ffLbl">최종 순위</div><div id="ffaFinalRows"></div></div>
 <div class="ovl" id="winOvl">
   <div id="winTitle">VICTORY</div>
   <div id="winSub"></div>
+  <div id="winStandings"></div>
   <div id="winRp" style="display:none"></div>
   <button id="restart">다시 하기</button>
 </div>
@@ -4035,6 +4050,7 @@ const Game = (() => {
       // 데스매치: 마지막 킬 -> 킬캠(슬로우모션 + 죽는 캐릭터 클로즈업)
       const won=killer.isPlayer;
       killCam={ t:0, dur:2.6, victim:victim, killer:killer, won:won, shown:false };
+      if(aiBots.length>1) showFFAFinal(); // AI 개인전: 킬캠 중 최종 순위 표시
       $('respawnOvl').classList.remove('show');
       const kl=$('killCamLabel'); if(kl) kl.textContent = won?'ELIMINATED':'DEFEATED';
       document.body.classList.add('killcam');
@@ -4057,6 +4073,7 @@ const Game = (() => {
   }
   function endTimeAttack(){
     running=false;
+    hideFFAFinal();
     document.body.classList.remove('playing');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
     const pk=player.kills;
@@ -4065,7 +4082,8 @@ const Game = (() => {
     if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk); }
     $('winTitle').textContent = draw?'DRAW':(won?'VICTORY!':'DEFEAT');
     $('winTitle').style.color = draw?'#ffd166':(won?'#3ef58a':'#ff5252');
-    $('winSub').textContent=`${pk} : ${bk}  ·  타임어택 종료`;
+    if(aiBots.length>1){ $('winSub').textContent='타임어택 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
+    else { $('winSub').textContent=`${pk} : ${bk}  ·  타임어택 종료`; $('winStandings').style.display='none'; }
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     draw?Sfx.win():(won?Sfx.win():Sfx.lose());
@@ -4077,11 +4095,13 @@ const Game = (() => {
     document.body.classList.remove('killcam');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
     const won=killCam?killCam.won:false;
+    hideFFAFinal();
     const topBotK = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : (bot?bot.kills:0);
     if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0); }
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`;
+    if(aiBots.length>1){ $('winSub').textContent=fmtTime(time); renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
+    else { $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`; $('winStandings').style.display='none'; }
     // 랭킹전: RP 변동 표시
     const rpEl=$('winRp');
     if(rankedMode && rpEl){
@@ -4114,10 +4134,9 @@ const Game = (() => {
     else $('scoreB').textContent=bot?bot.kills:0;
     if(board) updateFFABoard();
   }
-  // 개인전 순위표: 나+상대 전원을 킬 내림차순으로 (닉네임은 textContent로만 삽입 — 인젝션 방지)
-  function updateFFABoard(){
-    const host=$('ffaRows'); if(!host) return;
-    const rows=[{me:true,name:'나',kills:player.kills||0,dead:player.dead}];
+  // 순위 행 데이터 생성 (킬 내림차순, 동점이면 내가 위)
+  function buildStandings(){
+    const rows=[{me:true,name:'나',kills:player?player.kills||0:0,dead:player?player.dead:false}];
     if(typeof Net!=='undefined' && Net.ffa){
       for(const p of Net.peers) rows.push({me:false,name:p.name||'상대',kills:p.kills||0,dead:p.dead});
     } else if(aiBots.length>1){
@@ -4125,7 +4144,33 @@ const Game = (() => {
     } else if(bot){
       rows.push({me:false,name:bot.name||(SPECIES[bot.kind]?SPECIES[bot.kind].name:'봇'),kills:bot.kills||0,dead:bot.dead});
     }
-    rows.sort((a,b)=> (b.kills-a.kills) || (a.me?-1:b.me?1:0)); // 동점이면 내가 위
+    rows.sort((a,b)=> (b.kills-a.kills) || (a.me?-1:b.me?1:0));
+    return rows;
+  }
+  // 순위 행 렌더 (닉네임은 textContent로만 삽입 — 인젝션 방지). markDead=false면 사망 흐림 없음(최종 순위용)
+  function renderStandings(host, rows, markDead){
+    host.innerHTML='';
+    rows.forEach((r,i)=>{
+      const div=document.createElement('div');
+      div.className='ffaRow'+(r.me?' me':'')+(i===0?' top':'')+((markDead&&r.dead)?' dead2':'');
+      const fr=document.createElement('span'); fr.className='fr'; fr.textContent=(i+1);
+      const fn=document.createElement('span'); fn.className='fn'; fn.textContent=r.name;
+      const fk=document.createElement('span'); fk.className='fk'; fk.textContent=r.kills;
+      div.appendChild(fr); div.appendChild(fn); div.appendChild(fk);
+      host.appendChild(div);
+    });
+  }
+  // 개인전 최종 순위: 킬캠 시작 시 표시
+  function showFFAFinal(){
+    const el=$('ffaFinal'); if(!el) return;
+    renderStandings($('ffaFinalRows'), buildStandings(), false);
+    el.style.display='flex';
+  }
+  function hideFFAFinal(){ const el=$('ffaFinal'); if(el) el.style.display='none'; }
+  // 개인전 순위표 (상단 칩, 게임 중)
+  function updateFFABoard(){
+    const host=$('ffaRows'); if(!host) return;
+    const rows=buildStandings();
     host.innerHTML='';
     rows.forEach((r,i)=>{
       const div=document.createElement('div');
@@ -5203,6 +5248,7 @@ const Game = (() => {
 
   function onOpponentLeft(){
     if(!running || Net.ended) return; // 정상 종료 후 끊김은 무시
+    hideFFAFinal(); $('winStandings').style.display='none';
     running=false; pvpMode=false;
     document.body.classList.remove('playing');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
@@ -5227,6 +5273,7 @@ const Game = (() => {
       else { victim.dead=true; victim.deadT=CFG.respawnTime; }
     }
     killCam={ t:0, dur:2.6, victim:victim, won:won, shown:false, pvp:true };
+    if(Net.ffa) showFFAFinal(); // PVP 개인전: 킬캠 중 최종 순위 표시
     $('respawnOvl').classList.remove('show');
     const kl=$('killCamLabel'); if(kl) kl.textContent = won?'ELIMINATED':'DEFEATED';
     document.body.classList.add('killcam');
@@ -5239,9 +5286,11 @@ const Game = (() => {
     document.body.classList.remove('killcam');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
     const won=killCam?killCam.won:false;
+    hideFFAFinal();
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    $('winSub').textContent=(player?player.kills:0)+' : '+(Net.opp?Net.opp.kills:0);
+    if(Net.ffa){ $('winSub').textContent='개인전 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
+    else { $('winSub').textContent=(player?player.kills:0)+' : '+(Net.opp?Net.opp.kills:0); $('winStandings').style.display='none'; }
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     won?Sfx.win():Sfx.lose();
@@ -5337,7 +5386,7 @@ const Game = (() => {
   bindBtn('bPause',()=>{ if(running) setPause(true); });
   bindBtn('pResume',()=>setPause(false));
   bindBtn('pRestart',()=>{ if(pvpMode) return; setPause(false); if(lastDiff==='train') startTraining(); else start(lastDiff); });
-  bindBtn('pQuit',()=>{ setPause(false); running=false; trainingMode=false; if(pvpMode){ pvpMode=false; if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} } } document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; $('respawnOvl').classList.remove('show'); BGM.setScene('menu'); showScreen('lobby'); });
+  bindBtn('pQuit',()=>{ hideFFAFinal(); setPause(false); running=false; trainingMode=false; if(pvpMode){ pvpMode=false; if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} } } document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; $('respawnOvl').classList.remove('show'); BGM.setScene('menu'); showScreen('lobby'); });
   bindBtn('pSettings',()=>{ $('pauseOvl').style.display='none'; openSettings(true); });
   bindBtn('sClose',()=>{ Settings.save(); $('settingsOvl').style.display='none'; if(paused) $('pauseOvl').style.display='flex'; });
   // 커스텀 확인 팝업
