@@ -50,7 +50,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 button{font-family:inherit;cursor:pointer}
 
 /* ============ HUD ============ */
-#topbar{position:absolute;z-index:20;top:env(safe-area-inset-top,10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:stretch}
+#topbar{position:absolute;z-index:20;top:env(safe-area-inset-top,10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:flex-start}
 .tchip{background:linear-gradient(180deg,rgba(14,26,46,.92),rgba(8,15,28,.88));border:1px solid var(--pnb);border-top:2px solid rgba(125,243,255,.55);border-radius:4px;padding:5px 18px;color:#fff;text-align:center;backdrop-filter:blur(6px);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);min-width:120px;box-shadow:0 4px 18px rgba(0,0,0,.45)}
 #timer{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px;color:var(--yl);min-width:92px;text-shadow:0 0 12px rgba(255,216,61,.45);line-height:1.1}
 .score-lbl{font-size:8.5px;color:var(--tx2);letter-spacing:2.5px;font-weight:700}
@@ -4059,7 +4059,8 @@ const Game = (() => {
     running=false;
     document.body.classList.remove('playing');
     if(document.pointerLockElement) document.exitPointerLock&&document.exitPointerLock();
-    const pk=player.kills, bk=bot.kills;
+    const pk=player.kills;
+    const bk = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : bot.kills;
     const won = pk>bk, draw = pk===bk;
     if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk); }
     $('winTitle').textContent = draw?'DRAW':(won?'VICTORY!':'DEFEAT');
@@ -4104,7 +4105,7 @@ const Game = (() => {
   function updateScore(){
     const ffa = typeof Net!=='undefined' && Net.ffa;
     // 순위표는 개인전 + 봇전(AI 데스매치)에서 사용, 그 외(1대1 PVP·타임어택 등)는 기존 스코어 칩
-    const board = ffa || (!pvpMode && !trainingMode && gameMode==='deathmatch' && !!bot);
+    const board = ffa || (!pvpMode && !trainingMode && !!bot && (aiBots.length>1 || gameMode==='deathmatch'));
     $('scoreChip').style.display = board ? 'none' : '';
     $('ffaBoard').style.display = board ? '' : 'none';
     $('scoreP').textContent=player.kills;
