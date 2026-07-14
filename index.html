@@ -3604,8 +3604,9 @@ class Player extends Character {
       const muzzle=new THREE.Vector3(this.pos.x, this.pos.y+this.eyeY-0.12, this.pos.z);
       muzzle.x+=Math.sin(this.yaw)*.4; muzzle.z+=Math.cos(this.yaw)*.4;
       const dir=aimPoint.clone().sub(muzzle).normalize();
-      this.fire(dir,chars);
-      if(Game.pvpActive && Game.pvpActive()) Game.netFireEvt(muzzle,dir);
+      // fire()가 실제로 발사했을 때만(쿨다운 중이면 false) 네트워크로 알림 —
+      // 버튼을 누르고 있는 동안 매 프레임 보내면 상대 화면에서 연사처럼 보이는 버그가 있었음
+      if(this.fire(dir,chars) && Game.pvpActive && Game.pvpActive()) Game.netFireEvt(muzzle,dir);
     }
     this.animate(dt,moving&&!this.rolling);
     this.updateCamera(dt);
@@ -5205,7 +5206,9 @@ const Game = (() => {
           if(fw.type==='arc'||fw.type==='proj'){ Projectiles.fireGhost(d.wep, o, dir); }
           else if(fw.type==='laser'){ FX.megaBeam(o, o.clone().addScaledVector(dir, fw.range), fw.color); }
           else if(fw.type==='flame'){ for(let i=0;i<2;i++) FX.flame(o,dir); }
-          else { FX.tracer(o, o.clone().addScaledVector(dir,30), fw.color); }
+          // 히트스캔/샷건 예광탄: 로컬 발사와 동일하게 색을 지정하지 않음(항상 기본 노란색).
+          // 무기 실루엣 색(fw.color, 미니건/기관총 등은 어두운 회색)을 그대로 쓰면 예광탄이 검게 보이는 문제가 있었음
+          else { FX.tracer(o, o.clone().addScaledVector(dir,30)); }
           Sfx.shoot(d.wep, o);
         }
         break;
