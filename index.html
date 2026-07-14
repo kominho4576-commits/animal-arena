@@ -177,14 +177,16 @@ body.has-touch #abilityRow{display:none!important}
 #cross.head div{background:#ffdd44;box-shadow:0 0 8px rgba(255,221,68,1)}
 
 /* mobile joystick / buttons (hidden on PC) */
+/* --ox/--oy: 버튼 위치 설정에서 드래그한 오프셋 (기본 0). 기존 transform과 항상 함께 적용 */
+/* 조이스틱(joyBase)은 터치한 자리로 매번 새로 떠오르는 방식이라 위치 설정 대상에서 제외 */
 #joyBase{position:absolute;z-index:20;left:34px;bottom:calc(env(safe-area-inset-bottom,0px) + 34px);width:128px;height:128px;border-radius:50%;background:rgba(15,18,24,.4);border:1px solid rgba(255,255,255,.18);pointer-events:auto}
 #joyKnob{position:absolute;left:39px;top:39px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 #joyHint{position:absolute;width:100%;text-align:center;bottom:-20px;font-size:9px;color:rgba(255,255,255,.55);letter-spacing:1px}
-.btn{position:absolute;z-index:20;border-radius:50%;pointer-events:auto;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.18);background:rgba(15,18,24,.5);backdrop-filter:blur(2px);box-shadow:0 2px 8px rgba(0,0,0,.4);transition:transform .06s,background .06s}
-.btn:active{background:rgba(40,46,56,.7);transform:scale(.93)}
+.btn{position:absolute;z-index:20;border-radius:50%;pointer-events:auto;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.18);background:rgba(15,18,24,.5);backdrop-filter:blur(2px);box-shadow:0 2px 8px rgba(0,0,0,.4);transition:transform .06s,background .06s;--ox:0px;--oy:0px;transform:translate(var(--ox),var(--oy))}
+.btn:active{background:rgba(40,46,56,.7);transform:translate(var(--ox),var(--oy)) scale(.93)}
 .btn .ic{font-size:24px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .btn .lb{font-size:10px;margin-top:2px;color:rgba(255,255,255,.82);font-weight:600;letter-spacing:.5px}
-.btn.on{transform:scale(.9);background:rgba(110,231,255,.45)}
+.btn.on{transform:translate(var(--ox),var(--oy)) scale(.9);background:rgba(110,231,255,.45)}
 .btn.toggled{background:rgba(255,209,102,.45);border-color:#ffd166}
 .btn .ic{font-size:20px;line-height:1}.btn .lb{font-size:8px;letter-spacing:.5px;opacity:.85;margin-top:1px}
 /* 전투 버튼: 전부 흰색 테두리 + 흰색 반투명 통일 (이동 버튼 스타일) */
@@ -396,8 +398,8 @@ body.pc #keyGuide{display:block}
 #fpsBox,#killFeed,#profileBox,#weaponBox,#topbar,#cross{opacity:0;transition:opacity .25s}
 body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playing #weaponBox,body.playing #topbar,body.playing #cross{opacity:1}
 
-#bPause{position:absolute;z-index:20;top:env(safe-area-inset-top,6px);right:10px;width:42px;height:42px;border-radius:8px;background:rgba(9,17,32,.8);border:1px solid rgba(125,243,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:auto;font-size:15px;backdrop-filter:blur(4px)}
-#bPause:active{transform:scale(.9)}
+#bPause{position:absolute;z-index:20;top:env(safe-area-inset-top,6px);right:10px;width:42px;height:42px;border-radius:8px;background:rgba(9,17,32,.8);border:1px solid rgba(125,243,255,.25);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:auto;font-size:15px;backdrop-filter:blur(4px);--ox:0px;--oy:0px;transform:translate(var(--ox),var(--oy))}
+#bPause:active{transform:translate(var(--ox),var(--oy)) scale(.9)}
 
 /* respawn */
 #respawnOvl{position:absolute;inset:0;background:rgba(5,9,17,.62);display:none;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:20;backdrop-filter:blur(2px)}
@@ -578,8 +580,10 @@ body.killcam #killCamLabel{opacity:1}
 .ovl.scr>*{position:relative;z-index:1}
 #lobbyBg{display:none}
 .mExitOnly{display:none}
+.mTouchOnly{display:none} /* 조작 버튼 위치 설정: 터치 기기에서만 노출 (PC는 조작키 설정으로 대체) */
 body.has-touch .mKeysOnly{display:none}
 body.has-touch .mExitOnly{display:block}
+body.has-touch .mTouchOnly{display:block}
 .mExitOnly .mTxt{color:#ff7a8a}
 .mExitOnly:hover::before{background:linear-gradient(90deg,#ff5c6c,rgba(255,92,108,.85))}
 .mItem.play:hover .mTxt{color:#0a0f18}
@@ -622,6 +626,19 @@ body.has-touch .mExitOnly{display:block}
 .keyBtn{min-width:130px;padding:7px 14px;border-radius:5px;border:1px solid rgba(125,243,255,.3);background:linear-gradient(180deg,#26394e,#15243a);color:var(--cy2);font-size:13px;font-weight:900;letter-spacing:1px;transition:border-color .12s,box-shadow .12s;font-family:inherit}
 .keyBtn:hover{border-color:var(--cy);box-shadow:0 0 12px rgba(49,230,255,.25)}
 .keyBtn.listening{border-color:var(--yl);color:var(--yl);animation:pkBlink 1s infinite;font-size:11.5px}
+
+/* ===== 버튼 위치 설정 (모바일 전용) =====
+   실제 조작 버튼(#hud 안, z-index 10)이 항상 렌더링되어 있다는 점을 이용해서,
+   이 화면은 배경/장식을 전부 없애고 안내문·완료·초기화 버튼만 얹어 그 버튼들이 그대로 비쳐 보이게 함. */
+#layoutScr{background:transparent!important;pointer-events:none}
+#layoutScr::before,#layoutScr::after{content:none}
+#loHeader{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:0;right:0;text-align:center;pointer-events:none}
+#loHeader h1{font-size:20px;margin:0 0 3px;letter-spacing:2px}
+#loHeader p{color:#8fb2cc;font-size:12px;letter-spacing:.5px;margin:0}
+#loFoot{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);display:flex;gap:10px;pointer-events:auto;z-index:21}
+/* 드래그 가능한 버튼임을 알려주는 점선 테두리 */
+body.layout-edit .btn,body.layout-edit #bPause{outline:2px dashed rgba(255,255,255,.7);outline-offset:4px}
+body.layout-edit #joyHint{display:none}
 
 /* ===== PVP 입장 확인 배너 ===== */
 /* PVP 화면: 세로 중앙 정렬 (맵 배경은 공통 적용) */
@@ -847,6 +864,7 @@ body.has-touch .mExitOnly{display:block}
         <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY</span></button>
         <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택</span></button>
         <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정</span></button>
+        <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow">➔</span><span class="mTxt">버튼 위치 설정</span></button>
         <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정</span></button>
         <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼</span></button>
         <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료</span></button>
@@ -911,6 +929,18 @@ body.has-touch .mExitOnly{display:block}
   <div style="display:flex;gap:12px;margin-top:18px">
     <button class="pBtn" id="keysReset" style="width:150px">기본값 복원</button>
     <button class="pBtn pResume" id="keysBack" style="width:150px">← 뒤로</button>
+  </div>
+</div>
+
+<!-- ===== 버튼 위치 설정 (모바일 전용) ===== -->
+<div class="ovl scr" id="layoutScr" style="display:none">
+  <div id="loHeader">
+    <h1>버튼 위치 설정</h1>
+    <p>버튼을 눌러서 원하는 위치로 끌어보세요</p>
+  </div>
+  <div id="loFoot">
+    <button class="pBtn" id="loReset" style="width:130px">기본값 복원</button>
+    <button class="pBtn pResume" id="loBack" style="width:130px">완료</button>
   </div>
 </div>
 
@@ -4534,7 +4564,7 @@ const Game = (() => {
   requestAnimationFrame(loop);
 
   /* ===== screen navigation ===== */
-  const SCREENS=['titleScr','lobby','charScr','modeScr','diffScr','pvpConfirm','joinRoomOvl','matchScr','roomHostScr','keysScr','tutorialScr'];
+  const SCREENS=['titleScr','lobby','charScr','modeScr','diffScr','pvpConfirm','joinRoomOvl','matchScr','roomHostScr','keysScr','layoutScr','tutorialScr'];
   function showScreen(id){
     SCREENS.forEach(s=>{ const el=$(s); if(!el) return;
       if(s==='charScr'){ el.classList.toggle('csShow', s===id); el.style.display = (s===id)?'':'none'; }
@@ -4563,7 +4593,7 @@ const Game = (() => {
   // 화면 콘텐츠를 뷰포트에 맞게 스케일 (짤림/스크롤 방지) — 전체를 한 덩어리로 축소
   function fitScreen(id){
     // 자체 flex 레이아웃을 쓰는 화면은 스케일 래핑 제외 (래핑하면 flex 확장이 깨짐)
-    if(id==='charScr' || id==='lobby') return;
+    if(id==='charScr' || id==='lobby' || id==='layoutScr') return; // 실제 조작 버튼이 그대로 비쳐야 해서 래핑/스케일 제외
     const el=$(id); if(!el) return;
     let wrap=el.querySelector(':scope > .fitWrap');
     if(!wrap){
@@ -4813,6 +4843,7 @@ const Game = (() => {
   bindBtn('lbSettings',()=>{ openSettings(false); });
   bindBtn('lbTutorial',()=>{ openTutorial(false); });
   bindBtn('lbKeys',()=>{ buildKeyList(); showScreen('keysScr'); });
+  bindBtn('lbLayout',()=>{ document.body.classList.add('layout-edit'); showScreen('layoutScr'); });
   bindBtn('lbExit',()=>{
     // 게임 종료: 전체화면 해제 + 창 닫기 시도, 안 되면 안내
     try{ if(document.fullscreenElement) document.exitFullscreen&&document.exitFullscreen(); }catch(e){}
@@ -4825,6 +4856,8 @@ const Game = (() => {
   });
   bindBtn('keysBack',()=>{ refreshKeyGuide(); refreshAbilityKeys(); showScreen('lobby'); });
   bindBtn('keysReset',()=>{ KeyBinds.reset(); buildKeyList(); refreshKeyGuide(); refreshAbilityKeys(); });
+  bindBtn('loBack',()=>{ document.body.classList.remove('layout-edit'); showScreen('lobby'); });
+  bindBtn('loReset',()=>{ resetBtnLayout(); });
 
   /* ===== 타이틀: 아무 키나 눌러 시작 ===== */
   function leaveTitle(){
@@ -4874,6 +4907,72 @@ const Game = (() => {
   addEventListener('keydown',e=>{ if(e.code!=='Escape') leaveTitle(); });
   $('titleScr').addEventListener('click',leaveTitle);
   $('titleScr').addEventListener('touchend',e=>{ e.preventDefault(); leaveTitle(); },{passive:false});
+
+  /* ===== 버튼 위치 설정 (모바일 전용) =====
+     PC의 '조작키 설정'에 대응하는 모바일 기능. 실제 조작 버튼(#hud 안, 항상 DOM에 존재)을
+     CSS 변수 --ox/--oy(translate 오프셋)로 옮기고, 그 값을 localStorage에 저장한다.
+     기존 발사/이동 등 게임 로직은 건드리지 않고, layout-edit 모드일 때만 드래그를 가로챈다. */
+  const BTN_LAYOUT_IDS=['bFire','bJump','bRoll','bUlt','bCrouch','bTurn','bPick','bPause'];
+  const BTN_LAYOUT_KEY='aa_btnLayout';
+  function loadBtnLayout(){ try{ return JSON.parse(localStorage.getItem(BTN_LAYOUT_KEY))||{}; }catch(e){ return {}; } }
+  function curBtnOffset(el){
+    const cs=getComputedStyle(el);
+    return { x: parseFloat(cs.getPropertyValue('--ox'))||0, y: parseFloat(cs.getPropertyValue('--oy'))||0 };
+  }
+  function applyBtnLayout(){
+    const L=loadBtnLayout();
+    for(const id of BTN_LAYOUT_IDS){
+      const el=$(id); if(!el) continue;
+      const p=L[id];
+      if(p){ el.style.setProperty('--ox', p.x+'px'); el.style.setProperty('--oy', p.y+'px'); }
+      else { el.style.removeProperty('--ox'); el.style.removeProperty('--oy'); }
+    }
+  }
+  function saveBtnOffset(id,x,y){
+    const L=loadBtnLayout(); L[id]={x:Math.round(x),y:Math.round(y)};
+    try{ localStorage.setItem(BTN_LAYOUT_KEY, JSON.stringify(L)); }catch(e){}
+  }
+  function resetBtnLayout(){
+    try{ localStorage.removeItem(BTN_LAYOUT_KEY); }catch(e){}
+    for(const id of BTN_LAYOUT_IDS){ const el=$(id); if(el){ el.style.removeProperty('--ox'); el.style.removeProperty('--oy'); } }
+  }
+  // 버튼 위치 설정 화면(layout-edit 모드)에서만 반응하는 드래그. 실제 발사/점프 등 기존 터치
+  // 핸들러는 각 버튼에 그대로 남아있지만 게임이 플레이 중이 아닐 때는 아무 효과가 없어 충돌하지 않음.
+  function makeBtnDraggable(id){
+    const el=$(id); if(!el) return;
+    let dragId=null, startX=0, startY=0, startOx=0, startOy=0, baseLeft=0, baseTop=0, bw=0, bh=0;
+    function begin(clientX,clientY){
+      const off=curBtnOffset(el);
+      startX=clientX; startY=clientY; startOx=off.x; startOy=off.y;
+      const r=el.getBoundingClientRect();
+      baseLeft=r.left-startOx; baseTop=r.top-startOy; bw=r.width; bh=r.height;
+    }
+    function drag(clientX,clientY){
+      const margin=10;
+      let nx=startOx+(clientX-startX), ny=startOy+(clientY-startY);
+      nx=Math.max(margin-baseLeft, Math.min(innerWidth-margin-bw-baseLeft, nx));
+      ny=Math.max(margin-baseTop, Math.min(innerHeight-margin-bh-baseTop, ny));
+      el.style.setProperty('--ox', nx+'px'); el.style.setProperty('--oy', ny+'px');
+    }
+    function finish(){ const off=curBtnOffset(el); saveBtnOffset(id, off.x, off.y); }
+    el.addEventListener('touchstart', e=>{
+      if(!document.body.classList.contains('layout-edit')) return;
+      e.preventDefault(); e.stopPropagation();
+      const t=e.changedTouches[0]; dragId=t.identifier; begin(t.clientX,t.clientY);
+    },{passive:false});
+    el.addEventListener('touchmove', e=>{
+      if(dragId===null) return;
+      for(const t of e.changedTouches){ if(t.identifier===dragId){ e.preventDefault(); drag(t.clientX,t.clientY); } }
+    },{passive:false});
+    const stop=e=>{
+      if(dragId===null) return;
+      for(const t of e.changedTouches){ if(t.identifier===dragId){ dragId=null; finish(); } }
+    };
+    el.addEventListener('touchend', stop);
+    el.addEventListener('touchcancel', stop);
+  }
+  BTN_LAYOUT_IDS.forEach(makeBtnDraggable);
+  applyBtnLayout();
 
   /* ===== 조작키 설정 화면 ===== */
   const KEY_ACTIONS=[['forward','앞으로 이동'],['back','뒤로 이동'],['left','왼쪽 이동'],['right','오른쪽 이동'],['jump','점프'],['roll','구르기 (회피)'],['crouch','앉기 (홀드)'],['pick','줍기 / 버리기'],['ult','궁극기']];
