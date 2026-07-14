@@ -107,7 +107,11 @@ body.has-touch #abilityRow{display:none!important}
 #rollCdIc{font-size:22px;color:var(--cy);z-index:1;text-shadow:0 0 10px rgba(49,230,255,.6)}
 #rollCd.cooling #rollCdIc{color:#41576b;text-shadow:none}
 #wepCard{display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(78,86,72,.42);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(2px);border-radius:8px;padding:6px 12px 5px}
-#wepIcon{width:78px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+#wepIconWrap{position:relative;width:78px;height:40px;flex-shrink:0}
+#wepIcon{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+/* 무기 쿨타임 오버레이: 발사 순간 전체가 어두워졌다가, 기존 발사 딜레이가 흐르는 만큼 원형으로 걷혀서 남은 쿨타임을 표시 */
+#wepCdOverlay{position:absolute;inset:0;border-radius:4px;background:conic-gradient(rgba(10,12,10,.8) 0deg, rgba(10,12,10,.8) 0deg, transparent 0deg, transparent 360deg);pointer-events:none;opacity:0;transition:opacity .12s}
+#wepCdOverlay.show{opacity:1}
 #wepAmmo{font-family:'Black Han Sans',sans-serif;font-size:22px;color:#fff;font-weight:400;letter-spacing:1px;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,.5)}
 #wepAmmo span{color:#fff}
 
@@ -745,7 +749,7 @@ body.has-touch .mExitOnly{display:block}
       <div class="abIc" id="abRoll"><div id="rollCd"><div id="rollCdRing"></div><div id="rollCdIc">↻</div></div><span class="abKey" id="abRollKey">SHIFT</span></div>
     </div>
     <div id="wepCard">
-      <div id="wepIcon"></div>
+      <div id="wepIconWrap"><div id="wepIcon"></div><div id="wepCdOverlay"></div></div>
       <div id="wepAmmo"><span>∞</span></div>
     </div>
   </div>
@@ -1132,6 +1136,7 @@ const CFG = {
   pickupRange: 1.7, weaponRespawn: 9,
   camDist: 3.4, camH: 1.85, camSide: 0.62,
   fov: 62, aimFov: 44, sniperFov: 26,
+  wepCdUiMinRate: 0.75, // 이 값(초) 이상 발사 딜레이인 무기만 무기 아이콘에 쿨타임 오버레이 표시
 };
 const DIFF = {
   // HP·데미지·이동속도는 모든 난이도 동일 — 오직 봇의 '지능'(명중률/반응속도/회피/조준안정성)만 차이
@@ -2019,6 +2024,19 @@ const ULTIMATES = {
   henmother:   { name:'어미닭 소환', cd:13, desc:'어미 닭을 소환해 적을 쪼아 공격' },
   foxclone:    { name:'환영 분신',   cd:13, desc:'달려들어 할퀴는 분신 여우 2마리 소환 (체력 낮음)' },
 };
+// 데스 메세지/킬피드용: 실제 데미지를 준 원인(cause)을 표시용 이름으로 변환.
+// cause는 무기 id 문자열('grenade' 등) 또는 'ult:<ultId>'(궁극기로 인한 피해) 형태.
+// cause가 없으면 (기존 동작 유지) 공격자가 현재 들고 있는 무기로 추정.
+function weaponDisplayName(cause, killer){
+  if(cause){
+    if(typeof cause==='string' && cause.indexOf('ult:')===0){
+      const uid=cause.slice(4);
+      return (ULTIMATES[uid]&&ULTIMATES[uid].name) || '궁극기';
+    }
+    if(WEAPONS[cause]) return WEAPONS[cause].name;
+  }
+  return (killer && killer.weapon) ? (WEAPONS[killer.weapon]?WEAPONS[killer.weapon].name:'무기') : '맨주먹';
+}
 /* ---------------- ANIMAL CHARACTER MODELS ---------------- */
 /* species table: palette + ear style + tail style */
 const SPECIES = {
@@ -2442,8 +2460,7 @@ const Projectiles = (() => {
   const arrowGeo=new THREE.ConeGeometry(.05,.5,4);
   const smallGeo=new THREE.ConeGeometry(.03,.28,4);
   const rocketGeo=new THREE.CylinderGeometry(.06,.06,.34,6);
-  function fire(kind, origin, dir, owner){
-    const w=WEAPONS[kind];
+  function makeMesh(kind, w, origin, dir){
     let m,v;
     if(w.type==='arc'){
       // explosive lob/flat
@@ -2459,7 +2476,20 @@ const Projectiles = (() => {
     }
     m.position.copy(origin);
     scene.add(m);
-    list.push({kind,w,m,v,owner,t:4});
+    return {m,v};
+  }
+  // cause: 데스 메세지용 실제 피해 원인 (기본은 무기 id, 궁극기 유래면 'ult:<id>' 전달)
+  function fire(kind, origin, dir, owner, cause){
+    const w=WEAPONS[kind];
+    const {m,v}=makeMesh(kind,w,origin,dir);
+    list.push({kind,w,m,v,owner,t:4,cause:cause||kind});
+  }
+  // 시각 전용 "유령" 발사체: PVP에서 상대의 발사를 그대로 재현해서 보여주기 위함.
+  // 충돌/피해 판정이 전혀 없음 — 실제 데미지는 host/발사자 쪽의 hit/kill 메시지로 이미 처리됨.
+  function fireGhost(kind, origin, dir){
+    const w=WEAPONS[kind]; if(!w) return;
+    const {m,v}=makeMesh(kind,w,origin,dir);
+    list.push({kind,w,m,v,owner:null,t:4,ghost:true});
   }
   function update(dt, chars){
     for(let i=list.length-1;i>=0;i--){
@@ -2472,19 +2502,28 @@ const Projectiles = (() => {
       if(w.type==='proj'||p.kind==='rocket'){ p.m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), p.v.clone().normalize()); }
       const pos=p.m.position;
       let dead=false;
+      if(p.ghost){
+        // 유령 발사체: 지형/시간 만료에만 반응, 캐릭터/소환수는 그냥 통과 (피해 없음)
+        let solid = pos.y<=0.05;
+        if(!solid) for(const o of obstacles){ if(pos.y<o.h && pos.x>o.minx&&pos.x<o.maxx&&pos.z>o.minz&&pos.z<o.maxz){ solid=true; break; } }
+        if(solid){ if(w.type==='arc'){ FX.boom(pos); Sfx.boom(pos); } else FX.spark(pos,w.color,4,3); dead=true; }
+        if(p.t<=0){ if(w.type==='arc'){ FX.boom(pos); Sfx.boom(pos); } dead=true; }
+        if(dead){ scene.remove(p.m); list.splice(i,1); }
+        continue;
+      }
       // char hit
       for(const c of chars){
         if(c===p.owner||c.dead||c.invuln>0) continue;
         const cy=c.crouching?0.6:0.9;
         const dx=pos.x-c.pos.x, dy=pos.y-(c.pos.y+cy), dz=pos.z-c.pos.z;
         if(dx*dx+dy*dy+dz*dz < 0.42){
-          if(w.type==='arc'){ explode(pos,p.owner,chars,w); }
+          if(w.type==='arc'){ explode(pos,p.owner,chars,w,p.cause); }
           else {
             // 투사체 헤드샷: 맞은 높이가 머리 구역(머리 중심 ±0.4)인지
             const headY=c.crouching?0.9:1.32;
             const isHead = w.headMult && Math.abs(pos.y-(c.pos.y+headY))<0.42;
             const dmg = isHead ? w.dmg*w.headMult : w.dmg;
-            c.takeDamage(dmg, p.owner, isHead);
+            c.takeDamage(dmg, p.owner, isHead, p.cause);
             FX.impact(pos, isHead?0xffdd44:0xff6666, isHead); if(isHead) Sfx.headshot(pos); else Sfx.hit(pos);
             if(p.owner.isPlayer) Game.hitMark(isHead);
           }
@@ -2494,11 +2533,11 @@ const Projectiles = (() => {
       // summon hit (소환수 직격)
       if(!dead){
         for(const s of Summons.all()){
-          if(s.owner===p.owner) continue;
+          if(s.owner===p.owner || s.ghost) continue;
           const r = s.kind==='hen'?0.72:0.55;
           const dx=pos.x-s.pos.x, dy=pos.y-(s.y+0.8), dz=pos.z-s.pos.z;
           if(dx*dx+dy*dy+dz*dz < r*r+0.15){
-            if(w.type==='arc'){ explode(pos,p.owner,chars,w); }
+            if(w.type==='arc'){ explode(pos,p.owner,chars,w,p.cause); }
             else { Summons.hurt(s,w.dmg); Sfx.hit(pos); if(p.owner.isPlayer) Game.hitMark(); }
             dead=true; break;
           }
@@ -2509,16 +2548,16 @@ const Projectiles = (() => {
         let solid = pos.y<=0.05;
         if(!solid) for(const o of obstacles){ if(pos.y<o.h && pos.x>o.minx&&pos.x<o.maxx&&pos.z>o.minz&&pos.z<o.maxz){ solid=true; break; } }
         if(solid){
-          if(w.type==='arc') explode(pos,p.owner,chars,w);
+          if(w.type==='arc') explode(pos,p.owner,chars,w,p.cause);
           else FX.spark(pos,w.color,4,3);
           dead=true;
         }
       }
-      if(p.t<=0){ if(w.type==='arc') explode(pos,p.owner,chars,w); dead=true; }
+      if(p.t<=0){ if(w.type==='arc') explode(pos,p.owner,chars,w,p.cause); dead=true; }
       if(dead){ scene.remove(p.m); list.splice(i,1); }
     }
   }
-  function explode(pos,owner,chars,w){
+  function explode(pos,owner,chars,w,cause){
     FX.boom(pos); Sfx.boom(pos);
     const aoe=w.aoe||3.2;
     // 폭발 범위 내 소환수 피해
@@ -2528,13 +2567,13 @@ const Projectiles = (() => {
       const d=Math.hypot(pos.x-c.pos.x, pos.y-(c.pos.y+0.8), pos.z-c.pos.z);
       if(d<aoe){
         const dmg=w.dmg*(1-d/aoe*0.7);
-        c.takeDamage(dmg,owner);
+        c.takeDamage(dmg,owner,false,cause);
         if(owner.isPlayer&&c!==owner) Game.hitMark();
       }
     }
   }
   function clear(){ for(const p of list) scene.remove(p.m); list.length=0; }
-  return {fire,update,clear,explode};
+  return {fire,fireGhost,update,clear,explode};
 })();
 
 /* ---------------- 소환수 (어미닭 · 여우 분신) ---------------- */
@@ -2564,16 +2603,19 @@ const Summons = (() => {
     g.userData.beak=beak; g.userData.head=head;
     return g;
   }
-  function spawnHen(owner){
+  // ghost=true: PVP에서 상대의 소환 궁극기를 시각적으로만 재현하는 사본.
+  // 실제 피해는 owner 쪽 클라이언트가 이미 hit/kill 메시지로 처리하므로,
+  // 여기선 움직임/공격 애니메이션만 재생하고 피해 판정·피격은 전혀 하지 않음(중복 데미지 방지).
+  function spawnHen(owner, ghost){
     const g=buildHen();
     g.scale.setScalar(1.5); // 어미닭 1.5배 크기
     g.position.set(owner.pos.x, 0, owner.pos.z);
     scene.add(g);
     list.push({ m:g, kind:'hen', owner, hp:60, maxHp:60, pos:{x:owner.pos.x,z:owner.pos.z}, y:0,
-      atkCd:0, life:16, peckT:0, bob:Math.random()*6, spd:4.2, range:2.3, dmg:14 }); // 사거리도 덩치에 맞게
+      atkCd:0, life:16, peckT:0, bob:Math.random()*6, spd:4.2, range:2.3, dmg:14, ghost:!!ghost }); // 사거리도 덩치에 맞게
     FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xffe14d,14,5,.5,1.3);
   }
-  function spawnFoxClones(owner){
+  function spawnFoxClones(owner, ghost){
     for(let i=0;i<2;i++){
       const built=buildAnimal('fox'); const g=built.group;
       g.scale.setScalar(0.92);
@@ -2583,7 +2625,7 @@ const Summons = (() => {
       // 분신은 반투명 느낌 (환영)
       g.traverse(o=>{ if(o.material){ try{ o.material=o.material.clone(); o.material.transparent=true; o.material.opacity=0.82; }catch(e){} } });
       list.push({ m:g, kind:'foxclone', owner, hp:35, maxHp:35, pos:{x:ox,z:oz}, y:0, parts:built.parts,
-        atkCd:0, life:14, bob:Math.random()*6, spd:6.8, range:1.6, dmg:14, slashT:0 }); // 근접형: 달려들어 할퀴기
+        atkCd:0, life:14, bob:Math.random()*6, spd:6.8, range:1.6, dmg:14, slashT:0, ghost:!!ghost }); // 근접형: 달려들어 할퀴기
     }
     FX.spark(new THREE.Vector3(owner.pos.x,1,owner.pos.z),0xff9950,16,6,.5,1.4);
   }
@@ -2591,7 +2633,7 @@ const Summons = (() => {
   function damageAt(x,z,radius,dmg,fromOwner){
     let hit=false;
     for(const s of list){
-      if(s.owner===fromOwner) continue; // 자기 주인 공격엔 안 맞음
+      if(s.owner===fromOwner || s.ghost) continue; // 자기 주인 공격엔 안 맞음 / 유령 사본은 피격 대상 아님
       const dd=Math.hypot(s.pos.x-x, s.pos.z-z);
       if(dd<radius+0.5){ s.hp-=dmg; hit=true; FX.impact(new THREE.Vector3(s.pos.x,s.y+0.8,s.pos.z),0xffffff,false); }
     }
@@ -2606,7 +2648,7 @@ const Summons = (() => {
   function rayHit(origin,dir,range,fromOwner,maxD){
     let best=null, bestD=(maxD!==undefined?maxD:range);
     for(const s of list){
-      if(s.owner===fromOwner) continue;
+      if(s.owner===fromOwner || s.ghost) continue;
       const r = s.kind==='hen'?1.05:0.55, sy = s.kind==='hen'?1.25:0.8; // 어미닭 1.5배 스케일 반영
       const ox=s.pos.x-origin.x, oy=s.y+sy-origin.y, oz=s.pos.z-origin.z;
       const t=ox*dir.x+oy*dir.y+oz*dir.z;
@@ -2636,7 +2678,10 @@ const Summons = (() => {
         if(dist>s.range){ s.pos.x+=dx/dist*s.spd*dt; s.pos.z+=dz/dist*s.spd*dt; }
         s.m.rotation.y=Math.atan2(dx,dz);
         s.atkCd-=dt;
-        if(dist<=s.range && s.atkCd<=0){ s.atkCd=0.9; s.peckT=0.25; target.takeDamage(s.dmg,s.owner); FX.spark(new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z),0xff9a2e,8,5,.3,.9); }
+        if(dist<=s.range && s.atkCd<=0){
+          s.atkCd=0.9; s.peckT=0.25;
+          if(!s.ghost){ target.takeDamage(s.dmg,s.owner,false,'ult:'+(s.owner?s.owner.ultId:'henmother')); FX.spark(new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z),0xff9a2e,8,5,.3,.9); }
+        }
         // 쪼기 애니메이션 (머리 앞뒤)
         if(s.peckT>0){ s.peckT-=dt; if(s.m.userData.head) s.m.userData.head.position.z=0.42+Math.sin((0.25-s.peckT)/0.25*Math.PI)*0.25; }
         s.m.position.set(s.pos.x, Math.abs(Math.sin(s.bob))*0.08, s.pos.z);
@@ -2647,9 +2692,11 @@ const Summons = (() => {
         s.atkCd-=dt;
         if(dist<=s.range && s.atkCd<=0){
           s.atkCd=0.7; s.slashT=0.22;
-          target.takeDamage(s.dmg, s.owner);
-          const at=new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z);
-          FX.spark(at,0xff9950,10,5,.3,1.0); Sfx.hit(at);
+          if(!s.ghost){
+            target.takeDamage(s.dmg, s.owner, false, 'ult:'+(s.owner?s.owner.ultId:'foxclone'));
+            const at=new THREE.Vector3(target.pos.x,target.pos.y+1,target.pos.z);
+            FX.spark(at,0xff9950,10,5,.3,1.0); Sfx.hit(at);
+          }
         }
         // 할퀴기 모션: 양팔 휘두르기, 평시엔 다리 흔들기
         if(s.slashT>0){
@@ -2768,7 +2815,7 @@ class Character {
     this.name=name; this.kind=kind;
     this.pos=new THREE.Vector3(); this.velY=0; this.grounded=true;
     this.yaw=0; this.hp=CFG.maxHP; this.dead=false; this.deadT=0;
-    this.weapon=null; this.ammo=0; this.fireCd=0;
+    this.weapon=null; this.ammo=0; this.fireCd=0; this.fireCdMax=0;
     this.crouching=false; this.rolling=false; this.rollT=0; this.rollCd=0; this.rollDir=new THREE.Vector3();
     this.invuln=0; this.kills=0; this.isPlayer=false;
     this.animT=0; this.moveAmt=0; this.punchT=0; this.hurtT=0;
@@ -2838,6 +2885,7 @@ class Character {
     if(!this.canFire()) return false;
     const w=this.weaponDef(), id=this.weapon||'fists';
     this.fireCd=w.rate*(this.fireMul||1);
+    this.fireCdMax=this.fireCd; // 무기 UI 쿨타임 오버레이 계산용 (실제 발사 딜레이 값은 그대로)
     this.punchT=0.28;
     const muzzle=new THREE.Vector3(this.pos.x, this.pos.y+this.eyeY-0.12, this.pos.z);
     muzzle.x+=Math.sin(this.yaw)*.4; muzzle.z+=Math.cos(this.yaw)*.4;
@@ -2853,7 +2901,7 @@ class Character {
           const ang=Math.atan2(dx,dz);
           let diff=Math.abs(((ang-this.yaw)+Math.PI*3)%(Math.PI*2)-Math.PI);
           if(diff<1.1){
-            c.takeDamage(w.dmg,this);
+            c.takeDamage(w.dmg,this,false,id);
             const kn=w.knock||3.5;
             c.knock(dx/d*kn,dz/d*kn);
             FX.impact(new THREE.Vector3(c.pos.x,c.pos.y+1,c.pos.z),0xffe27a,!!w.knock);
@@ -2863,7 +2911,7 @@ class Character {
       }
       // 소환수도 근접 범위에 들어오면 피격
       for(const s of Summons.all()){
-        if(s.owner===this) continue;
+        if(s.owner===this || s.ghost) continue;
         const dx=s.pos.x-this.pos.x, dz=s.pos.z-this.pos.z, d=Math.hypot(dx,dz);
         if(d<w.range+0.4){
           const ang=Math.atan2(dx,dz);
@@ -2889,7 +2937,7 @@ class Character {
     const sndGap = fastAuto ? 140 : 90;
     if(!this._lastSnd || now-this._lastSnd > sndGap){ Sfx.shoot(id, this.isPlayer?null:this.pos); this._lastSnd=now; }
     if(w.type==='arc'||w.type==='proj'){ Projectiles.fire(id,muzzle,dir,this); }
-    else if(w.type==='laser'){ this.laserBeam(muzzle,dir,w,chars); }
+    else if(w.type==='laser'){ this.laserBeam(muzzle,dir,w,chars,id); }
     else if(w.type==='flame'){
       for(let i=0;i<2;i++) FX.flame(muzzle,dir);
       // cone damage
@@ -2901,13 +2949,13 @@ class Character {
           to.normalize();
           const flat=dir.clone(); flat.y=0; flat.normalize();
           if(to.dot(flat)>0.75 && !losBlocked(this.pos,c.pos,Math.min(this.eyeY,c.eyeY))){
-            c.takeDamage(w.dmg,this); if(this.isPlayer) Game.hitMark();
+            c.takeDamage(w.dmg,this,false,id); if(this.isPlayer) Game.hitMark();
           }
         }
       }
       // 소환수도 화염 콘 안이면 피격
       for(const s of Summons.all()){
-        if(s.owner===this) continue;
+        if(s.owner===this || s.ghost) continue;
         const to=new THREE.Vector3(s.pos.x-this.pos.x,0,s.pos.z-this.pos.z);
         const d=to.length();
         if(d<w.range){
@@ -2924,7 +2972,7 @@ class Character {
         const sp=(w.spread||0)*(this.isPlayer&&Input.st.aim?0.45:1);
         d.x+=(Math.random()-.5)*sp*2; d.y+=(Math.random()-.5)*sp*2; d.z+=(Math.random()-.5)*sp*2;
         d.normalize();
-        this.hitscan(muzzle,d,w,chars);
+        this.hitscan(muzzle,d,w,chars,id);
       }
     }
     // auto-discard on empty
@@ -2934,7 +2982,7 @@ class Character {
     }
     return true;
   }
-  hitscan(origin,dir,w,chars){
+  hitscan(origin,dir,w,chars,id){
     const wallD=rayObstacleDist(origin,dir,w.range);
     let bestC=null,bestD=wallD,bestHead=false;
     for(const c of chars){
@@ -2966,7 +3014,7 @@ class Character {
       // 헤드샷: headMult 배율 (총기류만). 근접/폭발엔 headMult 없음
       const head = bestHead && w.headMult;
       const dmg = head ? w.dmg*w.headMult : w.dmg;
-      bestC.takeDamage(dmg, this, head);
+      bestC.takeDamage(dmg, this, head, id);
       FX.impact(end, head?0xffdd44:0xff6666, head); if(head) Sfx.headshot(end); else Sfx.hit(end);
       if(this.isPlayer) Game.hitMark(head);
     } else if(bestD<w.range){
@@ -2974,7 +3022,7 @@ class Character {
     }
   }
   knock(vx,vz){ if(this.dead)return; this.pos.x+=vx*0.06; this.pos.z+=vz*0.06; }
-  laserBeam(origin,dir,w,chars){
+  laserBeam(origin,dir,w,chars,id){
     // 관통 거대 레이저: 벽도 무시하고 경로상 모든 적에게 고정 데미지
     const end=origin.clone().addScaledVector(dir,w.range);
     // 굵은 빔 비주얼
@@ -2997,18 +3045,18 @@ class Character {
         // PVP: 원격 상대면 데미지 전송, 아니면 직접 적용
         if(c.isNet && this.isPlayer && Game.pvpActive&&Game.pvpActive()){
           if(this.gainUlt) this.gainUlt(w.dmg*CFG.ultDmgRate);
-          Game.netHitOpp&&Game.netHitOpp(w.dmg, c);
+          Game.netHitOpp&&Game.netHitOpp(w.dmg, c, id);
         } else {
           const wasAlive=!c.dead && c.hp>0;
           c.hp-=w.dmg; c.hurtT=0.25;
           if(this.gainUlt) this.gainUlt(w.dmg*CFG.ultDmgRate);
-          if(c.hp<=0 && wasAlive){ c.hp=0; c.die(this); }
+          if(c.hp<=0 && wasAlive){ c.hp=0; c.die(this,false,id); }
         }
       }
     }
     // 빔 경로상 소환수도 피격 (관통)
     for(const s of Summons.all()){
-      if(s.owner===this) continue;
+      if(s.owner===this || s.ghost) continue;
       const ox=s.pos.x-origin.x, oy=s.y+0.8-origin.y, oz=s.pos.z-origin.z;
       const t=ox*dir.x+oy*dir.y+oz*dir.z;
       if(t<0||t>w.range) continue;
@@ -3016,7 +3064,7 @@ class Character {
       if(perp < 1.1*1.1) Summons.hurt(s,w.dmg);
     }
   }
-  takeDamage(dmg,attacker,isHead){
+  takeDamage(dmg,attacker,isHead,cause){
     if(this.dead||this.invuln>0) return;
     // PVP: when MY shot hits the remote opponent, don't apply HP locally —
     // send the hit so their client applies it; their HP syncs back via state.
@@ -3027,7 +3075,7 @@ class Character {
       if(isHead||dmg>=40){ Game.doHitStop(0.06); Game.shake(0.3); }
       if(isHead) Sfx.headshot?Sfx.headshot():Sfx.hit(this.pos); else Sfx.hit(this.pos);
       if(!this.dead) this.hurtT=0.25; // 즉각적인 피격 움찔(로컬)
-      Game.netHitOpp(dmg, this);
+      Game.netHitOpp(dmg, this, cause);
       return;
     }
     // difficulty: bot deals scaled damage to the player
@@ -3045,21 +3093,21 @@ class Character {
     }
     if(this.isPlayer){ Game.showDamage(); Sfx.hurt(); Game.shake(0.25); }
     if(this===Game.bot && Game.bot.onShotAt) Game.bot.onShotAt(attacker);
-    if(this.hp<=0){ this.hp=0; this.die(attacker); }
+    if(this.hp<=0){ this.hp=0; this.die(attacker,false,cause); }
   }
-  die(killer, skipKillCount){
+  die(killer, skipKillCount, cause){
     if(this.dead) return;
     this.dead=true; this.deadT=CFG.respawnTime;
     Sfx.die(this.isPlayer?null:this.pos);
+    const wn = weaponDisplayName(cause, killer);
     // PVP에선 킬 카운트를 hit/kill 메시지로 별도 처리하므로 여기선 건너뜀
-    if(killer&&killer!==this&&!skipKillCount){ killer.kills++; Sfx.kill(); Game.addKillFeed(killer.kind, this.kind, killer.weapon); Game.onKill(killer,this); }
+    if(killer&&killer!==this&&!skipKillCount){ killer.kills++; Sfx.kill(); Game.addKillFeed(killer.kind, this.kind, wn); Game.onKill(killer,this); }
     if(killer&&killer!==this&&killer.gainUlt) killer.gainUlt(CFG.ultKillBonus); // 킬 보너스 충전
     if(this.isPlayer){
       const el=document.getElementById('respawnKiller');
       if(el){
         if(killer&&killer!==this){
           const kn = killer.name || (SPECIES[killer.kind]?SPECIES[killer.kind].name:'상대');
-          const wn = killer.weapon ? (WEAPONS[killer.weapon]?WEAPONS[killer.weapon].name:'무기') : '맨주먹';
           el.innerHTML = '<b style="color:#ff8a7a">'+kn+'</b> 에게 <b style="color:#ffd166">'+wn+'</b> (으)로 당했습니다';
         } else {
           el.textContent = '자멸';
@@ -3126,7 +3174,7 @@ class Character {
       const chars2=(Game.chars&&Game.chars.length)?Game.chars:[Game.player,Game.bot];
       for(const c of chars2){ if(!c||c===this||c.dead||c.invuln>0) continue;
         const d=Math.hypot(c.pos.x-this.pos.x,c.pos.z-this.pos.z);
-        if(d<5){ c.takeDamage(70*(1-d/5)+15,this); c.stunT=Math.max(c.stunT||0,0.8); } }
+        if(d<5){ c.takeDamage(70*(1-d/5)+15,this,false,'ult:'+this.ultId); c.stunT=Math.max(c.stunT||0,0.8); } }
     }
     if(this.dead){
       this.deadT-=dt;
@@ -3184,7 +3232,7 @@ class Character {
         let t=((c.pos.x-sx)*vx+(c.pos.z-sz)*vz)/len2; t=Math.max(0,Math.min(1,t));
         const px=sx+vx*t, pz=sz+vz*t;
         const dd=Math.hypot(c.pos.x-px, c.pos.z-pz);
-        if(dd<radius){ c.takeDamage(dmg,this); if(extra) extra(c); }
+        if(dd<radius){ c.takeDamage(dmg,this,false,'ult:'+kind); if(extra) extra(c); }
       }
     };
     if(this.isPlayer && Game.pvpActive && Game.pvpActive()) Game.netUlt(kind);
@@ -3205,7 +3253,7 @@ class Character {
           this.pos.x=Math.max(-19,Math.min(19,bx)); this.pos.z=Math.max(-10,Math.min(10,bz)); collide(this.pos,0.45,this.pos.y);
           this.yaw=Math.atan2(tgt.pos.x-this.pos.x,tgt.pos.z-this.pos.z);
           FX.impact(new THREE.Vector3(this.pos.x,this.pos.y+1,this.pos.z),0x9a6bd9,true);
-          tgt.takeDamage(85,this,true); // 암살 기습 (거의 즉사급)
+          tgt.takeDamage(85,this,true,'ult:'+kind); // 암살 기습 (거의 즉사급)
         } else { this.pos.x+=fwd.x*6; collide(this.pos,0.45,this.pos.y); }
         this.invuln=Math.max(this.invuln,0.35); Sfx.roll(this.isPlayer?null:this.pos); break;
       }
@@ -3228,7 +3276,7 @@ class Character {
       case 'slam': { // 곰: 대지 강타 (주변 적 기절 + 강력 데미지)
         FX.ring(at,0xffb060,0.3,5,.5); FX.spark(at,0xffcc66,16,8,.5,1.4); Game.shake&&Game.shake(0.8);
         for(const c of enemies()){ const dd=Math.hypot(c.pos.x-this.pos.x,c.pos.z-this.pos.z);
-          if(dd<5.5){ c.takeDamage(55*(1-dd/5.5)+25,this); c.stunT=Math.max(c.stunT||0,1.6); } }
+          if(dd<5.5){ c.takeDamage(55*(1-dd/5.5)+25,this,false,'ult:'+kind); c.stunT=Math.max(c.stunT||0,1.6); } }
         Sfx.hit(this.pos); break;
       }
       case 'rush': { // 호랑이: 맹호 돌진 연속 공격
@@ -3243,7 +3291,7 @@ class Character {
       case 'wolfpack': { // 늑대: 늑대 무리 소환 (실제 늑대 형체 + 사방 탄막 + 잠시 공격력)
         FX.summonWolves(this.pos.x,this.pos.z,this.pos.y,this); // 늑대 형체 소환
         for(let i=0;i<14;i++){ const a=i/14*Math.PI*2; const d2=new THREE.Vector3(Math.sin(a),0.03,Math.cos(a));
-          Projectiles.fire('crossbow',new THREE.Vector3(this.pos.x,this.pos.y+1,this.pos.z),d2,this); }
+          Projectiles.fire('crossbow',new THREE.Vector3(this.pos.x,this.pos.y+1,this.pos.z),d2,this,'ult:'+kind); }
         this.ultActive=6; this.ultKind='frenzy'; this.dmgOut=1.4;
         FX.ring(at,0x8a95a3,0.3,3,.4); FX.spark(at,0xd0d8e0,12,6,.5,1.1); Sfx.pickup(); break;
       }
@@ -3254,7 +3302,7 @@ class Character {
       case 'sleepgas': { // 코알라: 수면 가스 (주변 적 둔화 + 데미지)
         FX.ring(at,0xb0c4d0,0.3,5.5,.7); FX.spark(at,0xc8d8e0,18,3,.9,1.5);
         for(const c of enemies()){ const dd=Math.hypot(c.pos.x-this.pos.x,c.pos.z-this.pos.z);
-          if(dd<6){ c.slowT=Math.max(c.slowT||0,4); c.takeDamage(40,this); } }
+          if(dd<6){ c.slowT=Math.max(c.slowT||0,4); c.takeDamage(40,this,false,'ult:'+kind); } }
         Sfx.pickup(); break;
       }
       case 'boarbomb': { // 돼지: 폭주 돌진 후 대폭발 (돌진 경로 + 착지 모두 데미지)
@@ -3262,7 +3310,7 @@ class Character {
         this.pos.x=Math.max(-19,Math.min(19,this.pos.x+fwd.x*d)); this.pos.z=Math.max(-10,Math.min(10,this.pos.z+fwd.z*d));
         collide(this.pos,0.45,this.pos.y); this.invuln=Math.max(this.invuln,0.35);
         hitAlongPath(sx2,sz2,this.pos.x,this.pos.z,2.6,60); // 돌진 경로 직격
-        Game.explodeAt(new THREE.Vector3(this.pos.x,this.pos.y+0.3,this.pos.z),this,{dmg:100,aoe:5.5}); Game.shake&&Game.shake(0.9);
+        Game.explodeAt(new THREE.Vector3(this.pos.x,this.pos.y+0.3,this.pos.z),this,{dmg:100,aoe:5.5},'ult:'+kind); Game.shake&&Game.shake(0.9);
         break;
       }
       case 'giant': { // 병아리: 거대화 (체력·공격력↑, 잠시)
@@ -4247,6 +4295,23 @@ const Game = (() => {
     else $('wepAmmo').innerHTML='<span>∞</span>';
     const wi=$('wepIcon');
     if(wi && wi._wep!==w){ wi._wep=w; drawWeaponIcon(wi, w); }
+    // 무기 쿨타임 오버레이: 발사 직후 아이콘 전체가 어두워지고, 기존 발사 딜레이(fireCd)가 흐르는 만큼 걷힘.
+    // 딜레이 값 자체는 건드리지 않고 표시만 함 (player.fireCd / player.fireCdMax 그대로 사용)
+    // 연사 속도가 빠른 무기(권총/기관단총류 등)는 깜빡임만 심해지므로 제외 — 발사 간격이 긴 무기에서만 표시
+    const cdOv=$('wepCdOverlay');
+    if(cdOv){
+      const wDef=w?WEAPONS[w]:null;
+      const longDelay = wDef && wDef.rate>=CFG.wepCdUiMinRate;
+      const cd=Math.max(0,player.fireCd||0), cdMax=player.fireCdMax||0;
+      const frac = (longDelay && cdMax>0) ? Math.min(1,cd/cdMax) : 0;
+      if(frac>0.001){
+        const deg=frac*360;
+        cdOv.style.background='conic-gradient(rgba(10,12,10,.8) 0deg, rgba(10,12,10,.8) '+deg+'deg, transparent '+deg+'deg, transparent 360deg)';
+        cdOv.classList.add('show');
+      } else {
+        cdOv.classList.remove('show');
+      }
+    }
     // roll cooldown ring
     const rc=$('rollCd'), ring=$('rollCdRing');
     if(rc && ring){
@@ -4277,12 +4342,12 @@ const Game = (() => {
       if(bpct) bpct.textContent = ready ? 'Q' : Math.floor(frac*100)+'%';
     }
   }
-  // kill feed (top-right). a killed b with weapon w
-  function addKillFeed(killerKind, victimKind, weaponId){
+  // kill feed (top-right). a killed b with weaponName (already-resolved display name)
+  function addKillFeed(killerKind, victimKind, weaponName){
     const feed=$('killFeed'); if(!feed) return;
     const kn=SPECIES[killerKind]?SPECIES[killerKind].name:'?';
     const vn=SPECIES[victimKind]?SPECIES[victimKind].name:'?';
-    const wn=weaponId?(WEAPONS[weaponId]?WEAPONS[weaponId].name:''):'맨주먹';
+    const wn=weaponName||'맨주먹';
     const row=document.createElement('div'); row.className='kfRow';
     row.innerHTML='<span class="kfA">'+kn+'</span><span class="kfW">▸'+wn+'▸</span><span class="kfB">'+vn+'</span>';
     feed.appendChild(row);
@@ -5029,13 +5094,23 @@ const Game = (() => {
         if(Net.ffa){ const p=Net.peerByIdx[d.from]; if(p && !killCam) p.applyState(d); break; }
         if(Net.opp && !killCam) Net.opp.applyState(d); // 데스캠 중엔 상태 갱신 무시 (연출 고정)
         break;
-      case 'fire':
-        // 상대 발사 이펙트 (시각용) — 원거리 무기만 궤적 표시
-        if(Net.opp && d.x!==undefined && d.wep && WEAPONS[d.wep] && WEAPONS[d.wep].type!=='melee' && WEAPONS[d.wep].type!=='item' && !WEAPONS[d.wep].melee){
+      case 'fire': {
+        // 상대 발사 이펙트 (시각용) — 무기 종류에 맞는 실제 이펙트를 재현 (탄막/투사체/레이저/화염 등)
+        const fsrc = Net.ffa ? Net.peerByIdx[d.from] : Net.opp;
+        const fw = d.wep && WEAPONS[d.wep];
+        if(fsrc && d.x!==undefined && fw && fw.type!=='melee' && fw.type!=='item' && !fw.melee){
           const o=new THREE.Vector3(d.x,d.y,d.z), dir=new THREE.Vector3(d.dx,d.dy,d.dz);
-          FX.tracer(o, o.clone().addScaledVector(dir,30)); Sfx.shoot(d.wep, o);
+          const _fast=(d.wep==='minigun'||d.wep==='smg'||d.wep==='mg'||d.wep==='smgcp'||d.wep==='nailgun');
+          const flashScale=(d.wep==='sniper'||d.wep==='rocket'||d.wep==='magnum'||d.wep==='dmr')?1.6:(d.wep==='shotgun'||d.wep==='gl')?1.4:_fast?0.75:1;
+          if(fw.type!=='flame') FX.muzzle(o, dir, fw.color||0xfff2a0, flashScale);
+          if(fw.type==='arc'||fw.type==='proj'){ Projectiles.fireGhost(d.wep, o, dir); }
+          else if(fw.type==='laser'){ FX.megaBeam(o, o.clone().addScaledVector(dir, fw.range), fw.color); }
+          else if(fw.type==='flame'){ for(let i=0;i<2;i++) FX.flame(o,dir); }
+          else { FX.tracer(o, o.clone().addScaledVector(dir,30), fw.color); }
+          Sfx.shoot(d.wep, o);
         }
         break;
+      }
       case 'hit':
         if(Net.ffa){
           if(d.to!==undefined && d.to!==Net.myIdx) break; // 내가 대상이 아님
@@ -5043,12 +5118,12 @@ const Game = (() => {
             const attacker=Net.peerByIdx[d.from];
             player.hp-=d.dmg; player.hurtT=0.25; showDamage(); Sfx.hurt(); shake(0.25);
             if(player.hp<=0){
-              player.hp=0; player.die(attacker||Net.opp, true);
+              player.hp=0; player.die(attacker||Net.opp, true, d.cause);
               Net.myDeaths=(Net.myDeaths||0)+1;
               if(attacker){ attacker.kills=(attacker.kills||0)+1; }
               updateScore(); killBanner('사망','#ff5252');
-              // 죽인 사람에게만 킬 확정 통지 (서버가 to로 라우팅)
-              if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',to:d.from,did:Net.myDeaths}));
+              // 죽인 사람에게만 킬 확정 통지 (서버가 to로 라우팅) — cause를 그대로 돌려보내 공격자 킬피드에도 반영
+              if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',to:d.from,did:Net.myDeaths,cause:d.cause}));
             }
           }
           break;
@@ -5057,12 +5132,12 @@ const Game = (() => {
         if(player && !player.dead && player.invuln<=0){
           player.hp-=d.dmg; player.hurtT=0.25; showDamage(); Sfx.hurt(); shake(0.25);
           if(player.hp<=0){
-            player.hp=0; player.die(Net.opp, true);          // skipKillCount: die()가 킬 카운트 안 하게
+            player.hp=0; player.die(Net.opp, true, d.cause);  // skipKillCount: die()가 킬 카운트 안 하게
             Net.myDeaths=(Net.myDeaths||0)+1;                // 내 죽음에 고유 번호
             if(Net.opp){ Net.opp.kills++; updateScore(); }   // 내 화면의 상대 점수 표시
             killBanner('사망','#ff5252');
-            // 상대에게 "네가 나를 죽였다" + 죽음 번호 전송 (중복 방지용)
-            if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',did:Net.myDeaths}));
+            // 상대에게 "네가 나를 죽였다" + 죽음 번호 전송 (중복 방지용) — cause도 함께 돌려보냄
+            if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',did:Net.myDeaths,cause:d.cause}));
             if(Net.opp && Net.opp.kills>=CFG.killTarget) pvpWin(false);
           }
         }
@@ -5076,7 +5151,7 @@ const Game = (() => {
           if(d.did) Net._seenDeaths[key]=true;
           player.kills++; updateScore(); killBanner('처치!','#3ef58a'); Sfx.kill();
           const victim=Net.peerByIdx[d.from];
-          if(victim) addKillFeed(player.kind, victim.kind, player.weapon);
+          if(victim) addKillFeed(player.kind, victim.kind, weaponDisplayName(d.cause, player));
           if(player.kills>=CFG.killTarget){
             // 승자가 전체에 종료 브로드캐스트
             if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerIdx:Net.myIdx})); }catch(e){} }
@@ -5092,7 +5167,7 @@ const Game = (() => {
           if(did && Net._seenDeaths[did]){ break; }          // 이미 센 죽음 -> 중복 무시
           if(did) Net._seenDeaths[did]=true;
           player.kills++; updateScore(); killBanner('처치!','#3ef58a'); Sfx.kill();
-          if(Net.opp) addKillFeed(player.kind, Net.opp.kind, player.weapon);
+          if(Net.opp) addKillFeed(player.kind, Net.opp.kind, weaponDisplayName(d.cause, player));
           if(player.kills>=CFG.killTarget) pvpWin(true);
         }
         break;
@@ -5117,6 +5192,9 @@ const Game = (() => {
         if(src){ const at=new THREE.Vector3(src.pos.x,src.pos.y+1,src.pos.z);
           const col={dash:0x7df3ff,blink:0xb388ff,leap:0x7dffb0,heal:0x3ef58a,regen:0x3ef58a,rapid:0xffd24a,quickdraw:0xffd24a,frenzy:0xff5252,shield:0x66d9ff,cloak:0x9aa7b4,bomb:0xff9040,turret:0xcfd4d9}[d.kind]||0xffffff;
           FX.ring(at,col,0.3,2.5,.4); FX.spark(at,col,10,5,.5,1.1);
+          // 소환형 궁극기는 실제 소환수도 보여야 함 (시각 전용 사본 — 진짜 피해는 hit/kill 메시지가 처리)
+          if(d.kind==='henmother') Summons.spawnHen(src, true);
+          else if(d.kind==='foxclone') Summons.spawnFoxClones(src, true);
         } }
         break;
       case 'pong':
@@ -5318,13 +5396,14 @@ const Game = (() => {
     if(!def || def.type==='melee' || def.type==='item' || def.melee) return;
     Net.ws.send(JSON.stringify({type:'fire', x:+muzzle.x.toFixed(2),y:+muzzle.y.toFixed(2),z:+muzzle.z.toFixed(2), dx:+dir.x.toFixed(3),dy:+dir.y.toFixed(3),dz:+dir.z.toFixed(3), wep:w}));
   }
-  function explodeAt(pos, owner, w){ Projectiles.explode(pos, owner, [player,bot].filter(Boolean), w); }
+  function explodeAt(pos, owner, w, cause){ Projectiles.explode(pos, owner, (chars&&chars.length?chars:[player,bot]).filter(Boolean), w, cause); }
   function netUlt(kind){ if(pvpMode && Net.ws && Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'ult', kind})); }
-  function netHitOpp(dmg, target){
+  function netHitOpp(dmg, target, cause){
     // 내 총알이 상대를 맞힘 -> 상대 클라이언트가 데미지 적용하도록 전송
     if(pvpMode && Net.ws && Net.ws.readyState===1){
       const m={type:'hit', dmg:+dmg.toFixed(1)};
       if(Net.ffa && target && target.netIdx!==undefined) m.to=target.netIdx; // FFA: 맞은 대상 지정
+      if(cause) m.cause=cause; // 데스 메세지용: 실제 피해 원인 (무기 스위칭/궁 타이밍에 영향 안 받게)
       Net.ws.send(JSON.stringify(m));
     }
   }
