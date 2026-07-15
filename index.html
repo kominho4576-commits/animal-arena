@@ -728,21 +728,26 @@ body.layout-edit #joyHint{display:none}
 }
 /* ===== 커스텀 대전 방(파티) 슬롯 목록 / 팀 편성 / 봇 설정 ===== */
 /* 옵션(경기방식/모드/맵/난이도)이 많아 세로 공간이 부족하기 쉬운 화면 —
-   내용이 넘칠 때 화면 밖으로 잘리는 대신 스크롤되도록 하고, 전체적으로 더 컴팩트하게 배치 */
-#customRoomScr{overflow-y:auto;overflow-x:hidden;justify-content:flex-start;padding:14px 0 24px}
-#customRoomScr h1{margin-top:2px;flex-shrink:0}
-.crLayout{gap:26px;align-items:flex-start}
-.crLayout .roomCol{gap:10px}
-.crLayout .optSection{margin-bottom:10px}
-.crLayout .optLabel{margin-bottom:6px}
-.crLayout .rhCodeCard{padding:14px 22px;gap:8px}
-.crLayout .rcCode{font-size:34px;letter-spacing:6px}
-.crBtnRow{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;justify-content:center;flex-shrink:0}
+   스크롤 없이도 다 보이도록 방 코드 카드를 가로 한 줄로 압축하고 전체적으로 컴팩트하게 배치 */
+#customRoomScr h1{margin-top:2px;margin-bottom:6px}
+.crLayout{gap:22px;align-items:flex-start}
+.crLayout .roomCol{gap:8px}
+.crLayout .optSection{margin-bottom:8px}
+.crLayout .optLabel{margin-bottom:5px}
+/* 방 코드 카드: 세로로 쌓지 않고 한 줄(라벨-코드-복사)로 압축 */
+.crLayout .rhCodeCard{flex-direction:row;flex-wrap:wrap;padding:8px 14px;gap:6px 10px}
+.crLayout .rcLabel{flex-shrink:0}
+.crLayout .rcCode{font-size:22px;letter-spacing:3px;padding-left:0}
+.crLayout .rhCodeCard .cfBtn{padding:6px 14px;font-size:12px;min-width:auto;flex-shrink:0}
+.crLayout .rhHint{width:100%;text-align:center;font-size:9.5px;order:9}
+.crBtnRow{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;justify-content:center;flex-shrink:0}
 /* 봇 난이도: 세로로 쌓으면 화면이 지나치게 길어지므로 항상 가로 배치 + 컴팩트한 크기 사용 */
 #crDiffSel{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:8px}
-#crDiffSel .diffBtn{width:auto;flex:1;min-width:84px;padding:8px 10px;font-size:14px;letter-spacing:.5px}
+#crDiffSel .diffBtn{width:auto;flex:1;min-width:84px;padding:7px 10px;font-size:13px;letter-spacing:.5px}
 #crDiffSel .diffBtn small{font-size:9px;margin-top:1px}
-.crSlots{display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow-y:auto;padding-right:2px;margin-top:4px}
+/* 선택된 난이도도 다른 옵션 버튼처럼 파란색으로 강조 */
+#crDiffSel .diffBtn.sel{background:linear-gradient(180deg,rgba(49,230,255,.25),rgba(49,230,255,.08));border-color:var(--cy);color:#fff;box-shadow:0 0 12px rgba(49,230,255,.3)}
+.crSlots{display:flex;flex-direction:column;gap:6px;max-height:30vh;overflow-y:auto;padding-right:2px;margin-top:4px}
 .crSlotRow{display:flex;align-items:center;gap:8px;background:rgba(10,19,34,.55);border:1px solid rgba(125,243,255,.14);border-radius:8px;padding:7px 10px;flex-wrap:wrap}
 .crTag{font-size:9.5px;font-weight:900;letter-spacing:1px;padding:2px 6px;border-radius:4px;flex-shrink:0}
 .crTag.crHost{background:rgba(49,230,255,.2);color:#9fe8ff}
@@ -769,9 +774,23 @@ body.layout-edit #joyHint{display:none}
   .crSlots{max-height:20vh}
   .crLayout{gap:14px}
   .crLayout .optSection{margin-bottom:6px}
-  .crLayout .rhCodeCard{padding:8px 16px;gap:4px}
-  .crLayout .rcCode{font-size:24px;letter-spacing:4px}
+  .crLayout .rhCodeCard{padding:6px 12px}
+  .crLayout .rcCode{font-size:19px;letter-spacing:2px}
   .crBtnRow{margin-top:6px}
+}
+/* 세로 공간이 아주 좁은 가로모드 휴대폰 대응 (스크롤 대신 옵션 요소를 한 단계 더 축소) */
+@media (max-height:460px){
+  #customRoomScr h1{font-size:18px;margin-bottom:2px}
+  .crLayout{gap:10px}
+  .crLayout .optLabel{font-size:9.5px;margin-bottom:3px}
+  .crLayout .optSection{margin-bottom:4px}
+  .crLayout .optBtn{padding:5px 8px;font-size:10.5px}
+  .crLayout .optBtn small{font-size:8.5px}
+  .crLayout .mapGrid{gap:5px}
+  .crSlots{max-height:16vh}
+  #crDiffSel .diffBtn{padding:5px 8px;font-size:11px}
+  .crBtnRow{margin-top:4px}
+  .crBtnRow .pBtn{padding:8px 0;font-size:13px}
 }
 .cfDeco{position:absolute;height:5px;border-radius:2px}
 .cfD1{width:70px;background:var(--yl);top:-16px;left:16%;transform:skew(-30deg)}
@@ -1154,7 +1173,7 @@ body.layout-edit #joyHint{display:none}
 
 <!-- ===== 커스텀 대전 방 (친구 초대 + 봇 추가 + 팀 편성) ===== -->
 <div class="ovl scr" id="customRoomScr" style="display:none">
-  <h1 style="font-size:26px;margin-bottom:8px">커스텀 대전</h1>
+  <h1 style="font-size:26px">커스텀 대전</h1>
   <div class="roomLayout crLayout">
     <div class="roomCol">
       <div class="rhCodeCard">
