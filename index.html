@@ -727,7 +727,22 @@ body.layout-edit #joyHint{display:none}
   .rhCodeCard{padding:16px 20px}
 }
 /* ===== 커스텀 대전 방(파티) 슬롯 목록 / 팀 편성 / 봇 설정 ===== */
-.crSlots{display:flex;flex-direction:column;gap:6px;max-height:38vh;overflow-y:auto;padding-right:2px;margin-top:4px}
+/* 옵션(경기방식/모드/맵/난이도)이 많아 세로 공간이 부족하기 쉬운 화면 —
+   내용이 넘칠 때 화면 밖으로 잘리는 대신 스크롤되도록 하고, 전체적으로 더 컴팩트하게 배치 */
+#customRoomScr{overflow-y:auto;overflow-x:hidden;justify-content:flex-start;padding:14px 0 24px}
+#customRoomScr h1{margin-top:2px;flex-shrink:0}
+.crLayout{gap:26px;align-items:flex-start}
+.crLayout .roomCol{gap:10px}
+.crLayout .optSection{margin-bottom:10px}
+.crLayout .optLabel{margin-bottom:6px}
+.crLayout .rhCodeCard{padding:14px 22px;gap:8px}
+.crLayout .rcCode{font-size:34px;letter-spacing:6px}
+.crBtnRow{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;justify-content:center;flex-shrink:0}
+/* 봇 난이도: 세로로 쌓으면 화면이 지나치게 길어지므로 항상 가로 배치 + 컴팩트한 크기 사용 */
+#crDiffSel{flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:8px}
+#crDiffSel .diffBtn{width:auto;flex:1;min-width:84px;padding:8px 10px;font-size:14px;letter-spacing:.5px}
+#crDiffSel .diffBtn small{font-size:9px;margin-top:1px}
+.crSlots{display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow-y:auto;padding-right:2px;margin-top:4px}
 .crSlotRow{display:flex;align-items:center;gap:8px;background:rgba(10,19,34,.55);border:1px solid rgba(125,243,255,.14);border-radius:8px;padding:7px 10px;flex-wrap:wrap}
 .crTag{font-size:9.5px;font-weight:900;letter-spacing:1px;padding:2px 6px;border-radius:4px;flex-shrink:0}
 .crTag.crHost{background:rgba(49,230,255,.2);color:#9fe8ff}
@@ -744,13 +759,19 @@ body.layout-edit #joyHint{display:none}
 .crSpecGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:46vh;overflow-y:auto;width:min(88vw,460px);margin:14px auto}
 .specPortrait.randSpec{display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:30px;color:#9fe8ff;background:rgba(49,230,255,.12);border-radius:8px}
 @media (max-width:760px){
-  .crSlots{max-height:30vh}
+  .crSlots{max-height:26vh}
   .crSlotRow{padding:6px 8px;gap:6px}
   .crName{font-size:12px}
   .crSpecGrid{grid-template-columns:repeat(3,1fr)}
+  .crLayout{gap:16px}
 }
 @media (max-height:620px){
-  .crSlots{max-height:24vh}
+  .crSlots{max-height:20vh}
+  .crLayout{gap:14px}
+  .crLayout .optSection{margin-bottom:6px}
+  .crLayout .rhCodeCard{padding:8px 16px;gap:4px}
+  .crLayout .rcCode{font-size:24px;letter-spacing:4px}
+  .crBtnRow{margin-top:6px}
 }
 .cfDeco{position:absolute;height:5px;border-radius:2px}
 .cfD1{width:70px;background:var(--yl);top:-16px;left:16%;transform:skew(-30deg)}
@@ -1185,11 +1206,11 @@ body.layout-edit #joyHint{display:none}
       </div>
     </div>
   </div>
-  <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+  <div class="crBtnRow">
     <button class="pBtn pQuit" id="crCancel" style="width:160px">방 나가기</button>
     <button class="pBtn crHostOnly" id="crStart" style="width:160px;background:linear-gradient(180deg,#3ef58a,#1c9660)">시작하기</button>
   </div>
-  <div id="crGuestHint" style="display:none;color:var(--tx2);font-size:13px;margin-top:10px">방장이 시작하기를 누르면 게임이 시작됩니다</div>
+  <div id="crGuestHint" style="display:none;color:var(--tx2);font-size:13px;margin-top:10px;flex-shrink:0">방장이 시작하기를 누르면 게임이 시작됩니다</div>
 </div>
 
 <!-- 봇 동물 선택 팝업 -->
