@@ -352,6 +352,8 @@ body.pc #keyGuide{display:block}
   .optSection{margin:0 0 8px}
   .optBtn{padding:6px 12px;font-size:12px}
   .optLabel{margin-bottom:4px}
+  .setBtnRow{margin-top:6px;gap:5px}
+  .setBtnRow .pBtn{padding:9px 6px;font-size:11px;letter-spacing:.5px}
 }
 .optSection{margin:0 0 16px;text-align:center}
 .optLabel{font-size:11px;font-weight:900;letter-spacing:2px;color:var(--cy2);margin-bottom:8px;text-transform:uppercase}
@@ -440,6 +442,8 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .pQuit{border-color:rgba(255,77,94,.45);color:#ffc9cf;background:linear-gradient(180deg,rgba(84,25,32,.85),rgba(40,12,16,.92))}
 .pQuit:hover{border-color:var(--rd);box-shadow:0 0 20px rgba(255,77,94,.25)}
 .setPanel{display:flex;flex-direction:column;gap:3px;width:300px;margin-top:10px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:10px 14px}
+.setBtnRow{display:flex;gap:8px;margin-top:12px;align-items:center;justify-content:center;flex-wrap:nowrap}
+.setBtnRow .pBtn{padding:12px 10px;font-size:13px;letter-spacing:1px;white-space:nowrap}
 .setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0f8;font-size:13px;padding:6px 4px;border-bottom:1px solid rgba(125,243,255,.08);font-weight:700}
 .setRow:last-child{border-bottom:none}
 .setRow input[type=range]{flex:1;accent-color:var(--cy)}
@@ -821,11 +825,9 @@ body.layout-edit #joyHint{display:none}
     <label class="setRow"><span>화면 흔들림</span><input type="checkbox" id="sShake" checked></label>
     <label class="setRow"><span>그래픽 품질</span><select id="sQual"><option value="high">높음</option><option value="low">낮음(저사양)</option></select></label>
   </div>
-  <div style="display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:320px">
+  <div class="setBtnRow">
     <button class="pBtn" id="sBackup">데이터 백업</button>
     <button class="pBtn" id="sRestore">데이터 복원</button>
-  </div>
-  <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
     <button class="pBtn pResume" id="sClose">확인</button>
     <button class="pBtn" id="sResetStats" style="border-color:rgba(255,100,110,.5);color:#ff8a94">전적 초기화</button>
   </div>
