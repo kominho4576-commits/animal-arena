@@ -63,6 +63,17 @@ button{font-family:inherit;cursor:pointer}
 .ffaRow.me .fn,.ffaRow.me .fk{color:var(--cy);text-shadow:0 0 10px rgba(49,230,255,.5)}
 .ffaRow.top .fr{color:var(--yl)}
 .ffaRow.dead2{opacity:.45}
+#teamBoard{min-width:150px;padding:5px 14px}
+#teamAliveRow{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Black Han Sans',sans-serif;font-size:18px;margin:2px 0 4px}
+#teamAliveMine{color:#5ec6ff;text-shadow:0 0 10px rgba(94,198,255,.5)}
+#teamAliveTheirs{color:#ff6d6d;text-shadow:0 0 10px rgba(255,109,109,.5)}
+#teamAliveMid{font-size:11px;color:var(--tx2);font-family:inherit;letter-spacing:1px}
+.teamRosterRow{display:flex;align-items:center;gap:6px;font-size:11.5px;line-height:1.4;color:var(--tx);text-align:left}
+.teamRosterRow .trDot{width:7px;height:7px;border-radius:50%;background:#3ef58a;flex-shrink:0}
+.teamRosterRow.dead .trDot{background:#ff5252}
+.teamRosterRow.dead{opacity:.5}
+.teamRosterRow .trName{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.teamRosterRow.me .trName{color:var(--cy)}
 #scoreP{color:var(--cy);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(49,230,255,.6)}
 #scoreB{color:var(--rd);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(255,77,94,.6)}
 #scoreMid{color:#5b7288;font-size:16px;margin:0 7px}
@@ -278,6 +289,7 @@ body.pc #keyGuide{display:block}
   .modeCards{margin-top:12px;gap:10px}
   .modeCard{max-width:160px;padding:14px 6px;gap:7px}
   .mcArt{width:min(72px,72%);height:auto;font-size:24px}
+  #modeCustom .mcArt{font-size:15px} #modeTeam .mcArt{font-size:18px} #modeRank .mcArt{font-size:22px}
   .mcName{font-size:17px}
   .mcDesc{font-size:11px}
 }
@@ -285,26 +297,32 @@ body.pc #keyGuide{display:block}
   .modeCards{gap:8px}
   .modeCard{max-width:144px;padding:14px 5px}
   .mcArt{width:min(64px,72%);height:auto;font-size:20px}
+  #modeCustom .mcArt{font-size:12px} #modeTeam .mcArt{font-size:15px} #modeRank .mcArt{font-size:18px}
   .mcName{font-size:16px}
   .mcDesc{font-size:10px}
 }
 @media (max-width:560px){
-  .modeCard{max-width:116px;padding:12px 3px}
-  .mcArt{width:min(52px,72%);height:auto;font-size:17px}
+  /* 5개 카드가 한 줄에 들어가기엔 너무 좁아지므로 2열로 줄바꿈 (억지로 줄여서 텍스트가 카드 밖으로 넘치는 것 방지) */
+  .modeCards{flex-wrap:wrap;row-gap:12px;gap:10px}
+  .modeCard{max-width:150px;flex:0 1 45%;padding:12px 6px}
+  .mcArt{width:min(66px,76%);height:auto;font-size:15px;letter-spacing:0.5px}
+  #modeCustom .mcArt{font-size:9px;letter-spacing:0} #modeTeam .mcArt{font-size:12px} #modeRank .mcArt{font-size:12.5px}
   .mcName{font-size:13px;letter-spacing:0}
-  .mcDesc{font-size:8.5px;line-height:1.4}
+  .mcDesc{font-size:9px;line-height:1.4}
 }
 .modeCard{flex:1 1 0;min-width:0;max-width:180px;padding:16px 8px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);backdrop-filter:blur(5px);color:#fff;transition:transform .14s,border-color .14s,box-shadow .18s;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%)}
 .modeCard::before{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.09),transparent);transition:left .45s;pointer-events:none}
 .modeCard:hover{transform:translateY(-6px)}
 .modeCard:hover::before{left:120%}
 .modeCard:active{transform:scale(.97)}
-#modeAI:hover{border-color:var(--cy);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(49,230,255,.25)}
+#modeCustom:hover{border-color:var(--cy);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(49,230,255,.25)}
 #modePVP:hover{border-color:var(--yl);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(255,216,61,.25)}
+#modeTeam:hover{border-color:#ff8a5c;box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(255,138,92,.25)}
 #modeTrain:hover{border-color:var(--gn);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(62,245,138,.25)}
 .mcArt{width:min(84px,72%);aspect-ratio:1/1;height:auto;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:28px;letter-spacing:2px;color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08) inset;text-shadow:0 2px 8px rgba(0,0,0,.4)}
-.mcAI{background:linear-gradient(135deg,#1c6a96,#0d1e30)}
+.mcAI{background:linear-gradient(135deg,#1c6a96,#0d1e30);font-size:19px}
 .mcPVP{background:linear-gradient(135deg,#96701c,#0d1e30)}
+.mcTeam{background:linear-gradient(135deg,#c0502a,#0d1e30);font-size:22px}
 .mcTrain{background:linear-gradient(135deg,#1c9660,#0d1e30)}
 .mcRank{background:linear-gradient(135deg,#8e3ad0,#0d1e30);font-size:26px}
 .mcName{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px}
@@ -708,6 +726,32 @@ body.layout-edit #joyHint{display:none}
   .roomCol{min-width:0;width:100%;max-width:340px}
   .rhCodeCard{padding:16px 20px}
 }
+/* ===== 커스텀 대전 방(파티) 슬롯 목록 / 팀 편성 / 봇 설정 ===== */
+.crSlots{display:flex;flex-direction:column;gap:6px;max-height:38vh;overflow-y:auto;padding-right:2px;margin-top:4px}
+.crSlotRow{display:flex;align-items:center;gap:8px;background:rgba(10,19,34,.55);border:1px solid rgba(125,243,255,.14);border-radius:8px;padding:7px 10px;flex-wrap:wrap}
+.crTag{font-size:9.5px;font-weight:900;letter-spacing:1px;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.crTag.crHost{background:rgba(49,230,255,.2);color:#9fe8ff}
+.crTag.crFriend{background:rgba(62,245,138,.2);color:#a9ffcd}
+.crTag.crBot{background:rgba(255,184,77,.2);color:#ffd9a0}
+.crName{flex:1;min-width:60px;font-size:13px;color:#e8f2fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crTeamPill{font-size:10.5px;font-weight:900;letter-spacing:1px;padding:4px 10px;border-radius:20px;border:1.5px solid transparent;cursor:pointer;flex-shrink:0}
+.crTeamPill.red{background:rgba(255,82,82,.22);color:#ffb0b0;border-color:rgba(255,82,82,.5)}
+.crTeamPill.blue{background:rgba(94,198,255,.22);color:#bfe6ff;border-color:rgba(94,198,255,.5)}
+.crMiniBtn{font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;cursor:pointer;flex-shrink:0}
+.crMiniBtn:hover{background:rgba(255,255,255,.2)}
+#customRoomScr.guestView .crHostOnly{pointer-events:none;opacity:.5}
+#customRoomScr.guestView #crStart{display:none}
+.crSpecGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:46vh;overflow-y:auto;width:min(88vw,460px);margin:14px auto}
+.specPortrait.randSpec{display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:30px;color:#9fe8ff;background:rgba(49,230,255,.12);border-radius:8px}
+@media (max-width:760px){
+  .crSlots{max-height:30vh}
+  .crSlotRow{padding:6px 8px;gap:6px}
+  .crName{font-size:12px}
+  .crSpecGrid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-height:620px){
+  .crSlots{max-height:24vh}
+}
 .cfDeco{position:absolute;height:5px;border-radius:2px}
 .cfD1{width:70px;background:var(--yl);top:-16px;left:16%;transform:skew(-30deg)}
 .cfD2{width:36px;background:#ff6e9c;top:-16px;left:24%;transform:skew(-30deg)}
@@ -759,6 +803,11 @@ body.layout-edit #joyHint{display:none}
     <div class="tchip"><div class="score-lbl">TIME</div><div id="timer">00:00</div></div>
     <div class="tchip" id="scoreChip"><div class="score-lbl">SCORE · 5킬 승리</div><div><span id="scoreP">0</span><span id="scoreMid">:</span><span id="scoreB">0</span></div></div>
     <div class="tchip" id="ffaBoard" style="display:none"><div class="score-lbl">순위 · 5킬 승리</div><div id="ffaRows"></div></div>
+    <div class="tchip" id="teamBoard" style="display:none">
+      <div class="score-lbl">TEAM · 전멸 승리</div>
+      <div id="teamAliveRow"><span id="teamAliveMine">0</span><span id="teamAliveMid">vs</span><span id="teamAliveTheirs">0</span></div>
+      <div id="teamRoster"></div>
+    </div>
   </div>
   <div id="killFeed"></div>
   <div id="cross"><div class="ch" id="chL"></div><div class="ch" id="chR"></div><div class="cv" id="chT"></div><div class="cv" id="chB"></div><div id="chDot"></div></div>
@@ -1022,15 +1071,20 @@ body.layout-edit #joyHint{display:none}
 <div class="ovl scr" id="modeScr" style="display:none">
   <h1 style="font-size:30px">모드 선택</h1>
   <div class="modeCards">
-    <button class="modeCard" id="modeAI">
-      <div class="mcArt mcAI">AI</div>
-      <div class="mcName">AI</div>
-      <div class="mcDesc">인공지능 봇과 대결<br>오프라인 · 1:1 · 개인전</div>
+    <button class="modeCard" id="modeCustom">
+      <div class="mcArt mcAI">CUSTOM</div>
+      <div class="mcName">커스텀 대전</div>
+      <div class="mcDesc">친구 초대 · 봇 추가<br>방장 자유 설정 · 개인전/팀전</div>
     </button>
     <button class="modeCard" id="modePVP">
       <div class="mcArt mcPVP">PVP</div>
       <div class="mcName">PVP 대전</div>
       <div class="mcDesc">실제 플레이어와 1:1<br>랜덤 매칭 · 온라인</div>
+    </button>
+    <button class="modeCard" id="modeTeam">
+      <div class="mcArt mcTeam">TEAM</div>
+      <div class="mcName">팀전</div>
+      <div class="mcDesc">2vs2 · 3vs3 빠른 매칭<br>실제 플레이어만 · 온라인</div>
     </button>
     <button class="modeCard" id="modeRank">
       <div class="mcArt mcRank">RANK</div>
@@ -1046,7 +1100,111 @@ body.layout-edit #joyHint{display:none}
   <button class="pBtn" id="modeBack" style="margin-top:20px;width:160px">← 뒤로</button>
 </div>
 
-<!-- ===== AI 모드 선택 (1:1 / 개인전) ===== -->
+<!-- ===== 커스텀 대전 입구 (빠른 AI 대전 / 방 만들기) ===== -->
+<div class="ovl scr" id="customEntryOvl" style="display:none">
+  <div class="cfBanner">
+    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
+    <div class="cfIcon">CUSTOM</div>
+    <div class="cfTitle">CUSTOM MATCH</div>
+    <div class="cfSub">플레이 방식을 선택하세요</div>
+    <div class="cfBtns">
+      <button class="cfBtn ok" id="customPickRoom">커스텀 방 만들기</button>
+      <button class="cfBtn" id="customPickJoin">코드로 입장</button>
+      <button class="cfBtn" id="customPickAI">빠른 AI 대전</button>
+      <button class="cfBtn" id="customPickBack">뒤로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 팀전 입구 (2vs2 / 3vs3) ===== -->
+<div class="ovl scr" id="teamPickOvl" style="display:none">
+  <div class="cfBanner">
+    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
+    <div class="cfIcon">TEAM</div>
+    <div class="cfTitle">TEAM MATCH</div>
+    <div class="cfSub">팀 규모를 선택하세요 · 봇 없음, 실제 플레이어만</div>
+    <div class="cfBtns">
+      <button class="cfBtn ok" id="teamPick2">2 vs 2</button>
+      <button class="cfBtn ok" id="teamPick3">3 vs 3</button>
+      <button class="cfBtn" id="teamPickBack">뒤로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 커스텀 대전 방 (친구 초대 + 봇 추가 + 팀 편성) ===== -->
+<div class="ovl scr" id="customRoomScr" style="display:none">
+  <h1 style="font-size:26px;margin-bottom:8px">커스텀 대전</h1>
+  <div class="roomLayout crLayout">
+    <div class="roomCol">
+      <div class="rhCodeCard">
+        <div class="rcLabel">방 코드</div>
+        <div class="rcCode" id="crCode">------</div>
+        <button class="cfBtn ok" id="crCopy">코드 복사</button>
+        <div class="rhHint">친구에게 코드를 공유하세요</div>
+      </div>
+      <div class="optSection" style="text-align:left;width:100%">
+        <div class="optLabel">참가자 (<span id="crCount">1</span>/<span id="crCap">5</span>)</div>
+        <div id="crSlots" class="crSlots"></div>
+        <button class="cfBtn crHostOnly" id="crAddBot" style="margin-top:8px;width:100%">+ 봇 추가</button>
+      </div>
+    </div>
+    <div class="roomCol">
+      <div class="optSection crHostOnly">
+        <div class="optLabel">경기 방식</div>
+        <div class="optRow" id="crMatchType">
+          <button class="optBtn sel" data-mt="ffa">개인전<small>FFA · 최대 5인</small></button>
+          <button class="optBtn" data-mt="team2">2 vs 2<small>팀전</small></button>
+          <button class="optBtn" data-mt="team3">3 vs 3<small>팀전</small></button>
+        </div>
+      </div>
+      <div class="optSection crHostOnly">
+        <div class="optLabel">게임 모드</div>
+        <div class="optRow" id="crModeSel">
+          <button class="optBtn sel" data-mode="deathmatch">데스매치<small>먼저 5킬</small></button>
+          <button class="optBtn" data-mode="timeattack">타임어택<small>2분 최다킬</small></button>
+        </div>
+      </div>
+      <div class="optSection crHostOnly">
+        <div class="optLabel">맵</div>
+        <div class="optRow mapGrid" id="crMapSel">
+          <button class="optBtn sel" data-map="random">랜덤</button>
+          <button class="optBtn" data-map="arena">아레나</button>
+          <button class="optBtn" data-map="ruins">폐허</button>
+          <button class="optBtn" data-map="factory">공장</button>
+          <button class="optBtn" data-map="garden">정원</button>
+          <button class="optBtn" data-map="ice">설원</button>
+        </div>
+      </div>
+      <div class="optSection crHostOnly">
+        <div class="optLabel">봇 난이도</div>
+        <div class="diffCol" id="crDiffSel">
+          <button class="diffBtn sel" data-diff="easy">쉬움<small>아주 약한 상대</small></button>
+          <button class="diffBtn" data-diff="normal">보통<small>노련한 상대</small></button>
+          <button class="diffBtn" data-diff="hard">어려움<small>맹수 같은 상대</small></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+    <button class="pBtn pQuit" id="crCancel" style="width:160px">방 나가기</button>
+    <button class="pBtn crHostOnly" id="crStart" style="width:160px;background:linear-gradient(180deg,#3ef58a,#1c9660)">시작하기</button>
+  </div>
+  <div id="crGuestHint" style="display:none;color:var(--tx2);font-size:13px;margin-top:10px">방장이 시작하기를 누르면 게임이 시작됩니다</div>
+</div>
+
+<!-- 봇 동물 선택 팝업 -->
+<div class="ovl scr" id="botSpecOvl" style="display:none">
+  <div class="cfBanner">
+    <div class="cfTitle" style="font-size:28px">봇 동물 선택</div>
+    <div class="cfSub">이 봇의 동물을 선택하세요</div>
+    <div class="csGrid crSpecGrid" id="botSpecGrid"></div>
+    <div class="cfBtns">
+      <button class="cfBtn ok" id="botSpecClose">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AI 모드 선택 (1:1 / 개인전) — 기존 그대로, 커스텀 대전 입구의 "빠른 AI 대전"에서 진입 ===== -->
 <div class="ovl scr" id="aiPickOvl" style="display:none">
   <div class="cfBanner">
     <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
@@ -1268,8 +1426,9 @@ function vibrate(ms){ if(Settings.vib && navigator.vibrate){ try{ navigator.vibr
 /* ---------------- 전적/통계 (로컬 저장) ---------------- */
 const Stats = {
   wins:0, losses:0, draws:0, kills:0, deaths:0, games:0, streak:0, bestStreak:0,
+  teamWins:0, teamLosses:0, // 팀전(빠른 매칭) 전용 기록 — 랭킹전 RP/승패 기록에는 영향 없음
   load(){ try{ const s=JSON.parse(localStorage.getItem('aa_stats')||'{}'); Object.assign(this,s); }catch(e){} },
-  save(){ try{ localStorage.setItem('aa_stats', JSON.stringify({wins:this.wins,losses:this.losses,draws:this.draws,kills:this.kills,deaths:this.deaths,games:this.games,streak:this.streak,bestStreak:this.bestStreak})); }catch(e){} },
+  save(){ try{ localStorage.setItem('aa_stats', JSON.stringify({wins:this.wins,losses:this.losses,draws:this.draws,kills:this.kills,deaths:this.deaths,games:this.games,streak:this.streak,bestStreak:this.bestStreak,teamWins:this.teamWins,teamLosses:this.teamLosses})); }catch(e){} },
   record(result, kills, deaths){ // result: 'win'|'loss'|'draw'
     this.games++; this.kills+=kills||0; this.deaths+=deaths||0;
     if(result==='win'){ this.wins++; this.streak++; if(this.streak>this.bestStreak) this.bestStreak=this.streak; }
@@ -1277,7 +1436,8 @@ const Stats = {
     else { this.draws++; }
     this.save();
   },
-  reset(){ this.wins=this.losses=this.draws=this.kills=this.deaths=this.games=this.streak=this.bestStreak=0; this.save(); },
+  recordTeam(won){ if(won) this.teamWins++; else this.teamLosses++; this.save(); },
+  reset(){ this.wins=this.losses=this.draws=this.kills=this.deaths=this.games=this.streak=this.bestStreak=this.teamWins=this.teamLosses=0; this.save(); },
   kd(){ return this.deaths>0 ? (this.kills/this.deaths).toFixed(2) : String(this.kills); },
   winRate(){ const t=this.wins+this.losses+this.draws; return t>0 ? Math.round(this.wins/t*100) : 0; }
 };
@@ -3146,9 +3306,9 @@ class Character {
         Sfx.headshot?Sfx.headshot(c.pos):Sfx.hit(c.pos);
         if(this.isPlayer) Game.hitMark(true);
         // PVP: 원격 상대면 데미지 전송, 아니면 직접 적용
-        if(c.isNet && this.isPlayer && Game.pvpActive&&Game.pvpActive()){
+        if(c.isNet && Game.pvpActive&&Game.pvpActive() && (this.isPlayer || this.isPartyBot)){
           if(this.gainUlt) this.gainUlt(w.dmg*CFG.ultDmgRate);
-          Game.netHitOpp&&Game.netHitOpp(w.dmg, c, id);
+          Game.netHitOpp&&Game.netHitOpp(w.dmg, c, id, this.isPartyBot ? this.netIdx : undefined);
         } else {
           const wasAlive=!c.dead && c.hp>0;
           c.hp-=w.dmg; c.hurtT=0.25;
@@ -3171,14 +3331,15 @@ class Character {
     if(this.dead||this.invuln>0) return;
     // PVP: when MY shot hits the remote opponent, don't apply HP locally —
     // send the hit so their client applies it; their HP syncs back via state.
-    if(this.isNet && attacker && attacker.isPlayer && Game.pvpActive()){
+    if(this.isNet && attacker && Game.pvpActive() && (attacker.isPlayer || attacker.isPartyBot)){
       if(attacker.dmgOut) dmg*=attacker.dmgOut;
       if(attacker.gainUlt) attacker.gainUlt(dmg*CFG.ultDmgRate); // 준 데미지에 비례해 충전
       Game.dmgNumber(new THREE.Vector3(this.pos.x,this.pos.y+1.5,this.pos.z), isHead?'HEAD '+Math.round(dmg):dmg, isHead||dmg>=40, isHead?'#ffdd44':null);
       if(isHead||dmg>=40){ Game.doHitStop(0.06); Game.shake(0.3); }
       if(isHead) Sfx.headshot?Sfx.headshot():Sfx.hit(this.pos); else Sfx.hit(this.pos);
       if(!this.dead) this.hurtT=0.25; // 즉각적인 피격 움찔(로컬)
-      Game.netHitOpp(dmg, this, cause);
+      // 커스텀 대전: 호스트의 봇이 원격 상대를 맞힌 경우 -> 봇의 netIdx를 발신자로 태깅해 전송
+      Game.netHitOpp(dmg, this, cause, attacker.isPartyBot ? attacker.netIdx : undefined);
       return;
     }
     // difficulty: bot deals scaled damage to the player
@@ -4198,7 +4359,9 @@ const Game = (() => {
     else if(victim && victim.isPlayer){ msg('당했다...'); killBanner('사망','#ff5252'); shake(0.7); vibrate(120); }
     // 봇끼리 킬: 킬피드만 (die()에서 처리)
     updateScore();
-    if(!trainingMode && gameMode==='deathmatch' && killer.kills>=CFG.killTarget){
+    // 오프라인 AI 개인전/1:1 전용 킬타겟 종료 체크 — 네트워크 매치(PVP/커스텀/팀전)는
+    // handleNetMessage의 'kill'/전멸 체크에서 별도로 처리하므로 여기서는 건너뜀(중복 종료 방지)
+    if(!trainingMode && !pvpMode && gameMode==='deathmatch' && killer.kills>=CFG.killTarget){
       // 데스매치: 마지막 킬 -> 킬캠(슬로우모션 + 죽는 캐릭터 클로즈업)
       const won=killer.isPlayer;
       killCam={ t:0, dur:2.6, victim:victim, killer:killer, won:won, shown:false };
@@ -4206,6 +4369,10 @@ const Game = (() => {
       $('respawnOvl').classList.remove('show');
       const kl=$('killCamLabel'); if(kl) kl.textContent = won?'ELIMINATED':'DEFEATED';
       document.body.classList.add('killcam');
+    }
+    // 커스텀 대전(개인전, 봇 포함)에서 내 봇이 목표 킬 수에 도달 -> 승리 브로드캐스트 (팀전은 전멸 조건으로 별도 처리)
+    if(pvpMode && Net.party && !Net.teamMode && !trainingMode && gameMode==='deathmatch' && killer.isPartyBot && killer.kills>=CFG.killTarget){
+      finishPartyBotWin(killer);
     }
   }
   function killCamUpdate(dt){
@@ -4276,15 +4443,38 @@ const Game = (() => {
   }
   function updateScore(){
     const ffa = typeof Net!=='undefined' && Net.ffa;
-    // 순위표는 개인전 + 봇전(AI 데스매치)에서 사용, 그 외(1대1 PVP·타임어택 등)는 기존 스코어 칩
-    const board = ffa || (!pvpMode && !trainingMode && !!bot && (aiBots.length>1 || gameMode==='deathmatch'));
-    $('scoreChip').style.display = board ? 'none' : '';
+    const teamMode = typeof Net!=='undefined' && Net.teamMode;
+    // 순위표는 개인전 + 봇전(AI 데스매치)에서 사용, 그 외(1대1 PVP·타임어택 등)는 기존 스코어 칩. 팀전은 전용 팀 보드.
+    const board = !teamMode && (ffa || (!pvpMode && !trainingMode && !!bot && (aiBots.length>1 || gameMode==='deathmatch')));
+    $('scoreChip').style.display = (board||teamMode) ? 'none' : '';
     $('ffaBoard').style.display = board ? '' : 'none';
+    $('teamBoard').style.display = teamMode ? '' : 'none';
     $('scoreP').textContent=player.kills;
     if(ffa){ let top=0; for(const p of Net.peers){ top=Math.max(top,p.kills||0); } $('scoreB').textContent=top; }
     else if(aiBots.length>1){ let top=0; for(const b of aiBots){ top=Math.max(top,b.kills||0); } $('scoreB').textContent=top; }
     else $('scoreB').textContent=bot?bot.kills:0;
     if(board) updateFFABoard();
+    if(teamMode) updateTeamBoard();
+  }
+  // 팀전 HUD: 우리 팀원 목록(생존 표시) + 우리팀/상대팀 생존 인원
+  function updateTeamBoard(){
+    if(!chars || !chars.length) return;
+    const mine=chars.filter(c=>c.team===Net.myTeam);
+    const theirs=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==Net.myTeam);
+    const mineAlive=mine.filter(c=>!c.dead).length, theirsAlive=theirs.filter(c=>!c.dead).length;
+    const a=$('teamAliveMine'), b2=$('teamAliveTheirs');
+    if(a) a.textContent=mineAlive; if(b2) b2.textContent=theirsAlive;
+    const host=$('teamRoster'); if(!host) return;
+    host.innerHTML='';
+    mine.forEach(c=>{
+      const row=document.createElement('div');
+      row.className='teamRosterRow'+(c.dead?' dead':'')+(c===player?' me':'');
+      const dot=document.createElement('span'); dot.className='trDot';
+      const nm=document.createElement('span'); nm.className='trName';
+      nm.textContent = c===player ? (nickOrDefault(c.kind)) : (c.name||(SPECIES[c.kind]?SPECIES[c.kind].name:'아군'));
+      row.appendChild(dot); row.appendChild(nm);
+      host.appendChild(row);
+    });
   }
   // 순위 행 데이터 생성 (킬 내림차순, 동점이면 내가 위)
   function buildStandings(){
@@ -4573,12 +4763,16 @@ const Game = (() => {
       player.update(simDt,chars);
       if(Net.ffa){
         for(const p of Net.peers) p.update(simDt,chars);
+        // 커스텀 대전: 호스트는 자신의 봇들을 직접 시뮬레이션(기존 AIBot 로직 그대로) + 상태 브로드캐스트
+        if(Net.party && Net.role==='host' && Net.myBotList){ for(const b of Net.myBotList) b.update(simDt,chars); broadcastBotStates(dt); }
         Net._boardT=(Net._boardT||0)+dt;
         if(Net._boardT>0.5){ Net._boardT=0; updateScore(); } // 상대 킬 수(state 동기화) 반영
-        // 가장 가까운 생존 상대를 bot 자리에 -> 기존 적 HP바/조준보조/리스폰 로직 재사용
+        // 가장 가까운 생존 상대(원격 플레이어 퍼펫 또는 내 봇 포함)를 bot 자리에 -> 기존 적 HP바/조준보조/리스폰 로직 재사용
         let near=null, nd=1e9;
-        for(const p of Net.peers){ if(p.dead) continue; const dd=Math.hypot(p.pos.x-player.pos.x,p.pos.z-player.pos.z); if(dd<nd){ nd=dd; near=p; } }
+        for(const c of chars){ if(c===player||c.dead) continue; const dd=Math.hypot(c.pos.x-player.pos.x,c.pos.z-player.pos.z); if(dd<nd){ nd=dd; near=c; } }
         if(near){ bot=near; Game.bot=near; Net.opp=near; }
+        // 팀전(빠른 매칭/커스텀 대전 팀 모드): 전멸 승리 조건 체크
+        if(Net.teamMode) checkTeamWipe();
       }
       else if(aiBots.length>1){ // AI 개인전
         for(const b of aiBots) b.update(simDt,chars);
@@ -4638,7 +4832,8 @@ const Game = (() => {
   requestAnimationFrame(loop);
 
   /* ===== screen navigation ===== */
-  const SCREENS=['titleScr','lobby','charScr','modeScr','aiPickOvl','diffScr','pvpConfirm','joinRoomOvl','matchScr','roomHostScr','keysScr','layoutScr','tutorialScr'];
+  const SCREENS=['titleScr','lobby','charScr','modeScr','aiPickOvl','diffScr','pvpConfirm','joinRoomOvl','matchScr','roomHostScr','keysScr','layoutScr','tutorialScr',
+    'customEntryOvl','teamPickOvl','customRoomScr','botSpecOvl'];
   function showScreen(id){
     SCREENS.forEach(s=>{ const el=$(s); if(!el) return;
       if(s==='charScr'){ el.classList.toggle('csShow', s===id); el.style.display = (s===id)?'':'none'; }
@@ -5093,20 +5288,29 @@ const Game = (() => {
   refreshAbilityKeys();
   bindBtn('modeBack',()=>showScreen('lobby'));
   let aiFfaPick=false; // 난이도 화면 진입 경로 (1대1 vs 개인전)
-  bindBtn('modeAI',()=>{ showScreen('aiPickOvl'); }); // AI 대전/개인전 선택 팝업부터 노출
+  bindBtn('modeCustom',()=>{ showScreen('customEntryOvl'); }); // 커스텀 대전: 빠른 AI 대전 / 방 만들기 선택 팝업부터 노출
+  bindBtn('customPickAI',()=>{ showScreen('aiPickOvl'); }); // 기존 AI 대전 기능 100% 그대로 재사용
+  bindBtn('customPickRoom',()=>{ openCustomRoom(); });
+  bindBtn('customPickBack',()=>{ showScreen('modeScr'); });
   bindBtn('aiPick1v1',()=>{ rankedMode=false; aiFfaPick=false; showScreen('diffScr'); });
   bindBtn('aiPickFfa',()=>{ rankedMode=false; aiFfaPick=true; showScreen('diffScr'); });
-  bindBtn('aiPickBack',()=>{ showScreen('modeScr'); });
+  bindBtn('aiPickBack',()=>{ showScreen('customEntryOvl'); });
   bindBtn('modeTrain',()=>{ rankedMode=false; startTraining(); });
   bindBtn('modePVP',()=>{ rankedMode=false; showScreen('pvpConfirm'); });
+  bindBtn('modeTeam',()=>{ showScreen('teamPickOvl'); });
+  bindBtn('teamPick2',()=>{ rankedMode=false; startNet('team2'); });
+  bindBtn('teamPick3',()=>{ rankedMode=false; startNet('team3'); });
+  bindBtn('teamPickBack',()=>{ showScreen('modeScr'); });
   bindBtn('modeRank',()=>{ rankedMode=true; startNet('random'); }); // 랭킹전: 바로 랜덤 매칭
   bindBtn('pvpRandom',()=>{ rankedMode=false; startNet('random'); });
   bindBtn('pvpFFA',()=>{ rankedMode=false; startNet('ffa'); });
   bindBtn('pvpCreate',()=>{ startNet('create'); });
-  bindBtn('pvpJoin',()=>{ $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
+  bindBtn('pvpJoin',()=>{ joinMode='pvp'; $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
   bindBtn('pvpCancel',()=>{ showScreen('modeScr'); });
-  bindBtn('joinBack',()=>{ showScreen('pvpConfirm'); });
-  bindBtn('joinConfirm',()=>{ const code=$('roomCodeInput').value.toUpperCase().trim(); if(code.length!==6){ $('joinError').textContent='6자리 코드를 입력하세요'; return; } startNet('join', code); });
+  bindBtn('customPickJoin',()=>{ joinMode='party'; $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
+  bindBtn('joinBack',()=>{ showScreen(joinMode==='party' ? 'customEntryOvl' : 'pvpConfirm'); });
+  bindBtn('joinConfirm',()=>{ const code=$('roomCodeInput').value.toUpperCase().trim(); if(code.length!==6){ $('joinError').textContent='6자리 코드를 입력하세요'; return; }
+    if(joinMode==='party') openCustomJoin(code); else startNet('join', code); });
   bindBtn('rhCopy',()=>{ const c=$('rhCode').textContent; if(!c||c==='------'){ return; } try{ navigator.clipboard.writeText(c); Game.msg('코드 복사됨: '+c); }catch(e){ Game.msg('코드: '+c); } });
   bindBtn('rhCancel',()=>{ stopMatchmaking(); showScreen('modeScr'); });
   // 방 만들기 화면: 모드/맵 선택 (호스트가 고르면 게스트에 동기화됨)
@@ -5116,6 +5320,16 @@ const Game = (() => {
   document.querySelectorAll('#rhMapSel .optBtn').forEach(b=>{
     bindBtn2(b,()=>{ document.querySelectorAll('#rhMapSel .optBtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); Net._roomMap=b.dataset.map; });
   });
+  // 커스텀 대전 방 화면: 경기 방식/모드/맵/봇 난이도 선택 (방장만 변경 가능)
+  document.querySelectorAll('#crMatchType .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(Party.isHost) setMatchType(b.dataset.mt); }); });
+  document.querySelectorAll('#crModeSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.gameMode=b.dataset.mode; renderPartySlots(); sendPartyConfig(); }); });
+  document.querySelectorAll('#crMapSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.map=b.dataset.map; renderPartySlots(); sendPartyConfig(); }); });
+  document.querySelectorAll('#crDiffSel .diffBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.diff=b.dataset.diff; renderPartySlots(); sendPartyConfig(); }); });
+  bindBtn('crAddBot',()=>addBotSlot());
+  bindBtn('crCopy',()=>{ const c=$('crCode').textContent; if(!c||c==='------'){ return; } try{ navigator.clipboard.writeText(c); Game.msg('코드 복사됨: '+c); }catch(e){ Game.msg('코드: '+c); } });
+  bindBtn('crCancel',()=>{ closeCustomRoom(); showScreen('modeScr'); });
+  bindBtn('crStart',()=>startCustomBattle());
+  bindBtn('botSpecClose',()=>{ showScreen('customRoomScr'); });
   // 코드 입력창: 엔터로 입장
   { const ri=$('roomCodeInput'); if(ri) ri.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('joinConfirm').click(); } }); }
   bindBtn('diffBack',()=>showScreen('aiPickOvl'));
@@ -5137,9 +5351,11 @@ const Game = (() => {
   $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; rankedMode=false; BGM.setScene('menu'); showScreen('lobby'); });
 
   /* ===== PVP: 매치메이킹 + 넷코드 ===== */
-  let mmTimer=null, mmWs=null;
+  let mmTimer=null, mmWs=null, joinMode='pvp'; // joinMode: 'pvp'(1:1 코드 입장) | 'party'(커스텀 대전 코드 입장)
   const Net = { ws:null, role:null, room:null, opp:null, seed:0, connected:false, lastSend:0, ended:false, oppNick:'', _pendingOppSpecies:null, ping:0 };
-  function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; Net.ffa=false; Net.myIdx=0; Net.peers=[]; Net.peerByIdx={}; Net._ffaPlayers=null; }
+  function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; Net.ffa=false; Net.myIdx=0; Net.peers=[]; Net.peerByIdx={}; Net._ffaPlayers=null;
+    // 커스텀 대전(파티)/팀전 전용 상태
+    Net.party=false; Net.teamMode=false; Net.myTeam=null; Net.myBotIdx=null; Net.myBots=null; Net._botStateTimer=0; }
 
   function startNet(mode, code){
     Sfx.unlock();
@@ -5155,6 +5371,7 @@ const Game = (() => {
       showScreen('matchScr');
       if(mode==='join'){ $('matchTitle').textContent='방 입장 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='코드 '+code; }
       else if(mode==='ffa'){ $('matchTitle').textContent='개인전 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='최대 5인 · 각자도생'; }
+      else if(mode==='team2'||mode==='team3'){ const sz=mode==='team2'?2:3; $('matchTitle').textContent=sz+'vs'+sz+' 팀전 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent=sz+' vs '+sz+' · 실제 플레이어만'; }
       else { $('matchTitle').textContent='랜덤 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='1 vs 1 · 랜덤 상대'; }
     }
     const MM_URL = window.__PVP_SERVER || null;
@@ -5178,6 +5395,7 @@ const Game = (() => {
         if(mode==='create'){ $('rhStatusText').textContent='방 생성 중...'; mmWs.send(JSON.stringify({type:'createroom',species:selectedSpecies,nick:playerNick})); }
         else if(mode==='join'){ $('matchStatus').textContent='방 입장 중...'; mmWs.send(JSON.stringify({type:'joinroom',species:selectedSpecies,nick:playerNick,code:code})); }
         else if(mode==='ffa'){ $('matchStatus').textContent='플레이어를 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_ffa',species:selectedSpecies,nick:playerNick})); }
+        else if(mode==='team2'||mode==='team3'){ $('matchStatus').textContent='팀원을 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_team',size:(mode==='team2'?2:3),species:selectedSpecies,nick:playerNick})); }
         else { $('matchStatus').textContent='상대를 찾는 중...'; mmWs.send(JSON.stringify({type:'queue',species:selectedSpecies,nick:playerNick})); }
       };
       mmWs.onmessage=(ev)=>{
@@ -5289,6 +5507,8 @@ const Game = (() => {
         break;
       }
       case 'hit':
+        // 커스텀 대전: 나(호스트)의 봇이 맞았다면 -> 봇에게 데미지 적용 (호스트가 봇을 대신 판정)
+        if(Net.party && d.to!==undefined && Net.myBotIdx && Net.myBotIdx.has(d.to)){ applyBotHit(d); break; }
         if(Net.ffa){
           if(d.to!==undefined && d.to!==Net.myIdx) break; // 내가 대상이 아님
           if(player && !player.dead && player.invuln<=0){
@@ -5320,6 +5540,8 @@ const Game = (() => {
         }
         break;
       case 'kill':
+        // 커스텀 대전: 내 봇이 (원격 상대를 죽여) 킬 크레딧을 받는 경우 -> 봇의 킬 수 증가
+        if(Net.party && d.to!==undefined && Net.myBotIdx && Net.myBotIdx.has(d.to)){ applyBotKillCredit(d); break; }
         if(Net.ffa){
           if(d.to!==undefined && d.to!==Net.myIdx) break;
           const key=(d.from||0)+':'+(d.did||0);
@@ -5329,8 +5551,8 @@ const Game = (() => {
           player.kills++; updateScore(); killBanner('처치!','#3ef58a'); Sfx.kill();
           const victim=Net.peerByIdx[d.from];
           if(victim) addKillFeed(player.kind, victim.kind, weaponDisplayName(d.cause, player));
-          if(player.kills>=CFG.killTarget){
-            // 승자가 전체에 종료 브로드캐스트
+          if(!Net.teamMode && player.kills>=CFG.killTarget){
+            // 승자가 전체에 종료 브로드캐스트 (팀전은 전멸 조건으로 별도 처리하므로 제외)
             if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerIdx:Net.myIdx})); }catch(e){} }
             if(victim){ Net.opp=victim; } // 킬캠 대상
             pvpWin(true);
@@ -5359,9 +5581,46 @@ const Game = (() => {
       case 'opponent_left':
         onOpponentLeft(); break;
       case 'gameover':
+        if(Net.teamMode){ if(running){ pvpWin(d.winnerTeam===Net.myTeam); } break; } // 팀전: 팀 단위 승패
         if(Net.ffa){ if(running){ const w=Net.peerByIdx[d.winnerIdx]; if(w) Net.opp=w; pvpWin(d.winnerIdx===Net.myIdx); } break; }
         // 상대가 경기 종료를 알림 (상대가 이겼거나 졌음) — 아직 결과창 안 떴으면 표시
         if(running){ pvpWin(!!d.youWon); }
+        break;
+      case 'bot_state': {
+        // 봇(호스트가 시뮬레이션)의 상태를 다른 클라이언트가 퍼펫으로 반영
+        const p=Net.peerByIdx[d.idx]; if(p && !killCam) p.applyState(d);
+        break;
+      }
+      case 'party_created':
+        Party.code=d.code; Party.isHost=true; renderPartySlots();
+        break;
+      case 'party_joined':
+        Party.code=d.code; Party.isHost=false;
+        break;
+      case 'party_join_failed':
+        if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
+        showScreen('joinRoomOvl');
+        $('joinError').textContent=d.reason||'입장에 실패했습니다';
+        break;
+      case 'party_roster':
+        Party.roster=d.roster||[];
+        if(Party.isHost) reconcilePartyRoster(); else renderPartySlots();
+        break;
+      case 'party_config':
+        if(!Party.isHost) applyPartyConfig(d.config);
+        break;
+      case 'party_closed':
+        if($('customRoomScr').style.display!=='none'){ Game.msg&&Game.msg(d.reason||'방이 종료되었습니다'); showScreen('customEntryOvl'); }
+        break;
+      case 'party_matched':
+        _startPartyMatch(d);
+        break;
+      case 'team_wait':
+        $('matchStatus').textContent='대기 인원 '+d.count+' / '+d.need;
+        $('matchSub').textContent=d.size+' vs '+d.size+' · 실제 플레이어만';
+        break;
+      case 'team_matched':
+        _prepTeamMatch(d);
         break;
       case 'ult':
         // 상대 궁극기 시각 효과
@@ -5420,7 +5679,7 @@ const Game = (() => {
     }, 3200);
   }
   // ===== 개인전(FFA) 시작 =====
-  const FFA_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11]]; // idx별 시작 위치 (최대 5인)
+  const FFA_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11],[11,-11]]; // idx별 시작 위치 (개인전 최대 5인 / 팀전 3vs3=6인)
   function startFFA(){
     if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
     currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length];
@@ -5439,6 +5698,7 @@ const Game = (() => {
     player=new Player(pSpec);
     const sp=FFA_SPAWNS[Net.myIdx]||FFA_SPAWNS[0];
     player.pos.set(sp[0],0,sp[1]);
+    player.team = Net.myTeam!=null ? Net.myTeam : undefined; // 팀전(빠른 매칭)일 때만 설정, 일반 개인전은 undefined
     // 원격 플레이어 퍼펫 생성
     Net.peers=[]; Net.peerByIdx={};
     for(const info of Net._ffaPlayers){
@@ -5446,6 +5706,7 @@ const Game = (() => {
       const o=new NetOpponent(info.species||'fox');
       o.netIdx=info.idx;
       o.name=info.nick||(SPECIES[info.species]?SPECIES[info.species].name:'상대');
+      o.team=info.team;
       const s=FFA_SPAWNS[info.idx]||[14,0];
       o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
       Net.peers.push(o); Net.peerByIdx[info.idx]=o;
@@ -5544,7 +5805,10 @@ const Game = (() => {
     hideFFAFinal();
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    if(Net.ffa){ $('winSub').textContent='개인전 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
+    // 팀전(빠른 매칭)만 별도 승/패 기록 — 랭킹전 RP/전적에는 영향 없음. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
+    if(Net.teamMode && !Net.party) Stats.recordTeam(won);
+    if(Net.teamMode){ $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료'; $('winStandings').style.display='none'; }
+    else if(Net.ffa){ $('winSub').textContent='개인전 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=(player?player.kills:0)+' : '+(Net.opp?Net.opp.kills:0); $('winStandings').style.display='none'; }
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
@@ -5575,12 +5839,13 @@ const Game = (() => {
   }
   function explodeAt(pos, owner, w, cause){ Projectiles.explode(pos, owner, (chars&&chars.length?chars:[player,bot]).filter(Boolean), w, cause); }
   function netUlt(kind){ if(pvpMode && Net.ws && Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'ult', kind})); }
-  function netHitOpp(dmg, target, cause){
+  function netHitOpp(dmg, target, cause, fromBotIdx){
     // 내 총알이 상대를 맞힘 -> 상대 클라이언트가 데미지 적용하도록 전송
     if(pvpMode && Net.ws && Net.ws.readyState===1){
       const m={type:'hit', dmg:+dmg.toFixed(1)};
-      if(Net.ffa && target && target.netIdx!==undefined) m.to=target.netIdx; // FFA: 맞은 대상 지정
+      if(Net.ffa && target && target.netIdx!==undefined) m.to=target.netIdx; // FFA/팀전/파티: 맞은 대상 지정
       if(cause) m.cause=cause; // 데스 메세지용: 실제 피해 원인 (무기 스위칭/궁 타이밍에 영향 안 받게)
+      if(fromBotIdx!==undefined) m.fromBot=fromBotIdx; // 호스트가 자신의 봇을 대신해 보내는 공격
       Net.ws.send(JSON.stringify(m));
     }
   }
@@ -5596,6 +5861,331 @@ const Game = (() => {
     if(mmWs){ try{ mmWs.send(JSON.stringify({type:'cancel'})); mmWs.close(); }catch(e){} mmWs=null; }
     Net.connected=false; Net.ws=null;
     $('matchSub').textContent='1 vs 1 · 랜덤 상대';
+  }
+
+  /* ===================================================================
+     ===== 커스텀 대전(파티 방: 친구 초대 + 봇 + 팀 편성) + 팀전(빠른 매칭) =====
+     기존 PVP 코드방(createroom/joinroom)과 FFA(startFFA/_startFFAMatch) 로직을
+     최대한 그대로 재사용한다. 봇은 방장(host) 클라이언트에서만 AIBot으로 시뮬레이션되고,
+     다른 클라이언트에는 NetOpponent 퍼펫(bot_state로 조종)으로 보인다.
+     =================================================================== */
+  const Party = {
+    ws:null, code:null, isHost:false,
+    roster:[],  // 서버가 알려준 실제 접속 멤버 [{partyIdx,species,nick,isHost}]
+    slots:[],   // 최종 구성(방장이 편집): [{type:'player'|'bot', partyIdx?, species, nick, team}]
+    matchType:'ffa', gameMode:'deathmatch', map:'random', diff:'easy'
+  };
+  function partyCapacity(mt){ return mt==='team2'?4 : mt==='team3'?6 : 5; }
+  function resolveSpeciesPick(key){ return (!key||key==='random') ? PLAYER_SPECIES[Math.floor(Math.random()*PLAYER_SPECIES.length)] : key; }
+
+  function openCustomRoom(){
+    Sfx.unlock(); resetNet();
+    Party.code=null; Party.isHost=true; Party.roster=[];
+    Party.slots=[{type:'player', partyIdx:0, species:selectedSpecies, nick:playerNick, team:'red'}];
+    Party.matchType='ffa'; Party.gameMode='deathmatch'; Party.map='random'; Party.diff='easy';
+    showScreen('customRoomScr');
+    $('crCode').textContent='------';
+    renderPartySlots();
+    const MM_URL = window.__PVP_SERVER || null;
+    if(!MM_URL){ Game.msg&&Game.msg('PVP 서버 미연결 (window.__PVP_SERVER 설정 필요)'); return; }
+    try{
+      const ws=new WebSocket(MM_URL); Net.ws=ws; Party.ws=ws;
+      ws.onopen=()=>{ ws.send(JSON.stringify({type:'party_create', species:selectedSpecies, nick:playerNick})); };
+      ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleNetMessage(d); };
+      ws.onerror=()=>{ Game.msg&&Game.msg('서버 연결 실패'); };
+      ws.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
+    }catch(e){ Game.msg&&Game.msg('서버 연결 실패'); }
+  }
+  function openCustomJoin(code){
+    Sfx.unlock(); resetNet();
+    Party.code=null; Party.isHost=false; Party.roster=[]; Party.slots=[];
+    const MM_URL = window.__PVP_SERVER || null;
+    if(!MM_URL){ $('joinError').textContent='PVP 서버 미연결'; return; }
+    try{
+      const ws=new WebSocket(MM_URL); Net.ws=ws; Party.ws=ws;
+      ws.onopen=()=>{ ws.send(JSON.stringify({type:'party_join', code, species:selectedSpecies, nick:playerNick})); };
+      ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleNetMessage(d); };
+      ws.onerror=()=>{ $('joinError').textContent='서버 연결 실패'; };
+      ws.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
+    }catch(e){ $('joinError').textContent='서버 연결 실패'; }
+  }
+  function closeCustomRoom(){
+    if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'party_leave'})); Net.ws.close(); }catch(e){} }
+    Net.ws=null; Party.ws=null;
+  }
+
+  // 호스트: 실제 접속자 로스터가 바뀔 때(친구 입장/퇴장) Party.slots를 재구성 — 봇/팀 배치는 유지
+  function reconcilePartyRoster(){
+    const seen={}; for(const r of Party.roster) seen[r.partyIdx]=r;
+    Party.slots = Party.slots.filter(s => s.type!=='player' || seen[s.partyIdx]);
+    for(const r of Party.roster){
+      if(r.partyIdx===0) continue; // 호스트 본인 슬롯은 항상 이미 존재
+      const ex=Party.slots.find(s=>s.type==='player' && s.partyIdx===r.partyIdx);
+      if(!ex){
+        const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
+        Party.slots.push({type:'player', partyIdx:r.partyIdx, species:r.species, nick:r.nick, team: redN<=blueN?'red':'blue'});
+      } else { ex.species=r.species; ex.nick=r.nick; }
+    }
+    const cap=partyCapacity(Party.matchType);
+    while(Party.slots.length>cap){ const ri=[...Party.slots].reverse().findIndex(s=>s.type==='bot'); if(ri<0) break; Party.slots.splice(Party.slots.length-1-ri,1); }
+    renderPartySlots();
+    sendPartyConfig();
+  }
+  function sendPartyConfig(){
+    if(!Party.isHost || !Net.ws || Net.ws.readyState!==1) return;
+    Net.ws.send(JSON.stringify({ type:'party_config', config:{
+      matchType:Party.matchType, gameMode:Party.gameMode, map:Party.map, diff:Party.diff, slots:Party.slots
+    }}));
+  }
+  function applyPartyConfig(config){
+    if(!config) return;
+    Party.matchType=config.matchType||'ffa'; Party.gameMode=config.gameMode||'deathmatch';
+    Party.map=config.map||'random'; Party.diff=config.diff||'easy'; Party.slots=config.slots||[];
+    renderPartySlots();
+  }
+  function setMatchType(mt){
+    if(!Party.isHost) return;
+    Party.matchType=mt;
+    const cap=partyCapacity(mt);
+    while(Party.slots.length>cap){ const ri=[...Party.slots].reverse().findIndex(s=>s.type==='bot'); if(ri<0) break; Party.slots.splice(Party.slots.length-1-ri,1); }
+    renderPartySlots(); sendPartyConfig();
+  }
+  function addBotSlot(){
+    if(!Party.isHost) return;
+    const cap=partyCapacity(Party.matchType);
+    if(Party.slots.length>=cap) return;
+    const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
+    Party.slots.push({type:'bot', species:'random', nick:'봇', team: redN<=blueN?'red':'blue'});
+    renderPartySlots(); sendPartyConfig();
+  }
+  function removeSlot(i){
+    if(!Party.isHost) return;
+    const s=Party.slots[i]; if(!s || s.type!=='bot') return; // 실제 플레이어는 스스로 나가야 함(강퇴 없음, 단순화)
+    Party.slots.splice(i,1);
+    renderPartySlots(); sendPartyConfig();
+  }
+  function cycleSlotTeam(i){
+    if(!Party.isHost) return;
+    const s=Party.slots[i]; if(!s) return;
+    s.team = (s.team==='red') ? 'blue' : 'red';
+    renderPartySlots(); sendPartyConfig();
+  }
+  let botSpecTarget=-1;
+  function openBotSpeciesPicker(i){ if(!Party.isHost) return; botSpecTarget=i; showScreen('botSpecOvl'); renderBotSpecGrid(); }
+  function renderBotSpecGrid(){
+    const grid=$('botSpecGrid'); if(!grid) return;
+    grid.innerHTML='';
+    const cur = (botSpecTarget>=0 && Party.slots[botSpecTarget]) ? Party.slots[botSpecTarget].species : 'random';
+    const mk=(key,label)=>{
+      const b=document.createElement('button'); b.className='specBtn'+(key===cur?' sel':'');
+      if(key==='random'){ const ic=document.createElement('div'); ic.className='specPortrait randSpec'; ic.textContent='?'; b.appendChild(ic); }
+      else { const cv=document.createElement('canvas'); cv.width=96; cv.height=96; cv.className='specPortrait'; b.appendChild(cv); drawPortrait(cv,key); }
+      const nm=document.createElement('span'); nm.className='specName'; nm.textContent=label; b.appendChild(nm);
+      b.addEventListener('click',()=>{ if(botSpecTarget>=0 && Party.slots[botSpecTarget]){ Party.slots[botSpecTarget].species=key; } renderBotSpecGrid(); Sfx.unlock(); Sfx.pickup(); });
+      grid.appendChild(b);
+    };
+    mk('random','랜덤');
+    PLAYER_SPECIES.forEach(key=>mk(key, SPECIES[key]?SPECIES[key].name:key));
+  }
+  function renderPartySlots(){
+    const root=$('customRoomScr'); if(!root) return;
+    root.classList.toggle('guestView', !Party.isHost);
+    $('crCode').textContent = Party.code || '------';
+    const cap=partyCapacity(Party.matchType);
+    const cnt=$('crCount'), capEl=$('crCap'); if(cnt) cnt.textContent=Party.slots.length; if(capEl) capEl.textContent=cap;
+    document.querySelectorAll('#crMatchType .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.mt===Party.matchType));
+    document.querySelectorAll('#crModeSel .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.mode===Party.gameMode));
+    document.querySelectorAll('#crMapSel .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.map===Party.map));
+    document.querySelectorAll('#crDiffSel .diffBtn').forEach(b=>b.classList.toggle('sel', b.dataset.diff===Party.diff));
+    const showTeam = Party.matchType!=='ffa';
+    const host=$('crSlots'); if(!host) return;
+    host.innerHTML='';
+    Party.slots.forEach((s,i)=>{
+      const row=document.createElement('div'); row.className='crSlotRow';
+      const tag=document.createElement('span'); tag.className='crTag '+(s.type==='bot'?'crBot':(s.partyIdx===0?'crHost':'crFriend'));
+      tag.textContent = s.type==='bot' ? 'BOT' : (s.partyIdx===0?'HOST':'GUEST');
+      const nm=document.createElement('span'); nm.className='crName';
+      nm.textContent = s.type==='bot' ? (s.species==='random'?'봇 (랜덤)':(SPECIES[s.species]?SPECIES[s.species].name+' 봇':'봇')) : (s.nick || (SPECIES[s.species]?SPECIES[s.species].name:'플레이어'));
+      row.appendChild(tag); row.appendChild(nm);
+      if(showTeam){
+        const tb=document.createElement('button'); tb.className='crTeamPill crHostOnly '+(s.team==='blue'?'blue':'red'); tb.textContent=(s.team==='blue'?'BLUE':'RED');
+        tb.addEventListener('click',()=>cycleSlotTeam(i));
+        row.appendChild(tb);
+      }
+      if(s.type==='bot'){
+        const sb=document.createElement('button'); sb.className='crMiniBtn crHostOnly'; sb.textContent='동물'; sb.addEventListener('click',()=>openBotSpeciesPicker(i));
+        const rb=document.createElement('button'); rb.className='crMiniBtn crHostOnly'; rb.textContent='제거'; rb.addEventListener('click',()=>removeSlot(i));
+        row.appendChild(sb); row.appendChild(rb);
+      }
+      host.appendChild(row);
+    });
+    const addBtn=$('crAddBot'); if(addBtn) addBtn.disabled = Party.slots.length>=cap;
+    const guestHint=$('crGuestHint'); if(guestHint) guestHint.style.display = Party.isHost ? 'none' : '';
+  }
+  function startCustomBattle(){
+    if(!Party.isHost) return;
+    const cap=partyCapacity(Party.matchType);
+    // 팀 모드에서 정원 미달이면 남는 자리를 무작위 종족 봇으로 자동 채움(작은 팀부터) — 인원 부족해도 시작 가능
+    if(Party.matchType!=='ffa'){
+      while(Party.slots.length<cap){
+        const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
+        Party.slots.push({type:'bot', species:'random', nick:'봇', team: redN<=blueN?'red':'blue'});
+      }
+    }
+    const roster = Party.slots.map(s => s.type==='bot'
+      ? { type:'bot', species: resolveSpeciesPick(s.species), nick:'봇', team: Party.matchType==='ffa'?'ffa':s.team }
+      : { type:'player', partyIdx:s.partyIdx, team: Party.matchType==='ffa'?'ffa':s.team });
+    renderPartySlots();
+    Net.ws.send(JSON.stringify({ type:'party_start', roster, gameMode:Party.gameMode, map:Party.map }));
+  }
+
+  // ===== 커스텀 대전 매치 시작 (party_matched 수신 시) =====
+  function _startPartyMatch(d){
+    Net.role = (d.idx===0)?'host':'guest'; // party_start에서 항상 idx0=호스트로 배정
+    Net.connected=true; Net.ffa=true; Net.party=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
+    Net._partyPlayers=d.players||[];
+    gameMode=d.gameMode||'deathmatch'; selectedMap=d.map||'random';
+    const mine=Net._partyPlayers.find(p=>p.idx===d.idx);
+    Net.myTeam = mine ? mine.team : 'ffa';
+    Net.teamMode = Net._partyPlayers.some(p=>p.team==='red'||p.team==='blue');
+    currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length];
+    showMapRoulette(currentMap, ()=>_startPartyMatchReal());
+  }
+  function _startPartyMatchReal(){
+    lastDiff='pvp';
+    if(player){ scene.remove(player.group); }
+    if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
+    if(Net.peers) Net.peers.forEach(p=>scene.remove(p.group));
+    if(Net.myBotList) Net.myBotList.forEach(b=>scene.remove(b.group));
+    Projectiles.clear(); Summons.clear();
+    buildArena(Net.seed);
+    const pSpec = selectedSpecies || 'rabbit';
+    player=new Player(pSpec); player.team=Net.myTeam;
+    const sp=FFA_SPAWNS[Net.myIdx]||FFA_SPAWNS[0];
+    player.pos.set(sp[0],0,sp[1]);
+    Net.peers=[]; Net.peerByIdx={}; Net.myBotIdx=new Set(); Net.myBotList=[];
+    for(const info of Net._partyPlayers){
+      if(info.idx===Net.myIdx) continue;
+      const s=FFA_SPAWNS[info.idx]||[14,0];
+      if(info.bot){
+        if(Net.role==='host'){
+          // 방장: 이 봇을 직접 시뮬레이션 (기존 AIBot 그대로 재사용)
+          const sp2=resolveSpeciesPick(info.species);
+          const b=new AIBot(Party.diff||'easy', sp2);
+          b.name=(SPECIES[sp2]?SPECIES[sp2].name:'봇')+' 봇';
+          b.team=info.team; b.isPartyBot=true; b.netIdx=info.idx;
+          b.pos.set(s[0],0,s[1]);
+          Net.myBotIdx.add(info.idx); Net.myBotList.push(b); Net.peerByIdx[info.idx]=b;
+        } else {
+          // 게스트: 봇은 bot_state로 조종되는 퍼펫 (NetOpponent 그대로 재사용)
+          const sp2=resolveSpeciesPick(info.species);
+          const o=new NetOpponent(sp2);
+          o.netIdx=info.idx; o.name=(SPECIES[sp2]?SPECIES[sp2].name:'봇')+' 봇'; o.team=info.team;
+          o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
+          Net.peers.push(o); Net.peerByIdx[info.idx]=o;
+        }
+      } else {
+        const o=new NetOpponent(info.species||'fox');
+        o.netIdx=info.idx; o.name=info.nick||(SPECIES[info.species]?SPECIES[info.species].name:'상대'); o.team=info.team;
+        o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
+        Net.peers.push(o); Net.peerByIdx[info.idx]=o;
+      }
+    }
+    Net.opp=Net.peers[0]||Net.myBotList[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
+    chars=[player, ...Net.peers, ...(Net.role==='host'?Net.myBotList:[])];
+    Pickups.init(Net.seed);
+    time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
+    const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
+    setProfileAvatar(pSpec);
+    const feed=$('killFeed'); if(feed) feed.innerHTML='';
+    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    $('winOvl').style.display='none';
+    updateHUD(); updateScore();
+    if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
+  }
+
+  // ===== 팀전(빠른 매칭) 시작: 기존 FFA 부트스트랩(_startFFAMatch) 그대로 재사용 =====
+  function _prepTeamMatch(d){
+    Net.connected=true; Net.ffa=true; Net.teamMode=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
+    Net.role = d.idx===0 ? 'host' : 'guest';
+    Net._ffaPlayers=d.players||[];
+    const mine=Net._ffaPlayers.find(p=>p.idx===d.idx);
+    Net.myTeam = mine ? mine.team : 'red';
+    gameMode='deathmatch'; selectedMap='random';
+    $('matchStatus').textContent='매칭 완료! '+d.size+'vs'+d.size;
+    $('matchSub').textContent='잠시 후 시작합니다';
+    setTimeout(()=>startFFA(), 700);
+  }
+
+  // ===== 봇 피격/킬 처리 (호스트 전용: 호스트가 자신의 봇을 대신 판정) =====
+  function applyBotHit(d){
+    const b=Net.peerByIdx[d.to];
+    if(!b || b.dead || b.invuln>0) return;
+    const attacker=Net.peerByIdx[d.from];
+    b.hp-=d.dmg; b.hurtT=0.25;
+    if(b.hp<=0){
+      b.hp=0;
+      b.die(attacker||null, true, d.cause); // skipKillCount: 아래서 별도 킬 메시지로 크레딧 부여
+      if(!Net._botDeaths) Net._botDeaths={};
+      const myDeaths=(Net._botDeaths[d.to]=(Net._botDeaths[d.to]||0)+1);
+      if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill', to:d.from, fromBot:d.to, did:myDeaths, cause:d.cause}));
+    }
+  }
+  function applyBotKillCredit(d){
+    const b=Net.peerByIdx[d.to]; if(!b) return;
+    const key=(d.from||0)+':'+(d.did||0);
+    if(!Net._seenDeaths) Net._seenDeaths={};
+    if(d.did && Net._seenDeaths[key]) return;
+    if(d.did) Net._seenDeaths[key]=true;
+    b.kills=(b.kills||0)+1; updateScore();
+    const victim=Net.peerByIdx[d.from];
+    if(victim) addKillFeed(b.kind, victim.kind, weaponDisplayName(d.cause, b));
+    if(!Net.teamMode && gameMode==='deathmatch' && b.kills>=CFG.killTarget) finishPartyBotWin(b);
+  }
+  function finishPartyBotWin(botChar){
+    if(Net.ended || killCam) return;
+    if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerIdx:botChar.netIdx})); }catch(e){} }
+    Net.opp=botChar;
+    pvpWin(false); // 내 봇이 이긴 것 -> 나(호스트) 개인 입장에서는 승리가 아님 (기존 AI 다인전과 동일한 규칙)
+  }
+
+  // 호스트: 매 프레임 자신의 봇들 상태를 다른 참가자에게 20Hz로 브로드캐스트
+  function broadcastBotStates(dt){
+    if(!Net.party || Net.role!=='host' || !Net.myBotList || !Net.myBotList.length || !Net.ws || Net.ws.readyState!==1) return;
+    Net._botStateTimer=(Net._botStateTimer||0)+dt;
+    if(Net._botStateTimer<0.05) return;
+    Net._botStateTimer=0;
+    for(const b of Net.myBotList){
+      if(!b) continue;
+      Net.ws.send(JSON.stringify({ type:'bot_state', idx:b.netIdx,
+        x:+b.pos.x.toFixed(2), y:+b.pos.y.toFixed(2), z:+b.pos.z.toFixed(2), k:b.kills||0,
+        yaw:+b.yaw.toFixed(3), mv:b._moving?1:0, hp:Math.round(b.hp),
+        wep:b.weapon||null, crouch:b.crouching?1:0, inv:b.invuln>0?1:0,
+        roll:b.rolling?1:0, rf:b.rolling?+(b.rollForward||0).toFixed(2):0, rr:b.rolling?+(b.rollRight||0).toFixed(2):0, rt:b.rolling?+b.rollT.toFixed(2):0 }));
+    }
+  }
+
+  // 팀전 승리 조건: 상대 팀 전원이 dead면 승리, 우리 팀 전원이 dead면 패배 (기존 리스폰 타이머는 그대로 둠)
+  function checkTeamWipe(){
+    if(!Net.teamMode || killCam || Net.ended || !running) return;
+    const mine=chars.filter(c=>c.team===Net.myTeam);
+    const theirs=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==Net.myTeam);
+    if(!mine.length || !theirs.length) return;
+    const myAlive=mine.filter(c=>!c.dead).length, theirAlive=theirs.filter(c=>!c.dead).length;
+    if(theirAlive===0){
+      if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:Net.myTeam})); }catch(e){} }
+      pvpWin(true);
+    } else if(myAlive===0){
+      if(!Net._myWipeT) Net._myWipeT=performance.now();
+      if(performance.now()-Net._myWipeT>600){ // 상대 쪽 gameover 브로드캐스트가 늦으면(동시 전멸 등) 스스로도 통지
+        const otherTeam = Net.myTeam==='red' ? 'blue' : 'red';
+        if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:otherTeam})); }catch(e){} }
+        pvpWin(false);
+      }
+    } else { Net._myWipeT=0; }
   }
 
   /* ---- pause / settings ---- */
