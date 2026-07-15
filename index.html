@@ -505,6 +505,12 @@ body.killcam #killCamLabel{opacity:1}
 /* 결과창 순위 목록 */
 #winStandings{display:none;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 20px;border:1px solid var(--pnb);border-radius:6px;background:rgba(8,15,28,.6)}
 #winStandings .ffaRow{font-size:14px;line-height:1.7;gap:10px}
+/* 팀전 순위(팀별 헤더 + 합산 킬) — #winStandings, #ffaFinalRows 양쪽에서 공용 */
+.ffaTeamHdr{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;letter-spacing:1px;margin:8px 0 3px;padding-bottom:2px;border-bottom:1px solid rgba(255,255,255,.15);color:#cfe0ee}
+.ffaTeamHdr:first-child{margin-top:0}
+.ffaTeamHdr.tmred{color:#ff6e6e;border-bottom-color:rgba(255,110,110,.35)}
+.ffaTeamHdr.tmblue{color:#5eb6ff;border-bottom-color:rgba(94,182,255,.35)}
+.ffaTeamHdr .tmKills{font-size:14px}
 
 /* ===== 타이틀 화면 ===== */
 #titleScr{background:radial-gradient(ellipse at 50% 20%, #1a3050 0%, var(--bg0) 65%)}
@@ -3474,10 +3480,11 @@ class Character {
     let best=spots[0],bd=-1;
     for(const s of spots){ const d=Math.hypot(s[0]-other.pos.x,s[1]-other.pos.z); if(d>bd){bd=d;best=s;} }
     this.pos.set(best[0],0,best[1]);
-    // 역전 메커니즘: 4점차로 지고 있으면 리스폰 시 관통 레이저 지급 (데스매치만)
-    if(!Game.isTraining() && Game.getMode()!=='timeattack'){
+    // 역전 메커니즘: 4점차로 지고 있으면 리스폰 시 관통 레이저 지급 (데스매치만, 한 판에 1회)
+    if(!Game.isTraining() && Game.getMode()!=='timeattack' && !this._comebackUsed){
       const myK=this.kills||0, opK=other.kills||0;
       if(opK-myK>=4){
+        this._comebackUsed=true;
         this.equip('megalaser', WEAPONS.megalaser.ammo[0]);
         if(this.isPlayer){ Game.msg&&Game.msg('역전의 레이저 획득! 모든 것을 관통한다'); Game.killBanner&&Game.killBanner('COMEBACK','#ff3df0'); }
       }
@@ -4579,10 +4586,48 @@ const Game = (() => {
       host.appendChild(div);
     });
   }
-  // 개인전 최종 순위: 킬캠 시작 시 표시
+  // 팀전 순위 데이터: 팀별로 묶어서 반환 { red:[...], blue:[...] } (팀 내부는 킬 내림차순, 동점이면 내가 위)
+  function buildTeamStandings(){
+    const teams={red:[],blue:[]};
+    for(const c of (chars||[])){
+      if(!c || (c.team!=='red' && c.team!=='blue')) continue;
+      const nm = c===player ? nickOrDefault(c.kind) : (c.name||(SPECIES[c.kind]?SPECIES[c.kind].name:'플레이어'));
+      teams[c.team].push({me:c===player, name:nm, kills:c.kills||0, dead:c.dead});
+    }
+    for(const t of ['red','blue']) teams[t].sort((a,b)=>(b.kills-a.kills)||(a.me?-1:b.me?1:0));
+    return teams;
+  }
+  // 팀전 순위 렌더: 내 팀을 먼저, 팀별 합산 킬을 헤더에 표시
+  function renderTeamStandings(host, teams, markDead){
+    host.innerHTML='';
+    const myTeam=(typeof Net!=='undefined')?Net.myTeam:null;
+    const order = myTeam==='blue' ? ['blue','red'] : ['red','blue'];
+    const label={red:'RED',blue:'BLUE'};
+    order.forEach(team=>{
+      const rows=teams[team]||[]; if(!rows.length) return;
+      const total=rows.reduce((s,r)=>s+r.kills,0);
+      const hdr=document.createElement('div');
+      hdr.className='ffaTeamHdr tm'+team+(team===myTeam?' myTeam':'');
+      const hn=document.createElement('span'); hn.className='tmName'; hn.textContent=(team===myTeam?'우리 팀 · ':'상대 팀 · ')+label[team];
+      const hk=document.createElement('span'); hk.className='tmKills'; hk.textContent=total;
+      hdr.appendChild(hn); hdr.appendChild(hk); host.appendChild(hdr);
+      rows.forEach((r,i)=>{
+        const div=document.createElement('div');
+        div.className='ffaRow'+(r.me?' me':'')+((markDead&&r.dead)?' dead2':'');
+        const fr=document.createElement('span'); fr.className='fr'; fr.textContent=(i+1);
+        const fn=document.createElement('span'); fn.className='fn'; fn.textContent=r.name;
+        const fk=document.createElement('span'); fk.className='fk'; fk.textContent=r.kills;
+        div.appendChild(fr); div.appendChild(fn); div.appendChild(fk);
+        host.appendChild(div);
+      });
+    });
+  }
+  // 개인전/팀전 최종 순위: 킬캠 시작 시 표시 (팀전이면 팀별로 묶어서)
   function showFFAFinal(){
     const el=$('ffaFinal'); if(!el) return;
-    renderStandings($('ffaFinalRows'), buildStandings(), false);
+    const lbl=el.querySelector('.ffLbl'); if(lbl) lbl.textContent = (typeof Net!=='undefined'&&Net.teamMode) ? '팀 전황' : '최종 순위';
+    if(typeof Net!=='undefined' && Net.teamMode) renderTeamStandings($('ffaFinalRows'), buildTeamStandings(), false);
+    else renderStandings($('ffaFinalRows'), buildStandings(), false);
     el.style.display='flex';
   }
   function hideFFAFinal(){ const el=$('ffaFinal'); if(el) el.style.display='none'; }
@@ -5898,7 +5943,11 @@ const Game = (() => {
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
     // 팀전(빠른 매칭)만 별도 승/패 기록 — 랭킹전 RP/전적에는 영향 없음. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
     if(Net.teamMode && !Net.party) Stats.recordTeam(won);
-    if(Net.teamMode){ $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료'; $('winStandings').style.display='none'; }
+    if(Net.teamMode){
+      $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료';
+      renderTeamStandings($('winStandings'), buildTeamStandings(), false);
+      $('winStandings').style.display='flex';
+    }
     else if(Net.ffa){ $('winSub').textContent='개인전 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=(player?player.kills:0)+' : '+(Net.opp?Net.opp.kills:0); $('winStandings').style.display='none'; }
     $('respawnOvl').classList.remove('show');
