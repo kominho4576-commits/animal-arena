@@ -227,9 +227,9 @@ body.has-touch #abilityRow{display:none!important}
   mask-image:radial-gradient(ellipse at center,rgba(0,0,0,.9),transparent 75%);}
 .ovl::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
 .ovl>*{position:relative;z-index:1}
-#settingsOvl{z-index:60}
-#pauseOvl,#settingsOvl{background:rgba(5,10,19,.78);backdrop-filter:blur(7px)}
-#pauseOvl::before,#settingsOvl::before{opacity:.25}
+#settingsOvl,#friendsOvl{z-index:60}
+#pauseOvl,#settingsOvl,#friendsOvl{background:rgba(5,10,19,.78);backdrop-filter:blur(7px)}
+#pauseOvl::before,#settingsOvl::before,#friendsOvl::before{opacity:.25}
 
 .ovl h1{font-family:'Black Han Sans',sans-serif;font-weight:400;letter-spacing:3px}
 
@@ -245,6 +245,20 @@ body.has-touch #abilityRow{display:none!important}
 .lbPreview{display:flex;flex-direction:column;align-items:center;min-width:232px}
 .lbPvLabel{display:none}
 #pvCanvas{width:min(260px,32vw);height:min(280px,42vh);display:block}
+/* 2vs2/3vs3 초대 슬롯: 캐릭터 프리뷰 좌우에 배치, 참가자는 나보다 약간 작게 */
+.pvRow{display:flex;align-items:flex-end;justify-content:center;gap:12px}
+.tpSlot{display:flex;flex-direction:column;align-items:center;gap:3px;width:84px;padding-bottom:8px}
+.tpAdd{width:64px;height:64px;border-radius:50%;border:2px dashed rgba(125,243,255,.4);background:rgba(10,19,34,.4);color:var(--cy2);font-size:26px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:transform .12s,border-color .12s}
+.tpAdd:hover{border-color:var(--cy);transform:scale(1.05)}
+.tpAdd:active{transform:scale(.94)}
+.tpPortrait{width:64px;height:64px;border-radius:50%;border:2px solid rgba(125,243,255,.35);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.tpName{font-size:11px;color:#cfe0ee;font-weight:700;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpReady{font-size:9px;color:#8fb2cc;font-weight:700;letter-spacing:.5px}
+.tpReady.on{color:var(--gn)}
+.tpHostTag{font-size:8px;color:var(--yl);font-weight:700;letter-spacing:.5px}
+.tpLinks{display:flex;gap:10px;margin-top:4px}
+.tpLink{background:none;border:none;color:var(--cy2);font-size:11px;font-weight:700;text-decoration:underline;padding:2px 4px;letter-spacing:.5px}
+.tpLink:active{opacity:.6}
 .lbPvName{font-family:'Black Han Sans',sans-serif;color:#8fb2cc;font-size:14px;margin-top:2px;letter-spacing:2px}
 .lbNickWrap{display:flex;flex-direction:column;align-items:center;margin-top:-4px}
 .lbNick{font-family:'Black Han Sans',sans-serif;color:#fff;font-size:22px;letter-spacing:2px;text-shadow:0 0 16px rgba(49,230,255,.35);cursor:pointer;padding:2px 12px;border-radius:8px;transition:background .15s;display:flex;align-items:center;gap:8px}
@@ -328,6 +342,29 @@ body.pc #keyGuide{display:block}
 .mcName{font-family:'Black Han Sans',sans-serif;font-size:22px;letter-spacing:2px}
 .mcDesc{font-size:12px;color:#a7bccf;line-height:1.55;text-align:center;word-break:keep-all}
 
+/* ===== 6종 모드 그리드 (데스매치/타임어택 x 1vs1/2vs2/3vs3) ===== */
+.modeCards.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 16px;width:min(97vw,760px);flex-wrap:unset}
+.modeCards.grid6 .modeCard{max-width:none}
+.modeCards.grid6 .modeCard.sel{border-color:var(--cy);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 24px rgba(49,230,255,.35)}
+.mcDM{background:linear-gradient(135deg,#96701c,#0d1e30);font-size:18px}
+.mcTA{background:linear-gradient(135deg,#1c6a96,#0d1e30);font-size:16px}
+.modeScrFoot{display:flex;gap:12px;margin-top:20px}
+@media (max-height:620px){
+  .modeCards.grid6{gap:9px 10px}
+  .modeCards.grid6 .modeCard{padding:10px 5px;gap:5px}
+  .modeCards.grid6 .mcArt{width:min(56px,70%);font-size:14px}
+  .modeCards.grid6 .mcName{font-size:14px}
+  .modeCards.grid6 .mcDesc{font-size:9px;line-height:1.35}
+}
+@media (max-width:760px){
+  .modeCards.grid6{gap:8px}
+  .modeCards.grid6 .modeCard{padding:9px 4px}
+  .modeCards.grid6 .mcArt{width:min(50px,68%);font-size:12px}
+  .modeCards.grid6 .mcName{font-size:12.5px}
+  .modeCards.grid6 .mcDesc{font-size:8px;line-height:1.3}
+  .modeScrFoot{flex-wrap:wrap;justify-content:center}
+}
+
 /* ===== matchmaking ===== */
 .matchSpin{width:66px;height:66px;border-radius:50%;border:5px solid rgba(125,243,255,.12);border-top-color:var(--cy);margin:26px 0 18px;box-shadow:0 0 24px rgba(49,230,255,.2);animation:spin .85s linear infinite}
 /* 맵 룰렛 */
@@ -361,17 +398,34 @@ body.pc #keyGuide{display:block}
   .diffCol{flex-direction:row;flex-wrap:wrap;justify-content:center}
   .diffCol .diffBtn{width:auto;flex:1;min-width:90px;padding:12px 8px}
 }
-/* 설정·게임설정 화면 반응형 (짧은 화면에서 안 잘리게) */
+/* 설정·게임설정 화면 반응형 (짧은 화면에서 안 잘리게) — 이 블록이 나중에 나오는 기본 규칙(.setPanel 등)보다
+   먼저 위치해 있어 소스 순서상 밀리므로, 확실히 이기도록 !important를 사용한다 */
 @media (max-height:620px){
-  .setPanel{margin-top:6px;padding:8px 12px;gap:2px}
-  .setRow{font-size:12px;padding:6px 4px}
+  .setPanel{margin-top:6px!important;padding:8px 12px!important;gap:1px!important}
+  .setRow{font-size:12px!important;padding:4px 4px!important}
+  .setRow select{padding:3px 6px!important;font-size:12px!important}
   .diffBtn{padding:12px 20px;font-size:17px}
   .diffBtn small{font-size:9px;margin-top:2px}
   .optSection{margin:0 0 8px}
   .optBtn{padding:6px 12px;font-size:12px}
   .optLabel{margin-bottom:4px}
-  .setBtnRow{margin-top:6px;gap:5px}
-  .setBtnRow .pBtn{padding:9px 6px;font-size:11px;letter-spacing:.5px}
+  .setBtnRow{margin-top:4px!important;gap:4px!important}
+  .setBtnRow .pBtn{padding:7px 5px!important;font-size:10.5px!important;letter-spacing:.3px!important}
+  .setNickRow{padding:3px 4px 4px!important;gap:2px!important;font-size:11px!important}
+  .setNickEdit input{padding:4px 8px!important;font-size:11px!important}
+  .setNickEdit .pBtn{padding:4px 10px!important}
+  #setNickMsg{min-height:12px!important;font-size:10px!important}
+  .myIdRow{margin-bottom:2px!important;font-size:11px!important}
+  .friendSearchRow input{padding:4px 8px!important;font-size:12px!important}
+  .friendList{max-height:74px!important}
+  .friendListTitle{margin-bottom:2px!important}
+}
+@media (max-height:440px){
+  h1{font-size:16px!important;margin-bottom:0!important}
+  .setPanel{gap:0!important;padding:4px 10px!important}
+  .setRow{padding:2px 4px!important}
+  .setNickRow{padding:1px 4px 3px!important}
+  .friendList{max-height:56px!important}
 }
 .optSection{margin:0 0 16px;text-align:center}
 .optLabel{font-size:11px;font-weight:900;letter-spacing:2px;color:var(--cy2);margin-bottom:8px;text-transform:uppercase}
@@ -430,6 +484,11 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 
 /* damage numbers */
 #dmgLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+/* 인게임 상시 닉네임(모든 캐릭터 머리 위) — 팀 구분 색상과 함께 표시 */
+#nickLabelLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:8}
+.nickLabel{position:absolute;transform:translate(-50%,-100%);font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 1px 3px #000,0 0 6px rgba(0,0,0,.85);white-space:nowrap;will-change:left,top}
+.nickLabel.tmred{color:#ffb3b8}
+.nickLabel.tmblue{color:#b3ddff}
 /* 적 머리 위 HP바 */
 #enemyHpBar{position:absolute;transform:translate(-50%,-100%);pointer-events:none;display:none;flex-direction:column;align-items:center;gap:2px;z-index:9;will-change:left,top}
 #enemyBuffs{display:flex;gap:3px;margin-bottom:2px;flex-wrap:wrap;justify-content:center;max-width:160px}
@@ -468,6 +527,25 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .setRow input[type=checkbox]{width:22px;height:22px;accent-color:var(--gn)}
 .setRow select{background:#16273c;color:#fff;border:1px solid rgba(125,243,255,.25);border-radius:6px;padding:6px 9px;font-size:13px;font-family:inherit;font-weight:700}
 .setVal{min-width:36px;text-align:right;color:var(--cy);font-weight:900;font-size:13px}
+/* 설정 화면: 닉네임 변경 */
+.setNickRow{display:flex;flex-direction:column;gap:5px;padding:6px 4px 10px;border-bottom:1px solid rgba(125,243,255,.08);color:#e8f0f8;font-size:13px;font-weight:700}
+#setNickMsg{margin-bottom:0;min-height:14px;font-size:11px}
+.setNickEdit{display:flex;gap:8px}
+.setNickEdit input{flex:1;min-width:0;padding:8px 10px;border-radius:6px;border:1px solid rgba(125,243,255,.3);background:rgba(6,13,25,.8);color:#fff;font-size:13px;font-family:inherit;font-weight:700}
+/* 친구 화면 */
+.myIdRow{color:#8fb2cc;font-size:12px;font-weight:700;margin-bottom:8px;letter-spacing:.5px}
+.myIdRow b{color:var(--cy2)}
+.friendSearchRow{display:flex;gap:8px}
+.friendSearchRow input{flex:1;min-width:0;padding:8px 10px;border-radius:6px;border:1px solid rgba(125,243,255,.3);background:rgba(6,13,25,.8);color:#fff;font-size:13px;font-family:inherit;font-weight:700}
+.friendListTitle{font-size:12px;color:var(--cy2);letter-spacing:1px;font-weight:800;margin-bottom:4px}
+.friendList{display:flex;flex-direction:column;gap:4px;max-height:150px;overflow-y:auto;margin-top:6px}
+.friendRow{display:flex;align-items:center;gap:8px;padding:6px 4px;font-size:12.5px;color:#e8f0f8;font-weight:700}
+.friendRow .frDot{width:8px;height:8px;border-radius:50%;background:#5a6b7a;flex-shrink:0}
+.friendRow .frDot.on{background:var(--gn);box-shadow:0 0 6px rgba(62,245,138,.6)}
+.friendRow .frName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friendRow .frId{color:#8fb2cc;font-size:10px;font-weight:600}
+.friendRow button{background:none;border:1px solid rgba(125,243,255,.3);border-radius:6px;color:var(--cy2);font-size:11px;font-weight:700;padding:4px 9px}
+.friendEmpty{color:#5a7085;font-size:12px;text-align:center;padding:8px 0}
 
 #rotate{position:absolute;inset:0;background:var(--bg0);z-index:99;display:none;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;text-align:center;pointer-events:auto}
 @media (orientation:portrait){#rotate{display:flex}}
@@ -547,6 +625,14 @@ body.killcam #killCamLabel{opacity:1}
 .mItem:hover .mArrow{opacity:1;left:8px}
 .mItem:active{transform:scale(.97)}
 .mItem.play .mTxt{color:var(--yl)}
+/* 매칭 중: 모드 변경 버튼은 검정 오버레이로 비활성화, PLAY 버튼은 경과시간 텍스트로 대체(JS) */
+body.aa-matching #lbModeChange{pointer-events:none;position:relative;opacity:.65}
+body.aa-matching #lbModeChange::after{content:"";position:absolute;inset:-4px;background:rgba(0,0,0,.55);border-radius:8px;z-index:2}
+body.aa-matching .mItem.play .mTxt{color:var(--cy)}
+/* 로비 계정 레벨 배지 (좌상단, 티어와 별도 관리) */
+#lbLevel{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-width:90px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:8px 12px}
+.llIcon{width:32px;height:32px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--cy),#1c6a96);display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:12px;color:#04121f;box-shadow:0 0 10px rgba(49,230,255,.4)}
+#lbLevel .ltName{font-size:16px}
 /* 로비 티어 배지 */
 .lbStatRow{display:flex;gap:10px;align-items:stretch;width:100%;max-width:520px;transform:scale(.75);transform-origin:center top;margin-bottom:-3%}
 #lbTier{display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:8px 12px}
@@ -652,6 +738,47 @@ body.has-touch .mTouchOnly{display:block}
   #pvCanvas{width:180px;height:210px}
   #keyGuide{display:none}
 }
+
+/* ===== 로비: 터치/모바일 화면 — 4개 코너 배치 (방향은 그대로 가로 유지, 화면 안에서만 반응형) ===== */
+body.has-touch #lobby .lbLayout{display:block;position:absolute;inset:0;max-width:none;gap:0}
+body.has-touch #lobby .lbLeft,
+body.has-touch #lobby .lbRight,
+body.has-touch #lobby .lbMenu{display:contents}
+body.has-touch #lobby .lbTitle{position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:18px;margin:0;text-align:center;pointer-events:none;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.6);white-space:nowrap}
+body.has-touch #lobby .mItem{position:absolute;padding:0;text-align:center;transition:none}
+body.has-touch #lobby .mItem::before{display:none}
+body.has-touch #lobby .mItem .mArrow{display:none}
+body.has-touch #lobby .mItem .mTxt{font-size:12px;letter-spacing:.5px;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(10,19,34,.75);border:1px solid rgba(125,243,255,.3);border-radius:10px;padding:7px 11px;box-shadow:0 6px 18px rgba(0,0,0,.4);min-width:58px;color:#fff}
+body.has-touch #lobby .mItem .mTxt small{color:#8fb2cc;font-size:8px}
+body.has-touch #lobby .mItem:active .mTxt{transform:scale(.95)}
+body.has-touch #lobby .mItem.play .mTxt{background:linear-gradient(180deg,rgba(23,84,53,.9),rgba(10,40,26,.92));border-color:rgba(62,245,138,.55);color:#dcffe9}
+body.has-touch.aa-matching #lobby .mItem.play .mTxt{color:var(--cy);min-width:100px}
+/* 우하단: 플레이 + 모드 변경 */
+body.has-touch #lobby #lbPlay{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
+body.has-touch #lobby #lbModeChange{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);z-index:3}
+/* 좌하단: 캐릭터 선택 + 체험하기 */
+body.has-touch #lobby #lbChar{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
+body.has-touch #lobby #lbTrain{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);z-index:3}
+/* 우상단: 친구 + 설정 + 더보기 */
+body.has-touch #lobby #lbFriends{right:10px;top:calc(env(safe-area-inset-top,0px) + 4px);z-index:3}
+body.has-touch #lobby #lbSettings{right:10px;top:calc(env(safe-area-inset-top,0px) + 46px);z-index:3}
+body.has-touch #lobby #lbMoreToggle{right:10px;top:calc(env(safe-area-inset-top,0px) + 88px);z-index:3}
+/* 더보기 패널: 토글 시에만 노출(버튼 위치 설정/튜토리얼/게임 종료) */
+body.has-touch #lobby #lbLayout,
+body.has-touch #lobby #lbTutorial,
+body.has-touch #lobby #lbExit{right:10px;z-index:3;display:none!important}
+body.has-touch.lbMoreOpen #lobby #lbLayout{display:block!important;top:calc(env(safe-area-inset-top,0px) + 130px)}
+body.has-touch.lbMoreOpen #lobby #lbTutorial{display:block!important;top:calc(env(safe-area-inset-top,0px) + 172px)}
+body.has-touch.lbMoreOpen #lobby #lbExit{display:block!important;top:calc(env(safe-area-inset-top,0px) + 214px)}
+/* 좌상단: 계정 레벨 + 티어 (전적은 그 아래 축소) */
+body.has-touch #lobby .lbStatRow{position:absolute;left:10px;top:calc(env(safe-area-inset-top,0px) + 4px);flex-direction:column;align-items:flex-start;width:auto;max-width:170px;transform:none;margin:0;gap:6px;z-index:2}
+body.has-touch #lobby #lbLevel,
+body.has-touch #lobby #lbTier{width:100%}
+body.has-touch #lobby #lbStats{width:100%;transform:scale(.82);transform-origin:left top}
+/* 중앙: 캐릭터 프리뷰가 화면을 채움 */
+body.has-touch #lobby .lbPreview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:0;min-width:0}
+body.has-touch #lobby #pvCanvas{width:min(46vh,58vw);height:min(80vh,62vh)}
+body.has-touch #lobby .lbNickWrap{margin-top:-6px}
 
 /* ===== 조작키 설정 ===== */
 #keyList{display:flex;flex-direction:column;gap:5px;width:400px;max-height:52vh;overflow-y:auto;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:12px}
@@ -912,6 +1039,7 @@ body.layout-edit #joyHint{display:none}
   <div class="btn" id="bPick"><div class="ic">E</div><div class="lb">줍기·버리기</div></div>
   <div id="bPause"><div class="ic">❚❚</div></div>
   <div id="dmgLayer"></div>
+  <div id="nickLabelLayer"></div>
   <div id="myBuffs"></div>
   <div id="enemyHpBar"><div id="enemyBuffs"></div><div id="enemyHpName"></div><div id="enemyHpTrack"><div id="enemyHpFill"></div></div></div>
   <div id="respawnOvl"><div id="respawnBig">3</div><div id="respawnLbl">리스폰까지</div><div id="respawnKiller"></div></div>
@@ -939,18 +1067,47 @@ body.layout-edit #joyHint{display:none}
 <div class="ovl" id="settingsOvl" style="display:none">
   <h1 style="font-size:22px;margin-bottom:2px">설정</h1>
   <div class="setPanel">
+    <div class="setNickRow">
+      <span>닉네임 변경</span>
+      <div class="setNickEdit">
+        <input type="text" id="setNickInput" maxlength="12" placeholder="2~12자">
+        <button class="pBtn" id="setNickBtn" style="width:auto;padding:8px 14px">변경</button>
+      </div>
+      <div id="setNickMsg" class="backupMsg"></div>
+    </div>
     <label class="setRow"><span>효과음</span><input type="checkbox" id="sSfx" checked></label>
     <label class="setRow"><span>배경음악</span><input type="checkbox" id="sBgm" checked></label>
     <label class="setRow"><span>배경음악 볼륨</span><input type="range" id="sBgmVol" min="0" max="100" value="50"><span class="setVal" id="sBgmVolVal">50</span></label>
     <label class="setRow"><span>조준 감도</span><input type="range" id="sSens" min="10" max="300" value="100"><span class="setVal" id="sSensVal">1.0</span></label>
     <label class="setRow"><span>화면 흔들림</span><input type="checkbox" id="sShake" checked></label>
+    <label class="setRow mTouchOnly"><span>진동</span><input type="checkbox" id="sVib" checked></label>
     <label class="setRow"><span>그래픽 품질</span><select id="sQual"><option value="high">높음</option><option value="low">낮음(저사양)</option></select></label>
   </div>
   <div class="setBtnRow">
+    <button class="pBtn mTouchOnly" id="sLayoutBtn">버튼 위치 설정</button>
     <button class="pBtn" id="sBackup">데이터 백업</button>
     <button class="pBtn" id="sRestore">데이터 복원</button>
     <button class="pBtn pResume" id="sClose">확인</button>
     <button class="pBtn" id="sResetStats" style="border-color:rgba(255,100,110,.5);color:#ff8a94">전적 초기화</button>
+  </div>
+</div>
+<!-- ===== 친구 (우측 상단) ===== -->
+<div class="ovl" id="friendsOvl" style="display:none">
+  <h1 style="font-size:22px;margin-bottom:2px">친구</h1>
+  <div class="myIdRow">내 ID <b id="myIdVal">불러오는 중...</b></div>
+  <div class="setPanel friendSearchPanel">
+    <div class="friendSearchRow">
+      <input type="text" id="friendSearchInput" placeholder="ID 또는 닉네임 검색" autocomplete="off">
+      <button class="pBtn" id="friendSearchBtn" style="width:auto;padding:8px 14px">검색</button>
+    </div>
+    <div id="friendSearchResults" class="friendList"></div>
+  </div>
+  <div class="setPanel friendListPanel">
+    <div class="friendListTitle">친구 목록</div>
+    <div id="friendListBody" class="friendList"></div>
+  </div>
+  <div class="setBtnRow">
+    <button class="pBtn pResume" id="friendsClose">확인</button>
   </div>
 </div>
 <!-- ===== 커스텀 확인 팝업 ===== -->
@@ -1022,16 +1179,27 @@ body.layout-edit #joyHint{display:none}
       <h1 class="lbTitle">ANIMAL <span>ARENA</span></h1>
       <div class="lbMenu">
         <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY</span></button>
+        <button class="mItem" id="lbModeChange"><span class="mArrow">➔</span><span class="mTxt">모드 변경<small id="lbModeChangeSub">데스매치 1vs1</small></span></button>
         <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택</span></button>
+        <button class="mItem" id="lbTrain"><span class="mArrow">➔</span><span class="mTxt">체험하기</span></button>
         <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정</span></button>
-        <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow">➔</span><span class="mTxt">버튼 위치 설정</span></button>
+        <button class="mItem" id="lbFriends"><span class="mArrow">➔</span><span class="mTxt">친구</span></button>
         <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정</span></button>
+        <button class="mItem mTouchOnly" id="lbMoreToggle"><span class="mArrow">➔</span><span class="mTxt">더보기</span></button>
+        <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow">➔</span><span class="mTxt">버튼 위치 설정</span></button>
         <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼</span></button>
         <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료</span></button>
       </div>
     </div>
     <div class="lbRight">
       <div class="lbStatRow">
+        <div id="lbLevel">
+          <div class="llIcon" id="llIcon">Lv</div>
+          <div class="ltInfo">
+            <div class="ltName" id="llNum">1</div>
+            <div class="ltBar"><div class="ltBarFill" id="llBarFill"></div></div>
+          </div>
+        </div>
         <div id="lbTier">
           <div class="ltIcon" id="ltIcon"></div>
           <div class="ltInfo">
@@ -1046,11 +1214,18 @@ body.layout-edit #joyHint{display:none}
         </div>
       </div>
       <div class="lbPreview">
-        <canvas id="pvCanvas"></canvas>
+        <div class="pvRow" id="pvRow">
+          <div class="tpSlot" id="tpSlotL" style="display:none"></div>
+          <canvas id="pvCanvas"></canvas>
+          <div class="tpSlot" id="tpSlotR" style="display:none"></div>
+        </div>
         <div class="lbNickWrap">
-          <div class="lbNick" id="lbNick" title="터치하여 닉네임 변경">만찐두빵 <span class="lbNickEdit">✎</span></div>
-          <input type="text" id="nickInput" maxlength="12" placeholder="닉네임 입력" autocomplete="off" style="display:none">
+          <div class="lbNick" id="lbNick" title="터치하여 닉네임 변경(설정 화면으로 이동)">만찐두빵 <span class="lbNickEdit">✎</span></div>
           <div class="lbPvName" id="pvName">토끼</div>
+        </div>
+        <div class="tpLinks">
+          <button class="tpLink" id="tpJoinLink" style="display:none">초대 코드로 참가</button>
+          <button class="tpLink" id="tpLeaveLink" style="display:none">파티 나가기</button>
         </div>
       </div>
     </div>
@@ -1139,37 +1314,30 @@ body.layout-edit #joyHint{display:none}
   </div>
 </div>
 
-<!-- ===== 모드 선택 ===== -->
+<!-- ===== 팀 파티(초대) 코드로 참가 — 2vs2/3vs3 전용 ===== -->
+<div class="ovl" id="tpJoinOvl" style="display:none;z-index:78">
+  <div class="cfBanner">
+    <div class="cfIcon">#</div>
+    <div class="cfTitle">파티 참가</div>
+    <div class="cfSub">친구에게 받은 6자리 초대 코드를 입력하세요</div>
+    <input type="text" id="tpJoinCodeInput" maxlength="6" placeholder="ABC123" autocomplete="off" style="text-transform:uppercase">
+    <div id="tpJoinError"></div>
+    <div class="cfBtns">
+      <button class="cfBtn ok" id="tpJoinConfirm">참가</button>
+      <button class="cfBtn" id="tpJoinBack">뒤로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 모드 선택 (데스매치/타임어택 x 1vs1/2vs2/3vs3) ===== -->
 <div class="ovl scr" id="modeScr" style="display:none">
   <h1 style="font-size:30px">모드 선택</h1>
-  <div class="modeCards">
-    <button class="modeCard" id="modeCustom">
-      <div class="mcArt mcAI">CUSTOM</div>
-      <div class="mcName">커스텀 대전</div>
-      <div class="mcDesc">친구 초대 · 봇 추가<br>방장 자유 설정 · 개인전/팀전</div>
-    </button>
-    <button class="modeCard" id="modePVP">
-      <div class="mcArt mcPVP">PVP</div>
-      <div class="mcName">PVP 대전</div>
-      <div class="mcDesc">실제 플레이어와 1:1<br>랜덤 매칭 · 온라인</div>
-    </button>
-    <button class="modeCard" id="modeTeam">
-      <div class="mcArt mcTeam">TEAM</div>
-      <div class="mcName">팀전</div>
-      <div class="mcDesc">2vs2 · 3vs3 빠른 매칭<br>실제 플레이어만 · 온라인</div>
-    </button>
-    <button class="modeCard" id="modeRank">
-      <div class="mcArt mcRank">RANK</div>
-      <div class="mcName">랭킹전</div>
-      <div class="mcDesc">승패로 RP 획득 · 손실<br>티어 경쟁 · 온라인</div>
-    </button>
-    <button class="modeCard" id="modeTrain">
-      <div class="mcArt mcTrain">훈련</div>
-      <div class="mcName">훈련장</div>
-      <div class="mcDesc">모든 무기 자유 테스트<br>과녁 · 무한 탄약</div>
-    </button>
+  <div class="modeCards grid6" id="queueModeGrid"></div>
+  <div class="modeScrFoot">
+    <button class="pBtn" id="modeLegacyPvp" style="width:210px">1:1 코드 대결 · 개인전(5인)</button>
+    <button class="pBtn" id="modeCustomLink" style="width:210px">커스텀 대전 (코드 초대 · AI 대전)</button>
+    <button class="pBtn" id="modeBack" style="width:130px">← 뒤로</button>
   </div>
-  <button class="pBtn" id="modeBack" style="margin-top:20px;width:160px">← 뒤로</button>
 </div>
 
 <!-- ===== 커스텀 대전 입구 (빠른 AI 대전 / 방 만들기) ===== -->
@@ -1518,8 +1686,9 @@ const Stats = {
     else if(result==='loss'){ this.losses++; this.streak=0; }
     else { this.draws++; }
     this.save();
+    AccountLevel.add(result==='win'?25:(result==='draw'?14:10));
   },
-  recordTeam(won){ if(won) this.teamWins++; else this.teamLosses++; this.save(); },
+  recordTeam(won){ if(won) this.teamWins++; else this.teamLosses++; this.save(); AccountLevel.add(won?20:8); },
   reset(){ this.wins=this.losses=this.draws=this.kills=this.deaths=this.games=this.streak=this.bestStreak=this.teamWins=this.teamLosses=0; this.save(); },
   kd(){ return this.deaths>0 ? (this.kills/this.deaths).toFixed(2) : String(this.kills); },
   winRate(){ const t=this.wins+this.losses+this.draws; return t>0 ? Math.round(this.wins/t*100) : 0; }
@@ -1560,6 +1729,26 @@ const Rank = {
 };
 function tierAt(rp){ let t=TIERS[0]; for(const x of TIERS){ if(rp>=x.min) t=x; } return t; }
 Rank.load();
+
+/* ---------------- 계정 레벨 (티어와 별도 관리) ---------------- */
+const AccountLevel = {
+  xp:0, level:1,
+  load(){ try{ const s=JSON.parse(localStorage.getItem('aa_level')||'{}'); Object.assign(this,s); }catch(e){} },
+  save(){ try{ localStorage.setItem('aa_level', JSON.stringify({xp:this.xp,level:this.level})); }catch(e){} },
+  xpForLevel(lv){ return 100*lv*lv; }, // 레벨 lv 완주에 필요한 누적 XP
+  add(amount){
+    this.xp+=amount;
+    while(this.xp>=this.xpForLevel(this.level)) this.level++;
+    this.save();
+  },
+  progress(){
+    const prev=this.level>1 ? this.xpForLevel(this.level-1) : 0;
+    const next=this.xpForLevel(this.level);
+    return Math.max(0,Math.min(1,(this.xp-prev)/Math.max(1,next-prev)));
+  },
+  reset(){ this.xp=0; this.level=1; this.save(); }
+};
+AccountLevel.load();
 
 /* ---------------- KEY BINDS (조작키 커스텀) ---------------- */
 const KeyBinds = {
@@ -3412,6 +3601,8 @@ class Character {
   }
   takeDamage(dmg,attacker,isHead,cause){
     if(this.dead||this.invuln>0) return;
+    // 팀전: 같은 팀끼리는 피해가 들어가지 않음(팀킬 비활성화). team이 없는 개인전/1v1은 영향 없음
+    if(attacker && attacker!==this && attacker.team && this.team && attacker.team===this.team) return;
     // PVP: when MY shot hits the remote opponent, don't apply HP locally —
     // send the hit so their client applies it; their HP syncs back via state.
     if(this.isNet && attacker && Game.pvpActive() && (attacker.isPlayer || attacker.isPartyBot)){
@@ -4438,6 +4629,48 @@ const Game = (() => {
     updateScore(); // 새 판 스코어 0:0 즉시 초기화
     if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
   }
+  // 매칭 시간 초과 시 봇 자동전환: start()의 개인전(aiFfa) 분기를 임의 인원수로 확장한 버전.
+  // 승패 판정은 기존 오프라인 개인전과 동일하게 개인 킬수 기준(팀 취합 판정 없음) — team 태그는 Phase 4의 팀 외곽선/팀킬 방지용으로만 사용.
+  function startWithBotFill(botCount, assignTeams){
+    lastDiff='normal';
+    if(player){ scene.remove(player.group); }
+    if(bot){ scene.remove(bot.group); }
+    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    aiBots=[];
+    Projectiles.clear(); Summons.clear();
+    currentMap=(selectedMap==='random'||!selectedMap)?MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)]:selectedMap;
+    buildArena();
+    const pSpec=selectedSpecies||'rabbit';
+    const SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11],[11,-11]];
+    player=new Player(pSpec);
+    player.pos.set(SPAWNS[0][0],0,SPAWNS[0][1]);
+    if(assignTeams) player.team='red';
+    const pool=PLAYER_SPECIES.filter(s=>s!==pSpec);
+    for(let i=0;i<botCount;i++){
+      const sp=pool.length?pool.splice(Math.floor(Math.random()*pool.length),1)[0]:'fox';
+      const b=new AIBot('normal',sp);
+      b.name=(SPECIES[sp]?SPECIES[sp].name:'봇')+' 봇';
+      const sp2=SPAWNS[(i+1)%SPAWNS.length];
+      b.pos.set(sp2[0],0,sp2[1]);
+      if(assignTeams) b.team=((i+1)%2===0)?'red':'blue';
+      aiBots.push(b);
+    }
+    bot=aiBots[0];
+    Game.player=player; Game.bot=bot;
+    chars=[player,...aiBots];
+    Pickups.init();
+    time=0; running=true; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.add('playing'); BGM.start('battle'); BGM.setScene('battle');
+    document.body.classList.add('unlocked');
+    const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
+    setProfileAvatar(pSpec);
+    const feed=$('killFeed'); if(feed) feed.innerHTML='';
+    $('menu').style.display='none';
+    $('winOvl').style.display='none';
+    updateHUD();
+    updateScore();
+    if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
+  }
   function onKill(killer,victim){
     if(killer.isPlayer){ msg('처치! +1'); killBanner('처치!','#3ef58a'); doHitStop(0.09); shake(0.5); vibrate([0,40,30,40]); Sfx.kill(); }
     else if(victim && victim.isPlayer){ msg('당했다...'); killBanner('사망','#ff5252'); shake(0.7); vibrate(120); }
@@ -4835,6 +5068,61 @@ const Game = (() => {
     const eb=$('enemyBuffs'); if(eb){ const html=statusBadges(enemy); if(eb._html!==html){ eb._html=html; eb.innerHTML=html; } }
     bar.classList.add('show');
   }
+  // 인게임 상시 닉네임: 모든 캐릭터(플레이어/봇/원격 상대) 머리 위에 항상 표시 + 팀 색상(파랑/빨강)
+  const nickLabelPool=new Map(); // Character 인스턴스 -> DOM 엘리먼트 (매치가 바뀌면 chars에 없는 엔트리는 자동 정리됨)
+  function updateNicknameLabels(){
+    const layer=$('nickLabelLayer'); if(!layer) return;
+    const list=(chars&&chars.length)?chars:[player,bot].filter(Boolean);
+    const active=new Set(list.filter(Boolean));
+    for(const [c,el] of nickLabelPool){ if(!active.has(c)){ el.remove(); nickLabelPool.delete(c); } }
+    for(const c of list){
+      if(!c) continue;
+      let el=nickLabelPool.get(c);
+      if(!el){ el=document.createElement('div'); el.className='nickLabel'; layer.appendChild(el); nickLabelPool.set(c,el); }
+      if(c.dead){ el.style.display='none'; continue; }
+      const wp=new THREE.Vector3(c.pos.x, c.pos.y+2.4, c.pos.z);
+      const p=wp.clone().project(camera);
+      if(p.z>1){ el.style.display='none'; continue; }
+      el.style.display='block';
+      el.style.left=((p.x*0.5+0.5)*innerWidth)+'px';
+      el.style.top=((-p.y*0.5+0.5)*innerHeight)+'px';
+      const label = c.isPlayer ? (playerNick||'플레이어') : (c.name || (SPECIES[c.kind]?SPECIES[c.kind].name:'상대'));
+      if(el._label!==label){ el._label=label; el.textContent=label; }
+      const teamCls = c.team==='red'?'tmred':(c.team==='blue'?'tmblue':'');
+      if(el._teamCls!==teamCls){ if(el._teamCls) el.classList.remove(el._teamCls); if(teamCls) el.classList.add(teamCls); el._teamCls=teamCls; }
+    }
+  }
+  // 팀 구분 캐릭터 외곽선(우리팀 파랑/상대팀 빨강) — inverted-hull 기법: 전체를 살짝 키운 뒤 뒷면만 그려 실루엣만 남김
+  function ensureOutlineMesh(c){
+    if(c._outlineMesh || !c.group) return c._outlineMesh;
+    const origNodes=[]; c.group.traverse(o=>origNodes.push(o));
+    const clone=c.group.clone(true);
+    const cloneNodes=[]; clone.traverse(o=>cloneNodes.push(o));
+    const outlineMat=new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.BackSide});
+    clone.traverse(o=>{ if(o.isMesh) o.material=outlineMat; });
+    clone.scale.setScalar(1.1);
+    c.group.add(clone);
+    c._outlineMesh=clone; c._outlineMat=outlineMat;
+    // 루트(0번째)는 부모(c.group) 변환을 그대로 상속하므로 동기화 대상에서 제외 — 나머지 노드는 애니메이션(팔다리 움직임)을 매 프레임 따라가야 함
+    c._outlinePairs = origNodes.slice(1).map((o,i)=>[o, cloneNodes[i+1]]).filter(pair=>pair[1]);
+    return clone;
+  }
+  function updateTeamOutlines(){
+    const list=(chars&&chars.length)?chars:[player,bot].filter(Boolean);
+    for(const c of list){
+      if(!c || !c.group) continue;
+      if(c.team==='red'||c.team==='blue'){
+        if(!c._outlineMesh) ensureOutlineMesh(c);
+        if(c._outlineMesh){
+          c._outlineMesh.visible=!c.dead;
+          c._outlineMat.color.set(c.team==='red'?0xff3b46:0x3b8bff);
+          for(const [o,cl] of c._outlinePairs){ cl.position.copy(o.position); cl.quaternion.copy(o.quaternion); cl.scale.copy(o.scale); }
+        }
+      } else if(c._outlineMesh){
+        c._outlineMesh.visible=false;
+      }
+    }
+  }
   /* floating damage number at a world position */
   function dmgNumber(worldPos, amount, crit, color){
     const p=worldPos.clone().project(camera);
@@ -4944,10 +5232,13 @@ const Game = (() => {
       // update spatial-audio listener to camera pose
       { const cd=new THREE.Vector3(); camera.getWorldDirection(cd); Sfx.setListener(camera.position, cd); }
       updateEnemyHpBar();
+      updateNicknameLabels();
+      updateTeamOutlines();
       renderer.render(scene,camera);
       if(shakeAmt>0 && shakeT>0) camera.position.copy(camBase); // restore so next frame's lerp is clean
     } else {
       const _hb=$('enemyHpBar'); if(_hb) _hb.classList.remove('show');
+      for(const el of nickLabelPool.values()) el.style.display='none';
       renderer.render(scene,camera);
     }
   }
@@ -4971,6 +5262,11 @@ const Game = (() => {
     set('lsWins',Stats.wins); set('lsLosses',Stats.losses); set('lsRate',Stats.winRate()+'%');
     set('lsKD',Stats.kd()); set('lsStreak',Stats.streak); set('lsBest',Stats.bestStreak);
     updateTierBadge();
+    updateLevelBadge();
+  }
+  function updateLevelBadge(){
+    const num=$('llNum'); if(num) num.textContent=AccountLevel.level;
+    const bar=$('llBarFill'); if(bar) bar.style.width=(AccountLevel.progress()*100)+'%';
   }
   function updateTierBadge(){
     const t=Rank.tier(); const tierEl=$('lbTier'); if(!tierEl) return;
@@ -5013,31 +5309,61 @@ const Game = (() => {
   let selectedMap='random'; // 'random' 또는 특정 맵 키
   let gameMode='deathmatch'; // 'deathmatch'(5킬) 또는 'timeattack'(2분 최다킬)
   const TIMEATTACK_SEC=120;
+
+  /* ===== 6종 게임모드 (데스매치/타임어택 x 1vs1/2vs2/3vs3) — 메인 화면에서 바로 매칭 ===== */
+  const QUEUE_MODES=[
+    {key:'dm1',label:'데스매치',short:'1vs1',gameMode:'deathmatch',size:1,ranked:true},
+    {key:'dm2',label:'데스매치',short:'2vs2',gameMode:'deathmatch',size:2,ranked:false},
+    {key:'dm3',label:'데스매치',short:'3vs3',gameMode:'deathmatch',size:3,ranked:false},
+    {key:'ta1',label:'타임어택',short:'1vs1',gameMode:'timeattack',size:1,ranked:false},
+    {key:'ta2',label:'타임어택',short:'2vs2',gameMode:'timeattack',size:2,ranked:false},
+    {key:'ta3',label:'타임어택',short:'3vs3',gameMode:'timeattack',size:3,ranked:false},
+  ];
+  function findQueueMode(key){ return QUEUE_MODES.find(m=>m.key===key)||QUEUE_MODES[0]; }
+  let selectedQueueMode=(function(){
+    try{ const k=localStorage.getItem('aa_queueMode'); return (k && QUEUE_MODES.some(m=>m.key===k)) ? k : 'dm1'; }catch(e){ return 'dm1'; }
+  })();
+  // 팀 매칭용 파티(초대) 상태 + 인라인 매칭 상태 — refreshModeChangeUI()가 초기 로드 시점에 바로 참조하므로 다른 선언들보다 앞에 위치해야 함
+  const TP = { ws:null, code:null, isHost:false, myIdx:null, size:1, gameMode:'deathmatch', roster:[] };
+  const MATCH_BOT_TIMEOUT_MS=15000;
+  let matching=false, matchElapsedSec=0, matchTickTimer=null, botFallbackTimer=null;
+  function setSelectedQueueMode(key){
+    selectedQueueMode=key;
+    try{ localStorage.setItem('aa_queueMode',key); }catch(e){}
+    refreshModeChangeUI();
+  }
+  // 모드 선택 화면: 6장 카드를 동적으로 생성
+  function buildQueueModeGrid(){
+    const grid=$('queueModeGrid'); if(!grid || grid.childElementCount) return;
+    QUEUE_MODES.forEach(m=>{
+      const b=document.createElement('button');
+      b.className='modeCard'; b.dataset.key=m.key;
+      b.innerHTML='<div class="mcArt '+(m.gameMode==='deathmatch'?'mcDM':'mcTA')+'">'+m.short+'</div>'
+        +'<div class="mcName">'+m.label+'</div>'
+        +'<div class="mcDesc">'+m.short+' 랜덤 매칭<br>'+(m.size===1?'실제 플레이어':'파티 초대 가능')+' · 온라인</div>';
+      bindBtn2(b,()=>{
+        setSelectedQueueMode(m.key);
+        document.querySelectorAll('#queueModeGrid .modeCard').forEach(x=>x.classList.remove('sel'));
+        b.classList.add('sel');
+        showScreen('lobby');
+      });
+      grid.appendChild(b);
+    });
+    markSelectedQueueCard();
+  }
+  function markSelectedQueueCard(){
+    document.querySelectorAll('#queueModeGrid .modeCard').forEach(x=>x.classList.toggle('sel', x.dataset.key===selectedQueueMode));
+  }
+  buildQueueModeGrid();
+  refreshModeChangeUI();
   // nickname: load from storage, wire input
   let playerNick = (function(){ try{ return localStorage.getItem('aa_nick')||''; }catch(e){ return ''; } })();
-  (function initNick(){
-    const inp=$('nickInput'), nick=$('lbNick'); if(!inp||!nick) return;
-    const DEFNICK='플레이어';
-    function showNick(){
-      const t=playerNick||DEFNICK;
-      nick.innerHTML=t+' <span class="lbNickEdit">✎</span>';
-      nick.style.display='flex'; inp.style.display='none';
-    }
-    function startEdit(){
-      inp.value=playerNick; nick.style.display='none'; inp.style.display='block';
-      setTimeout(()=>{ inp.focus(); inp.select&&inp.select(); },20);
-    }
-    function commit(){
-      playerNick=inp.value.trim().slice(0,12);
-      try{ localStorage.setItem('aa_nick',playerNick); }catch(e){}
-      showNick();
-    }
-    if(playerNick) inp.value=playerNick;
-    showNick();
-    bindBtn2(nick, startEdit);
-    inp.addEventListener('blur', commit);
-    inp.addEventListener('keydown',e=>{ e.stopPropagation(); if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } });
-  })();
+  // 닉네임 표시(머리 위/로비 프리뷰에 항상 표시). 변경은 설정 화면에서(중복/비속어 등 서버 검증) — lbNick 클릭은 설정 화면으로 이동
+  function refreshNicknameUI(){
+    const nick=$('lbNick'); if(!nick) return;
+    nick.innerHTML=(playerNick||'플레이어')+' <span class="lbNickEdit">✎</span>';
+  }
+  refreshNicknameUI();
   function nickOrDefault(spec){ return playerNick || (SPECIES[spec]?SPECIES[spec].name:'플레이어'); }
   // 좌하단 프로필 아바타에 동물 얼굴 초상화 그리기
   function setProfileAvatar(spec){
@@ -5228,13 +5554,16 @@ const Game = (() => {
   }
 
   /* ===== lobby buttons ===== */
-  bindBtn('lbPlay',()=>{ Sfx.unlock(); showScreen('modeScr'); });
+  bindBtn('lbPlay',()=>{ Sfx.unlock(); onLbPlayClick(); }); // 매칭 중이 아니면 선택된 모드로 바로 매칭 시작, 매칭 중이면 취소
+  bindBtn('lbModeChange',()=>{ Sfx.unlock(); if(matching) return; showScreen('modeScr'); });
   bindBtn('lbChar',()=>{ Sfx.unlock(); pvWeaponId=null; if(pvCharParts&&pvCharParts.hand){ while(pvCharParts.hand.children.length) pvCharParts.hand.remove(pvCharParts.hand.children[0]); } showScreen('charScr'); if(window.__csResize) setTimeout(window.__csResize,30); });
+  bindBtn('lbTrain',()=>{ Sfx.unlock(); rankedMode=false; startTraining(); });
   bindBtn('csConfirm',()=>{ Sfx.pickup(); showScreen('lobby'); if(window.__pvResize) setTimeout(window.__pvResize,30); });
   bindBtn('lbSettings',()=>{ openSettings(false); });
   bindBtn('lbTutorial',()=>{ openTutorial(false); });
   bindBtn('lbKeys',()=>{ buildKeyList(); showScreen('keysScr'); });
   bindBtn('lbLayout',()=>{ document.body.classList.add('layout-edit'); showScreen('layoutScr'); });
+  bindBtn('lbMoreToggle',()=>{ document.body.classList.toggle('lbMoreOpen'); });
   bindBtn('lbExit',()=>{
     // 게임 종료: 전체화면 해제 + 창 닫기 시도, 안 되면 안내
     try{ if(document.fullscreenElement) document.exitFullscreen&&document.exitFullscreen(); }catch(e){}
@@ -5410,20 +5739,18 @@ const Game = (() => {
   refreshAbilityKeys();
   bindBtn('modeBack',()=>showScreen('lobby'));
   let aiFfaPick=false; // 난이도 화면 진입 경로 (1대1 vs 개인전)
-  bindBtn('modeCustom',()=>{ showScreen('customEntryOvl'); }); // 커스텀 대전: 빠른 AI 대전 / 방 만들기 선택 팝업부터 노출
+  // 신규 6종 모드 그리드(#queueModeGrid)가 메인 진입점 — 아래는 그 밖에 유지되는 기존 기능들의 보조 진입점
+  bindBtn('modeCustomLink',()=>{ showScreen('customEntryOvl'); }); // 커스텀 대전: 빠른 AI 대전 / 방 만들기 선택 팝업부터 노출
+  bindBtn('modeLegacyPvp',()=>{ showScreen('pvpConfirm'); }); // 1:1 코드 대결 · 개인전(최대 5인) — 6종 모드에 없는 기존 기능 유지
   bindBtn('customPickAI',()=>{ showScreen('aiPickOvl'); }); // 기존 AI 대전 기능 100% 그대로 재사용
   bindBtn('customPickRoom',()=>{ openCustomRoom(); });
   bindBtn('customPickBack',()=>{ showScreen('modeScr'); });
   bindBtn('aiPick1v1',()=>{ rankedMode=false; aiFfaPick=false; showScreen('diffScr'); });
   bindBtn('aiPickFfa',()=>{ rankedMode=false; aiFfaPick=true; showScreen('diffScr'); });
   bindBtn('aiPickBack',()=>{ showScreen('customEntryOvl'); });
-  bindBtn('modeTrain',()=>{ rankedMode=false; startTraining(); });
-  bindBtn('modePVP',()=>{ rankedMode=false; showScreen('pvpConfirm'); });
-  bindBtn('modeTeam',()=>{ showScreen('teamPickOvl'); });
   bindBtn('teamPick2',()=>{ rankedMode=false; startNet('team2'); });
   bindBtn('teamPick3',()=>{ rankedMode=false; startNet('team3'); });
   bindBtn('teamPickBack',()=>{ showScreen('modeScr'); });
-  bindBtn('modeRank',()=>{ rankedMode=true; startNet('random'); }); // 랭킹전: 바로 랜덤 매칭
   bindBtn('pvpRandom',()=>{ rankedMode=false; startNet('random'); });
   bindBtn('pvpFFA',()=>{ rankedMode=false; startNet('ffa'); });
   bindBtn('pvpCreate',()=>{ startNet('create'); });
@@ -5461,6 +5788,12 @@ const Game = (() => {
   bindBtn('crAddCancel',()=>closeAddSlotChooser());
   // 코드 입력창: 엔터로 입장
   { const ri=$('roomCodeInput'); if(ri) ri.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('joinConfirm').click(); } }); }
+  // 팀 파티(초대) 코드로 참가
+  bindBtn('tpJoinLink',()=>openTpJoinOvl());
+  bindBtn('tpJoinBack',()=>closeTpJoinOvl());
+  bindBtn('tpJoinConfirm',()=>tpJoinWithCode());
+  bindBtn('tpLeaveLink',()=>{ tpLeaveParty(); renderTeamPartySlots(); refreshPlayButtonLabel(); });
+  { const ti=$('tpJoinCodeInput'); if(ti) ti.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('tpJoinConfirm').click(); } }); }
   bindBtn('diffBack',()=>showScreen('aiPickOvl'));
   // 모드/맵 선택 버튼
   document.querySelectorAll('#modeSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{
@@ -5486,16 +5819,23 @@ const Game = (() => {
     // 커스텀 대전(파티)/팀전 전용 상태
     Net.party=false; Net.teamMode=false; Net.myTeam=null; Net.myBotIdx=null; Net.myBots=null; Net._botStateTimer=0; }
 
+  function getDeviceToken(){ try{ return localStorage.getItem('aa_token')||''; }catch(e){ return ''; } }
+  function saveDeviceIdentity(id,token){ try{ if(id) localStorage.setItem('aa_uid',id); if(token) localStorage.setItem('aa_token',token); }catch(e){} }
+
   function startNet(mode, code){
     Sfx.unlock();
     resetNet(); // 재경기 시 이전 매치 상태 완전 초기화
     Net._mode=mode;
+    const queueMode=QUEUE_MODES.find(m=>m.key===mode) || null; // 6종 모드 큐(dm1/dm2/dm3/ta1/ta2/ta3) 여부
     if(mode==='create'){
       // 방 만들기: 전용 화면
       showScreen('roomHostScr');
       $('rhCode').textContent='------';
       $('rhDot').className='rhDot waiting';
       $('rhStatusText').textContent='서버에 연결 중...';
+    } else if(queueMode){
+      // 6종 모드 큐: 별도 화면 없이 로비 화면에서 그대로 인라인 매칭 (E: 매칭 인라인화)
+      gameMode=queueMode.gameMode; selectedMap='random'; rankedMode=!!queueMode.ranked;
     } else {
       showScreen('matchScr');
       if(mode==='join'){ $('matchTitle').textContent='방 입장 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='코드 '+code; }
@@ -5506,6 +5846,7 @@ const Game = (() => {
     const MM_URL = window.__PVP_SERVER || null;
     if(!MM_URL){
       if(mode==='create'){ $('rhStatusText').textContent='PVP 서버 미연결 (window.__PVP_SERVER 설정 필요)'; return; }
+      if(queueMode) return; // 인라인 모드: 조용히 대기 -> 봇 자동전환 타이머(F)가 처리
       let dots=0;
       mmTimer=setInterval(()=>{ dots=(dots+1)%4; $('matchStatus').textContent='상대를 찾는 중'+'.'.repeat(dots); },500);
       setTimeout(()=>{
@@ -5521,19 +5862,25 @@ const Game = (() => {
       mmWs=new WebSocket(MM_URL);
       Net.ws=mmWs;
       mmWs.onopen=()=>{
+        try{ mmWs.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){}
         if(mode==='create'){ $('rhStatusText').textContent='방 생성 중...'; mmWs.send(JSON.stringify({type:'createroom',species:selectedSpecies,nick:playerNick})); }
         else if(mode==='join'){ $('matchStatus').textContent='방 입장 중...'; mmWs.send(JSON.stringify({type:'joinroom',species:selectedSpecies,nick:playerNick,code:code})); }
         else if(mode==='ffa'){ $('matchStatus').textContent='플레이어를 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_ffa',species:selectedSpecies,nick:playerNick})); }
         else if(mode==='team2'||mode==='team3'){ $('matchStatus').textContent='팀원을 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_team',size:(mode==='team2'?2:3),species:selectedSpecies,nick:playerNick})); }
-        else { $('matchStatus').textContent='상대를 찾는 중...'; mmWs.send(JSON.stringify({type:'queue',species:selectedSpecies,nick:playerNick})); }
+        else if(queueMode){
+          if(queueMode.size===1) mmWs.send(JSON.stringify({type:'queue',gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
+          else mmWs.send(JSON.stringify({type:'queue_team',size:queueMode.size,gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
+        }
+        else { $('matchStatus').textContent='상대를 찾는 중...'; mmWs.send(JSON.stringify({type:'queue',gameMode:'deathmatch',species:selectedSpecies,nick:playerNick})); }
       };
       mmWs.onmessage=(ev)=>{
         let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+        if(d.type==='identified'){ saveDeviceIdentity(d.id,d.token); return; }
         handleNetMessage(d);
       };
-      mmWs.onerror=()=>{ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else { $('matchStatus').textContent='서버 연결 실패'; $('matchSub').textContent='잠시 후 다시 시도해주세요'; } };
+      mmWs.onerror=()=>{ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else if(!queueMode){ $('matchStatus').textContent='서버 연결 실패'; $('matchSub').textContent='잠시 후 다시 시도해주세요'; } };
       mmWs.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
-    }catch(e){ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else { $('matchStatus').textContent='서버 연결 실패'; } }
+    }catch(e){ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else if(!queueMode){ $('matchStatus').textContent='서버 연결 실패'; } }
   }
   // 하위호환
   function startMatchmaking(){ startNet('random'); }
@@ -5585,6 +5932,7 @@ const Game = (() => {
         break;
       case 'matched':
         Net.role=d.role; Net.room=d.room; Net.connected=true;
+        clearBotFallbackTimer(); // 상대를 찾았으므로 봇 자동전환 타이머 해제
         // host가 시드 생성해서 보냄; guest는 받은 시드로 같은 맵 생성
         if(Net.role==='host'){
           Net.seed=(Math.random()*1e9)|0; Net.oppNick=d.opponentNick||'';
@@ -5593,13 +5941,18 @@ const Game = (() => {
             $('rhDot').className='rhDot joined';
             $('rhStatusText').textContent=(Net.oppNick||'친구')+' 입장! 곧 시작합니다';
           }
-          // 호스트가 고른 모드/맵을 게스트에 전달 (seed로 맵 동기화 + 모드 문자열)
-          const hostMode=Net._roomMode||'deathmatch', hostMap=Net._roomMap||'random';
-          gameMode=hostMode; selectedMap=hostMap;
+          // 1:1 코드 방(create/join)일 때만 방장이 고른 모드/맵을 게스트에 전달 — 6종 큐 매칭은 큐 진입 전 이미 같은 gameMode로 페어링됐으므로 덮어쓰지 않음
+          const isCodeRoom=(Net._mode==='create'||Net._mode==='join');
+          const hostMode=isCodeRoom ? (Net._roomMode||'deathmatch') : (d.gameMode||gameMode);
+          const hostMap=isCodeRoom ? (Net._roomMap||'random') : selectedMap;
+          if(isCodeRoom){ gameMode=hostMode; selectedMap=hostMap; }
           Net.ws.send(JSON.stringify({type:'spawn',seed:Net.seed,mode:hostMode,map:hostMap}));
+          endMatchingUI();
           setTimeout(()=>startPVP(d.opponentSpecies), 900); // 잠깐 "입장!" 보여주고 시작
         }
         else { $('matchStatus').textContent='상대를 찾았습니다!'; Net._pendingOppSpecies=d.opponentSpecies; Net.oppNick=d.opponentNick||'';
+          if(d.gameMode) gameMode=d.gameMode;
+          endMatchingUI();
           if(Net._pendingSpawn){ Net._pendingSpawn=false; startPVP(Net._pendingOppSpecies); } }
         break;
       case 'spawn':
@@ -5752,6 +6105,8 @@ const Game = (() => {
         _startPartyMatch(d);
         break;
       case 'team_wait':
+        // 파티원이 호스트를 따라 매칭 큐에 들어온 경우(직접 PLAY를 누르지 않음) — 인라인 매칭 UI를 여기서 시작
+        if(!matching){ enterMatchingState(()=>startBotFallback(d.gameMode||gameMode, d.size)); }
         $('matchStatus').textContent='대기 인원 '+d.count+' / '+d.need;
         $('matchSub').textContent=d.size+' vs '+d.size+' · 실제 플레이어만';
         break;
@@ -6001,6 +6356,270 @@ const Game = (() => {
     if(mmWs){ try{ mmWs.send(JSON.stringify({type:'cancel'})); mmWs.close(); }catch(e){} mmWs=null; }
     Net.connected=false; Net.ws=null;
     $('matchSub').textContent='1 vs 1 · 랜덤 상대';
+  }
+
+  /* ===== 6종 모드 인라인 매칭 (로비 PLAY 버튼) + 시간 초과 시 봇 자동전환 ===== */
+  function clearBotFallbackTimer(){ if(botFallbackTimer){ clearTimeout(botFallbackTimer); botFallbackTimer=null; } }
+  function refreshModeChangeUI(){
+    const qm=findQueueMode(selectedQueueMode);
+    const sub=$('lbModeChangeSub'); if(sub) sub.textContent=qm.label+' '+qm.short;
+    markSelectedQueueCard();
+    if(qm.size<=1 && TP.code) tpLeaveParty(); // 1vs1은 초대 기능 없음 — 모드가 바뀌면 파티 해산
+    renderTeamPartySlots();
+    refreshPlayButtonLabel();
+  }
+  function onLbPlayClick(){
+    if(matching){ cancelQueueMatch(); return; }
+    const qm=findQueueMode(selectedQueueMode);
+    if(TP.code && qm.size>1 && !TP.isHost){
+      // 초대받은 파티원: PLAY 버튼 = 준비 완료 토글 (매칭 시작은 파티장만 가능)
+      const ready=!tpAmIReady();
+      try{ TP.ws.send(JSON.stringify({type:'team_party_ready',ready})); }catch(e){}
+      return;
+    }
+    if(TP.code && qm.size>1 && TP.isHost){
+      const others=TP.roster.filter(r=>r.i!==TP.myIdx);
+      if(others.length>0 && !others.every(o=>o.ready)){ Game.msg && Game.msg('파티원이 아직 준비되지 않았습니다'); return; }
+      beginPartyQueueMatch();
+      return;
+    }
+    beginQueueMatch(selectedQueueMode);
+  }
+  // 매칭 대기 UI 공통 시작(경과시간 표시 + 봇 자동전환 타이머)
+  function enterMatchingState(onBotFallback){
+    matching=true; matchElapsedSec=0;
+    document.body.classList.add('aa-matching');
+    updateMatchingUI();
+    renderTeamPartySlots(); // 매칭 중엔 파티 나가기/초대 참가 링크 숨김
+    if(matchTickTimer) clearInterval(matchTickTimer);
+    matchTickTimer=setInterval(()=>{ matchElapsedSec++; updateMatchingUI(); },1000);
+    clearBotFallbackTimer();
+    botFallbackTimer=setTimeout(onBotFallback, MATCH_BOT_TIMEOUT_MS);
+  }
+  function beginQueueMatch(key){
+    const qm=findQueueMode(key);
+    enterMatchingState(()=>startBotFallback(qm.gameMode, qm.size));
+    startNet(key);
+  }
+  // 파티장이 파티원 전원 준비 완료를 확인한 뒤 실제 팀 매칭 큐로 진입
+  function beginPartyQueueMatch(){
+    resetNet();
+    Net._mode='partyTeam'; Net.ws=TP.ws; mmWs=TP.ws;
+    gameMode=TP.gameMode; selectedMap='random'; rankedMode=false;
+    try{ TP.ws.send(JSON.stringify({type:'team_party_start'})); }catch(e){}
+    enterMatchingState(()=>startBotFallback(TP.gameMode, TP.size));
+  }
+  function cancelQueueMatch(){
+    stopMatchmaking();
+    if(TP.code){ tpReset(); renderTeamPartySlots(); }
+    endMatchingUI();
+  }
+  function updateMatchingUI(){
+    const btn=$('lbPlay'); if(!btn) return;
+    const mm=Math.floor(matchElapsedSec/60), ss=matchElapsedSec%60;
+    const t=mm>0 ? (mm+':'+String(ss).padStart(2,'0')) : (ss+'초');
+    const txt=btn.querySelector('.mTxt'); if(txt) txt.textContent='매칭 중... '+t;
+  }
+  function endMatchingUI(){
+    if(!matching) return;
+    matching=false;
+    document.body.classList.remove('aa-matching');
+    if(matchTickTimer){ clearInterval(matchTickTimer); matchTickTimer=null; }
+    clearBotFallbackTimer();
+    refreshPlayButtonLabel();
+    renderTeamPartySlots();
+  }
+  // PLAY 버튼 라벨: 평상시 PLAY / 매칭 중엔 updateMatchingUI가 담당 / 파티원(비호스트)이면 준비 상태 토글 라벨
+  function refreshPlayButtonLabel(){
+    if(matching) return;
+    const txt=document.querySelector('#lbPlay .mTxt'); if(!txt) return;
+    const qm=findQueueMode(selectedQueueMode);
+    if(TP.code && qm.size>1 && !TP.isHost) txt.textContent = tpAmIReady() ? '준비완료 ✓' : '준비하기';
+    else txt.textContent='PLAY';
+  }
+  function startBotFallback(gm,size){
+    if(!matching) return; // 이미 매칭됐거나 취소된 경우 무시
+    stopMatchmaking();
+    endMatchingUI();
+    gameMode=gm; selectedMap='random'; rankedMode=false; // 봇 상대는 랭킹전 RP에 영향을 주지 않음
+    SCREENS.forEach(s=>{ const el=$(s); if(el) el.style.display='none'; }); // 로비 등 메뉴 화면을 감추고 게임 캔버스로 전환
+    Game.msg && Game.msg('상대를 찾지 못해 AI와 대전합니다');
+    const totalBots=size*2-1; // 1v1=1, 2v2=3, 3v3=5
+    startWithBotFill(totalBots, size>1);
+  }
+
+  /* ===================================================================
+     ===== 팀 매칭용 파티(초대): 2vs2/3vs3에서 내 팀원을 미리 초대해 함께 매칭 =====
+     로비 화면 안에서 인라인으로 동작(별도 화면 없음). 커스텀 대전(친구초대+봇+방장설정)과는
+     완전히 별개 시스템 — 여긴 "랜덤 매칭에 내 팀원만 미리 묶어서 들어가는" 용도.
+     =================================================================== */
+  function tpAmIReady(){ const me=TP.roster.find(r=>r.i===TP.myIdx); return me?!!me.ready:false; }
+  function tpReset(){ TP.ws=null; TP.code=null; TP.isHost=false; TP.myIdx=null; TP.roster=[]; }
+  function tpConnect(onOpenSend){
+    if(TP.ws && TP.ws.readyState===WebSocket.OPEN){ onOpenSend(); return; }
+    const MM_URL=window.__PVP_SERVER||null;
+    if(!MM_URL){ Game.msg && Game.msg('PVP 서버가 설정되어 있지 않습니다'); return; }
+    try{
+      const ws=new WebSocket(MM_URL);
+      TP.ws=ws;
+      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){} onOpenSend(); };
+      ws.onmessage=(ev)=>{
+        let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; }
+        if(d.type==='identified' || (d.type||'').indexOf('team_party_')===0){ handleTeamPartyMessage(d); return; }
+        // 파티장이 매칭을 시작하면(team_party_start) 이 소켓이 곧 실제 매치 소켓이 됨 — 최초 1회 승격
+        if(Net.ws!==ws){ resetNet(); Net._mode='partyTeam'; Net.ws=ws; mmWs=ws; gameMode=TP.gameMode; selectedMap='random'; rankedMode=false; }
+        handleNetMessage(d);
+      };
+      ws.onerror=()=>{ Game.msg && Game.msg('파티 서버 연결 실패'); };
+      ws.onclose=()=>{ if(Net.ws===ws && Net.connected && running){ onOpponentLeft(); } };
+    }catch(e){ Game.msg && Game.msg('파티 서버 연결 실패'); }
+  }
+  function handleTeamPartyMessage(d){
+    switch(d.type){
+      case 'identified': saveDeviceIdentity(d.id,d.token); break;
+      case 'team_party_created':
+        TP.code=d.code; TP.isHost=true; TP.myIdx=0;
+        try{ navigator.clipboard.writeText(d.code); Game.msg && Game.msg('초대 코드 복사됨: '+d.code+' · 친구에게 공유하세요'); }
+        catch(e){ Game.msg && Game.msg('초대 코드: '+d.code); }
+        renderTeamPartySlots(); refreshPlayButtonLabel();
+        break;
+      case 'team_party_joined':
+        TP.code=d.code; TP.isHost=false; TP.myIdx=d.idx; TP.size=d.size; TP.gameMode=d.gameMode;
+        closeTpJoinOvl();
+        renderTeamPartySlots(); refreshPlayButtonLabel();
+        break;
+      case 'team_party_join_failed':
+        { const err=$('tpJoinError'); if(err) err.textContent=d.reason||'참가에 실패했습니다'; }
+        break;
+      case 'team_party_roster':
+        TP.roster=d.roster||[]; TP.size=d.size; TP.gameMode=d.gameMode;
+        renderTeamPartySlots(); refreshPlayButtonLabel();
+        break;
+      case 'team_party_closed':
+        Game.msg && Game.msg(d.reason||'파티가 종료되었습니다');
+        tpReset(); renderTeamPartySlots(); refreshPlayButtonLabel();
+        break;
+      case 'team_party_start_failed':
+        Game.msg && Game.msg(d.reason||'아직 파티원이 준비되지 않았습니다');
+        break;
+    }
+  }
+  function tpLeaveParty(){
+    if(TP.ws){ try{ TP.ws.send(JSON.stringify({type:'team_party_leave'})); TP.ws.close(); }catch(e){} }
+    tpReset();
+  }
+  // 로비의 빈 초대 슬롯 클릭 -> 파티 생성(없으면) 후 코드 복사(있으면 재복사)
+  function onTapInviteSlot(){
+    const qm=findQueueMode(selectedQueueMode);
+    if(qm.size<=1) return;
+    if(TP.code){
+      try{ navigator.clipboard.writeText(TP.code); Game.msg && Game.msg('코드 복사됨: '+TP.code); }catch(e){}
+      return;
+    }
+    tpConnect(()=>{
+      TP.ws.send(JSON.stringify({type:'team_party_create', size:qm.size, gameMode:qm.gameMode, species:selectedSpecies, nick:playerNick}));
+    });
+  }
+  function openTpJoinOvl(){ const el=$('tpJoinOvl'); if(!el) return; const err=$('tpJoinError'); if(err) err.textContent=''; const inp=$('tpJoinCodeInput'); if(inp) inp.value=''; el.style.display='flex'; }
+  function closeTpJoinOvl(){ const el=$('tpJoinOvl'); if(el) el.style.display='none'; }
+  function tpJoinWithCode(){
+    const inp=$('tpJoinCodeInput'); const code=(inp?inp.value:'').toUpperCase().trim();
+    if(code.length!==6){ const err=$('tpJoinError'); if(err) err.textContent='6자리 코드를 입력하세요'; return; }
+    tpConnect(()=>{
+      TP.ws.send(JSON.stringify({type:'team_party_join', code, species:selectedSpecies, nick:playerNick}));
+    });
+  }
+  // 로비 초대 슬롯 렌더: 1vs1은 슬롯 없음, 2vs2는 오른쪽 1개, 3vs3은 좌우 2개
+  function renderTeamPartySlots(){
+    const qm=findQueueMode(selectedQueueMode);
+    const showR=qm.size>=2, showL=qm.size>=3;
+    const slotL=$('tpSlotL'), slotR=$('tpSlotR'), joinLink=$('tpJoinLink'), leaveLink=$('tpLeaveLink');
+    if(slotL) slotL.style.display = showL?'flex':'none';
+    if(slotR) slotR.style.display = showR?'flex':'none';
+    if(joinLink) joinLink.style.display = (showR && !TP.code && !matching) ? 'block' : 'none';
+    if(leaveLink) leaveLink.style.display = (showR && !!TP.code && !matching) ? 'block' : 'none';
+    if(!showR) return;
+    const others = TP.code ? TP.roster.filter(r=>r.i!==TP.myIdx).sort((a,b)=>a.i-b.i) : [];
+    tpFillSlot(slotR, others[0]);
+    if(showL) tpFillSlot(slotL, others[1]);
+  }
+  function tpFillSlot(el, info){
+    if(!el) return;
+    if(!info){
+      el.innerHTML='<button class="tpAdd" type="button">+</button>';
+      const btn=el.querySelector('.tpAdd'); if(btn) bindBtn2(btn, onTapInviteSlot);
+      return;
+    }
+    const spName = SPECIES[info.species] ? SPECIES[info.species].name : '플레이어';
+    el.innerHTML='<canvas class="tpPortrait" width="72" height="72"></canvas>'
+      +'<div class="tpName">'+(info.nick||spName)+'</div>'
+      +'<div class="tpReady '+(info.ready?'on':'')+'">'+(info.ready?'준비완료':'대기중')+'</div>'
+      +(info.isHost?'<div class="tpHostTag">파티장</div>':'');
+    const cv=el.querySelector('canvas'); if(cv){ try{ drawPortrait(cv, info.species||'rabbit'); }catch(e){} }
+  }
+
+  /* ===================================================================
+     ===== 친구 시스템: ID 검색 · 추가 · 목록 + 닉네임 서버 검증 =====
+     계정(고유 ID)/닉네임 유일성/친구 목록은 서버(server.js)의 파일 계정 저장소가 최종 권위를 가짐.
+     =================================================================== */
+  const FR = { ws:null };
+  let myAccountId=null;
+  function frConnect(onOpenSend){
+    if(FR.ws && FR.ws.readyState===WebSocket.OPEN){ onOpenSend(); return; }
+    const MM_URL=window.__PVP_SERVER||null;
+    if(!MM_URL){ Game.msg && Game.msg('서버가 설정되어 있지 않습니다'); return; }
+    try{
+      const ws=new WebSocket(MM_URL);
+      FR.ws=ws;
+      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){} onOpenSend(); };
+      ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleFriendMessage(d); };
+      ws.onerror=()=>{};
+      ws.onclose=()=>{ if(FR.ws===ws) FR.ws=null; };
+    }catch(e){}
+  }
+  function handleFriendMessage(d){
+    switch(d.type){
+      case 'identified':
+        saveDeviceIdentity(d.id,d.token); myAccountId=d.id;
+        { const el=$('myIdVal'); if(el) el.textContent=d.id; }
+        break;
+      case 'friend_search_result': renderFriendSearchResults(d.results||[]); break;
+      case 'friend_add_result':
+        if(d.ok){ Game.msg && Game.msg((d.nickname||'친구')+' 님을 추가했습니다'); frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); }); }
+        else Game.msg && Game.msg(d.reason||'추가에 실패했습니다');
+        break;
+      case 'friend_list_result': renderFriendList(d.friends||[]); break;
+      case 'nickname_set':
+        playerNick=d.nickname; try{ localStorage.setItem('aa_nick',playerNick); }catch(e){}
+        refreshNicknameUI();
+        { const m=$('setNickMsg'); if(m){ m.classList.remove('err'); m.textContent='변경되었습니다'; } }
+        break;
+      case 'nickname_set_failed':
+        { const m=$('setNickMsg'); if(m){ m.classList.add('err'); m.textContent=d.reason||'변경에 실패했습니다'; } }
+        break;
+    }
+  }
+  function renderFriendSearchResults(results){
+    const box=$('friendSearchResults'); if(!box) return;
+    if(!results.length){ box.innerHTML='<div class="friendEmpty">검색 결과가 없습니다</div>'; return; }
+    box.innerHTML='';
+    results.forEach(r=>{
+      const row=document.createElement('div'); row.className='friendRow';
+      row.innerHTML='<span class="frDot"></span><span class="frName">'+(r.nickname||'(닉네임 없음)')+'</span><span class="frId">'+r.id+'</span><button type="button">추가</button>';
+      const btn=row.querySelector('button'); bindBtn2(btn, ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_add', id:r.id})); }); });
+      box.appendChild(row);
+    });
+  }
+  function renderFriendList(friends){
+    const box=$('friendListBody'); if(!box) return;
+    if(!friends.length){ box.innerHTML='<div class="friendEmpty">아직 친구가 없습니다</div>'; return; }
+    box.innerHTML='';
+    friends.forEach(f=>{
+      const row=document.createElement('div'); row.className='friendRow';
+      row.innerHTML='<span class="frDot '+(f.online?'on':'')+'"></span><span class="frName">'+(f.nickname||'(닉네임 없음)')+'</span><span class="frId">'+f.id+'</span><button type="button">삭제</button>';
+      const btn=row.querySelector('button'); bindBtn2(btn, ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_remove', id:f.id})); }); });
+      box.appendChild(row);
+    });
   }
 
   /* ===================================================================
@@ -6278,14 +6897,16 @@ const Game = (() => {
 
   // ===== 팀전(빠른 매칭) 시작: 기존 FFA 부트스트랩(_startFFAMatch) 그대로 재사용 =====
   function _prepTeamMatch(d){
+    clearBotFallbackTimer();
     Net.connected=true; Net.ffa=true; Net.teamMode=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
     Net.role = d.idx===0 ? 'host' : 'guest';
     Net._ffaPlayers=d.players||[];
     const mine=Net._ffaPlayers.find(p=>p.idx===d.idx);
     Net.myTeam = mine ? mine.team : 'red';
-    gameMode='deathmatch'; selectedMap='random';
+    gameMode=d.gameMode||'deathmatch'; selectedMap='random';
     $('matchStatus').textContent='매칭 완료! '+d.size+'vs'+d.size;
     $('matchSub').textContent='잠시 후 시작합니다';
+    endMatchingUI();
     setTimeout(()=>startFFA(), 700);
   }
 
@@ -6461,6 +7082,9 @@ const Game = (() => {
     $('sBgmVol').value=Math.round(Settings.bgmVol*100); $('sBgmVolVal').textContent=Math.round(Settings.bgmVol*100);
     $('sShake').checked=Settings.shake; $('sQual').value=Settings.quality;
     $('sSens').value=Math.round(Settings.sens*100); $('sSensVal').textContent=Settings.sens.toFixed(1);
+    const vib=$('sVib'); if(vib) vib.checked=Settings.vib;
+    const ni=$('setNickInput'); if(ni) ni.value=playerNick;
+    const nm=$('setNickMsg'); if(nm){ nm.textContent=''; nm.className='backupMsg'; }
   }
   const on=(id,ev,fn)=>{ const el=$(id); if(el) el.addEventListener(ev,fn); };
   on('sSfx','change',e=>{ Settings.sfx=e.target.checked; Settings.save(); });
@@ -6471,6 +7095,35 @@ const Game = (() => {
   on('sQual','change',e=>{ Settings.quality=e.target.value; applyQuality(); Settings.save(); });
   on('sSens','input',e=>{ Settings.sens=e.target.value/100; $('sSensVal').textContent=Settings.sens.toFixed(1); });
   on('sSens','change',()=>Settings.save());
+  on('sVib','change',e=>{ Settings.vib=e.target.checked; Settings.save(); if(Settings.vib) vibrate(30); });
+  bindBtn('sLayoutBtn',()=>{ document.body.classList.add('layout-edit'); showScreen('layoutScr'); });
+
+  /* ---- 닉네임 변경(설정 화면 — 2~12자 · 중복 불가 · 특수문자/비속어 필터, 서버가 최종 검증) ---- */
+  bindBtn('setNickBtn',()=>{
+    const inp=$('setNickInput'); const nick=(inp?inp.value:'').trim();
+    const msgEl=$('setNickMsg');
+    const fail=t=>{ if(msgEl){ msgEl.classList.add('err'); msgEl.textContent=t; } };
+    if(nick.length<2||nick.length>12){ fail('닉네임은 2~12자로 입력해주세요'); return; }
+    if(!/^[a-zA-Z0-9가-힣_]+$/.test(nick)){ fail('특수문자는 사용할 수 없습니다'); return; }
+    if(msgEl){ msgEl.classList.remove('err'); msgEl.textContent='확인 중...'; }
+    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'set_nickname', nickname:nick})); });
+  });
+  // 로비의 닉네임 라벨을 누르면 인라인 편집 대신 설정 화면의 닉네임 변경으로 이동
+  bindBtn('lbNick',()=>{ openSettings(false); const ni=$('setNickInput'); if(ni){ setTimeout(()=>{ ni.focus(); },50); } });
+
+  /* ---- 친구: ID 검색 · 추가 · 목록 ---- */
+  bindBtn('lbFriends',()=>{
+    $('friendsOvl').style.display='flex';
+    $('friendSearchResults').innerHTML='';
+    $('friendSearchInput').value='';
+    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+  });
+  bindBtn('friendsClose',()=>{ $('friendsOvl').style.display='none'; });
+  bindBtn('friendSearchBtn',()=>{
+    const q=$('friendSearchInput').value.trim(); if(!q) return;
+    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_search', query:q})); });
+  });
+  { const fi=$('friendSearchInput'); if(fi) fi.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('friendSearchBtn').click(); } }); }
 
   // start lobby preview once DOM ready
   setTimeout(initPreview, 60);
