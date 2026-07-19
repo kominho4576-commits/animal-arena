@@ -134,7 +134,7 @@ body.has-touch #abilityRow{display:none!important}
 .csName{font-family:'Black Han Sans',sans-serif;font-size:22px;color:var(--yl);letter-spacing:3px;margin-top:2px;text-shadow:0 0 14px rgba(255,216,61,.4)}
 .csNameRow{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:2px}
 .csClassBadge{font-size:12px;font-weight:900;letter-spacing:1px;color:#0a0f18;background:var(--cy2);border-radius:4px;padding:3px 10px;box-shadow:0 0 10px rgba(125,243,255,.4)}
-.csInfo{position:static;width:300px;background:linear-gradient(180deg,rgba(14,26,46,.95),rgba(8,15,28,.94));border:1px solid rgba(125,243,255,.25);border-radius:10px;padding:14px 16px;box-shadow:0 8px 28px rgba(0,0,0,.6);text-align:left;z-index:6}
+.csInfo{position:static;width:300px;background:linear-gradient(180deg,rgba(14,26,46,.95),rgba(8,15,28,.94));border:1px solid rgba(125,243,255,.25);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:14px 16px;box-shadow:0 8px 28px rgba(0,0,0,.6);text-align:left;z-index:6}
 .csInfoRow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .csInfoLbl{font-size:10px;font-weight:900;letter-spacing:2px;color:var(--cy2);text-transform:uppercase;white-space:nowrap}
 .csInfoLbl.ult{color:#e879f9}
@@ -270,7 +270,7 @@ body.has-touch #abilityRow{display:none!important}
 .pickLbl{color:var(--cy2);font-size:11px;letter-spacing:3px;margin-bottom:8px;text-transform:uppercase;font-weight:700}
 .pickLbl::before{content:"◤ ";color:var(--yl);font-size:9px}
 .specRow{display:flex;gap:10px;flex-wrap:wrap;max-width:440px}
-.specBtn{width:74px;height:88px;border-radius:10px;border:1px solid rgba(125,243,255,.18);background:linear-gradient(180deg,rgba(22,40,64,.55),rgba(10,19,34,.7));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#fff;transition:transform .12s,border-color .12s,box-shadow .12s;position:relative;overflow:hidden}
+.specBtn{width:74px;height:88px;clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%);border:1px solid rgba(125,243,255,.18);background:linear-gradient(180deg,rgba(22,40,64,.55),rgba(10,19,34,.7));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#fff;transition:transform .12s,border-color .12s,box-shadow .12s;position:relative;overflow:hidden}
 .specBtn:hover{transform:translateY(-3px);border-color:rgba(125,243,255,.5)}
 .specBtn:active{transform:scale(.94)}
 .specBtn.sel{border-color:var(--cy);background:linear-gradient(180deg,rgba(49,230,255,.2),rgba(10,25,40,.85));box-shadow:0 0 18px rgba(49,230,255,.35),0 0 0 1px rgba(49,230,255,.4) inset}
@@ -279,7 +279,7 @@ body.has-touch #abilityRow{display:none!important}
 .specDot{width:36px;height:36px;border-radius:50%;box-shadow:inset 0 -4px 8px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35)}
 .specName{font-size:12px;font-weight:700;letter-spacing:1px}
 .wepRow{display:flex;gap:8px;flex-wrap:wrap;max-width:440px}
-.wepChip{display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(180deg,rgba(22,40,64,.45),rgba(10,19,34,.6));border:1px solid rgba(125,243,255,.12);border-radius:8px;padding:7px 4px;width:66px;cursor:pointer;transition:transform .1s,border-color .1s,box-shadow .1s}
+.wepChip{display:flex;flex-direction:column;align-items:center;gap:4px;background:linear-gradient(180deg,rgba(22,40,64,.45),rgba(10,19,34,.6));border:1px solid rgba(125,243,255,.12);clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);padding:7px 4px;width:66px;cursor:pointer;transition:transform .1s,border-color .1s,box-shadow .1s}
 .wepChip:hover{transform:translateY(-3px);border-color:var(--yl);box-shadow:0 6px 16px rgba(0,0,0,.4),0 0 12px rgba(255,216,61,.15)}
 .wepChip .wcSw{width:34px;height:22px;border-radius:4px;border:1px solid rgba(255,255,255,.15)}
 .wepChip .wcNm{font-size:9px;color:#cfe0ee;text-align:center;line-height:1.15}
@@ -518,7 +518,7 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .pResume:hover{border-color:var(--gn);box-shadow:0 0 20px rgba(62,245,138,.3)}
 .pQuit{border-color:rgba(255,77,94,.45);color:#ffc9cf;background:linear-gradient(180deg,rgba(84,25,32,.85),rgba(40,12,16,.92))}
 .pQuit:hover{border-color:var(--rd);box-shadow:0 0 20px rgba(255,77,94,.25)}
-.setPanel{display:flex;flex-direction:column;gap:3px;width:300px;margin-top:10px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:10px 14px}
+.setPanel{display:flex;flex-direction:column;gap:3px;width:300px;margin-top:10px;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:10px 14px}
 .setBtnRow{display:flex;gap:8px;margin-top:12px;align-items:center;justify-content:center;flex-wrap:nowrap}
 .setBtnRow .pBtn{padding:12px 10px;font-size:13px;letter-spacing:1px;white-space:nowrap}
 .setRow{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0f8;font-size:13px;padding:6px 4px;border-bottom:1px solid rgba(125,243,255,.08);font-weight:700}
@@ -544,7 +544,7 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .friendRow .frDot.on{background:var(--gn);box-shadow:0 0 6px rgba(62,245,138,.6)}
 .friendRow .frName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .friendRow .frId{color:#8fb2cc;font-size:10px;font-weight:600}
-.friendRow button{background:none;border:1px solid rgba(125,243,255,.3);border-radius:6px;color:var(--cy2);font-size:11px;font-weight:700;padding:4px 9px}
+.friendRow button{background:none;border:1px solid rgba(125,243,255,.3);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);color:var(--cy2);font-size:11px;font-weight:700;padding:4px 9px}
 .friendEmpty{color:#5a7085;font-size:12px;text-align:center;padding:8px 0}
 
 #rotate{position:absolute;inset:0;background:var(--bg0);z-index:99;display:none;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;text-align:center;pointer-events:auto}
@@ -629,22 +629,48 @@ body.killcam #killCamLabel{opacity:1}
 body.aa-matching #lbModeChange{pointer-events:none;position:relative;opacity:.65}
 body.aa-matching #lbModeChange::after{content:"";position:absolute;inset:-4px;background:rgba(0,0,0,.55);border-radius:8px;z-index:2}
 body.aa-matching .mItem.play .mTxt{color:var(--cy)}
-/* 로비 계정 레벨 배지 (좌상단, 티어와 별도 관리) */
-#lbLevel{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-width:90px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:8px 12px}
-.llIcon{width:32px;height:32px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,var(--cy),#1c6a96);display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:12px;color:#04121f;box-shadow:0 0 10px rgba(49,230,255,.4)}
-#lbLevel .ltName{font-size:16px}
-/* 로비 티어 배지 */
+/* 로비 랭크·레벨 통합 배지 (좌상단) — 클릭하면 랭크 화면으로 이동 */
 .lbStatRow{display:flex;gap:10px;align-items:stretch;width:100%;max-width:520px;transform:scale(.75);transform-origin:center top;margin-bottom:-3%}
-#lbTier{display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:8px 12px}
+#lbRankLevel{display:flex;align-items:center;gap:10px;flex:1;min-width:0;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:8px 12px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+#lbRankLevel:hover{border-color:rgba(125,243,255,.4)}
+#lbRankLevel:active{transform:scale(.98)}
 .ltIcon{width:40px;height:40px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
 .ltIcon::before{content:"";position:absolute;inset:0;background:var(--tierCol,#cd7f4d);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);box-shadow:0 0 14px var(--tierGlow,rgba(205,127,77,.5))}
 .ltIcon::after{content:"";position:absolute;inset:6px;background:rgba(8,15,28,.55);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%)}
 .ltIcon span{position:relative;z-index:1;font-family:'Black Han Sans',sans-serif;font-size:20px;color:var(--tierCol,#cd7f4d);text-shadow:0 0 8px var(--tierGlow)}
+.llBadge{position:absolute;right:-6px;bottom:-4px;z-index:2;min-width:18px;height:16px;padding:0 3px;border-radius:8px;background:linear-gradient(135deg,var(--cy),#1c6a96);color:#04121f;font-family:'Black Han Sans',sans-serif;font-size:10px;line-height:16px;text-align:center;box-shadow:0 0 6px rgba(49,230,255,.5)}
 .ltInfo{flex:1;min-width:0}
 .ltName{font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--tierCol,#fff);letter-spacing:1px}
 .ltRp{font-size:12px;color:#8fb2cc;font-weight:700;margin:1px 0 4px}
 .ltBar{height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
 .ltBarFill{height:100%;background:var(--tierCol,#cd7f4d);border-radius:3px;transition:width .4s;box-shadow:0 0 8px var(--tierGlow)}
+/* ===== 랭크 화면: 가로로 이어지는 티어 진행 트랙 ===== */
+.rsLevelRow{display:flex;align-items:center;gap:14px;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);padding:12px 18px;width:min(92vw,520px);margin-bottom:22px}
+.rsLevelIcon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--cy),#1c6a96);display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:15px;color:#04121f;box-shadow:0 0 14px rgba(49,230,255,.45);flex-shrink:0}
+.rsLevelInfo{flex:1;min-width:0}
+.rsLevelLbl{font-size:12px;color:#8fb2cc;margin-bottom:5px;letter-spacing:1px}
+.rsTrackWrap{width:min(94vw,900px);max-width:100%;overflow-x:auto;overflow-y:hidden;padding:26px 10px 20px;-webkit-overflow-scrolling:touch}
+.rsTrack{display:flex;align-items:flex-start;gap:0;width:max-content;padding:0 24px}
+.rsNode{display:flex;flex-direction:column;align-items:center;width:130px;flex-shrink:0;position:relative;opacity:.4}
+.rsNode.reached{opacity:1}
+.rsConnector{width:60px;height:4px;margin-top:36px;flex-shrink:0;background:rgba(255,255,255,.12);border-radius:2px;position:relative;overflow:hidden}
+.rsConnector.filled::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#7df3ff,#3ad6b0)}
+.rsNodeIcon{width:72px;height:72px;position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.rsNodeIcon::before{content:"";position:absolute;inset:0;background:var(--tierCol,#cd7f4d);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);box-shadow:0 0 16px var(--tierGlow,rgba(205,127,77,.5))}
+.rsNodeIcon::after{content:"";position:absolute;inset:8px;background:rgba(8,15,28,.6);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%)}
+.rsNodeIcon span{position:relative;z-index:1;font-family:'Black Han Sans',sans-serif;font-size:26px;color:var(--tierCol,#cd7f4d);text-shadow:0 0 10px var(--tierGlow)}
+.rsNodeName{font-family:'Black Han Sans',sans-serif;font-size:16px;color:#fff;letter-spacing:1px}
+.rsNodeRange{font-size:11px;color:#8fb2cc;margin-top:2px;white-space:nowrap}
+.rsNodeReward{margin-top:10px;width:100%;min-height:44px;border:1.5px dashed rgba(125,243,255,.3);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);display:flex;align-items:center;justify-content:center;font-size:10px;color:#5a7690;text-align:center;padding:4px;box-sizing:border-box}
+.rsNodePin{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--cy);color:#04121f;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.rsNodePin::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--cy)}
+@media (max-width:600px){
+  .rsNode{width:104px}
+  .rsNodeIcon{width:58px;height:58px}
+  .rsNodeIcon span{font-size:20px}
+  .rsNodeName{font-size:13px}
+  .rsConnector{width:36px}
+}
 /* 랭킹전 승리화면 RP 표시 */
 #winRp{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 14px}
 .wrpDelta{font-family:'Black Han Sans',sans-serif;font-size:32px;letter-spacing:1px}
@@ -654,7 +680,7 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 /* iOS 홈화면 추가 안내 배너 */
 #iosInstall{position:fixed;left:0;right:0;bottom:0;z-index:10000;display:flex;justify-content:center;padding:10px;pointer-events:none;animation:iosUp .4s ease}
 @keyframes iosUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.iosCard{pointer-events:auto;display:flex;align-items:center;gap:12px;background:rgba(18,28,44,.97);border:1px solid rgba(125,243,255,.35);border-radius:14px;padding:12px 14px;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-family:'Noto Sans KR',sans-serif}
+.iosCard{pointer-events:auto;display:flex;align-items:center;gap:12px;background:rgba(18,28,44,.97);border:1px solid rgba(125,243,255,.35);clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);padding:12px 14px;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-family:'Noto Sans KR',sans-serif}
 .iosIcon{width:44px;height:44px;border-radius:10px;flex-shrink:0}
 .iosTxt{font-size:12.5px;color:#cfe0ee;line-height:1.5;flex:1}
 .iosTxt b{color:#fff}
@@ -662,7 +688,7 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 .iosX{background:rgba(255,255,255,.1);border:none;color:#cfe0ee;width:26px;height:26px;border-radius:50%;font-size:14px;flex-shrink:0;cursor:pointer}
 /* 커스텀 확인 팝업 */
 #confirmOvl{background:rgba(5,10,19,.75);backdrop-filter:blur(6px)}
-.cfmCard{background:linear-gradient(180deg,rgba(18,32,54,.98),rgba(8,15,28,.98));border:1px solid rgba(125,243,255,.3);border-radius:16px;padding:26px 30px;width:min(400px,88vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.65)}
+.cfmCard{background:linear-gradient(180deg,rgba(18,32,54,.98),rgba(8,15,28,.98));border:1px solid rgba(125,243,255,.3);clip-path:polygon(16px 0,100% 0,calc(100% - 16px) 100%,0 100%);padding:26px 30px;width:min(400px,88vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.65)}
 .cfmTitle{font-family:'Black Han Sans',sans-serif;font-size:24px;color:#fff;letter-spacing:1px;margin-bottom:12px}
 .cfmMsg{font-size:14px;color:#cfe0ee;line-height:1.6;margin-bottom:22px;font-weight:500}
 .cfmBtns{display:flex;gap:12px;justify-content:center}
@@ -674,7 +700,7 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 .backupMsg{font-size:12px;font-weight:700;min-height:16px;color:var(--gn);margin-bottom:14px}
 .backupMsg.err{color:#ff6b7a}
 /* 튜토리얼 */
-.tutCard{background:linear-gradient(180deg,rgba(18,32,54,.96),rgba(8,15,28,.97));border:1px solid rgba(125,243,255,.28);border-radius:16px;padding:28px 32px;width:min(440px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.tutCard{background:linear-gradient(180deg,rgba(18,32,54,.96),rgba(8,15,28,.97));border:1px solid rgba(125,243,255,.28);clip-path:polygon(16px 0,100% 0,calc(100% - 16px) 100%,0 100%);padding:28px 32px;width:min(440px,90vw);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .tutTitle{font-family:'Black Han Sans',sans-serif;font-size:26px;color:var(--cy2);letter-spacing:2px;margin-bottom:12px}
 .tutIcon{font-size:56px;margin:10px 0;line-height:1}
 .tutBody{font-size:15px;color:#cfe0ee;line-height:1.7;min-height:96px;font-weight:500}
@@ -685,7 +711,7 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 .tutDots .td.on{background:var(--cy);width:22px;border-radius:5px}
 .tutBtns{display:flex;gap:12px;justify-content:center;margin-top:4px}
 /* 로비 전적 패널 */
-#lbStats{flex:1;min-width:0;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);border-radius:10px;padding:8px 14px;display:flex;flex-direction:column;justify-content:center}
+#lbStats{flex:1;min-width:0;background:rgba(10,19,34,.5);border:1px solid rgba(125,243,255,.18);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:8px 14px;display:flex;flex-direction:column;justify-content:center}
 .lsRow{display:flex;align-items:baseline;gap:4px;margin-bottom:4px;justify-content:center;white-space:nowrap;flex-wrap:nowrap}
 .lsNum{font-family:'Black Han Sans',sans-serif;font-size:18px;color:#fff}
 .lsRow .lsNum:nth-child(1){color:var(--gn)} .lsRow .lsNum:nth-child(3){color:var(--rd)} .lsRow .lsNum:nth-child(5){color:var(--cy2)}
@@ -748,32 +774,29 @@ body.has-touch #lobby .lbTitle{position:absolute;top:4px;left:50%;transform:tran
 body.has-touch #lobby .mItem{position:absolute;padding:0;text-align:center;transition:none}
 body.has-touch #lobby .mItem::before{display:none}
 body.has-touch #lobby .mItem .mArrow{display:none}
-body.has-touch #lobby .mItem .mTxt{font-size:12px;letter-spacing:.5px;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(10,19,34,.75);border:1px solid rgba(125,243,255,.3);border-radius:10px;padding:7px 11px;box-shadow:0 6px 18px rgba(0,0,0,.4);min-width:58px;color:#fff}
+body.has-touch #lobby .mItem .mTxt{font-size:12px;letter-spacing:.5px;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(10,19,34,.75);border:1px solid rgba(125,243,255,.3);clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);padding:7px 11px;box-shadow:0 6px 18px rgba(0,0,0,.4);min-width:58px;color:#fff}
 body.has-touch #lobby .mItem .mTxt small{color:#8fb2cc;font-size:8px}
 body.has-touch #lobby .mItem:active .mTxt{transform:scale(.95)}
 body.has-touch #lobby .mItem.play .mTxt{background:linear-gradient(180deg,rgba(23,84,53,.9),rgba(10,40,26,.92));border-color:rgba(62,245,138,.55);color:#dcffe9}
 body.has-touch.aa-matching #lobby .mItem.play .mTxt{color:var(--cy);min-width:100px}
 /* 우하단: 플레이 + 모드 변경 */
+/* 게임 모드 버튼 + 플레이 버튼을 세로가 아닌 가로로 나란히 배치 */
 body.has-touch #lobby #lbPlay{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
-body.has-touch #lobby #lbModeChange{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);z-index:3}
-/* 좌하단: 캐릭터 선택 + 체험하기 */
+body.has-touch #lobby #lbModeChange{right:104px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
+/* 좌하단: 캐릭터 선택 */
 body.has-touch #lobby #lbChar{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
-body.has-touch #lobby #lbTrain{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);z-index:3}
-/* 우상단: 친구 + 설정 + 더보기 */
+/* 우상단: 친구 + 설정 + 버튼 위치 설정 + 튜토리얼 + 게임 종료 (항상 노출) */
 body.has-touch #lobby #lbFriends{right:10px;top:calc(env(safe-area-inset-top,0px) + 4px);z-index:3}
 body.has-touch #lobby #lbSettings{right:10px;top:calc(env(safe-area-inset-top,0px) + 46px);z-index:3}
-body.has-touch #lobby #lbMoreToggle{right:10px;top:calc(env(safe-area-inset-top,0px) + 88px);z-index:3}
-/* 더보기 패널: 토글 시에만 노출(버튼 위치 설정/튜토리얼/게임 종료) */
 body.has-touch #lobby #lbLayout,
 body.has-touch #lobby #lbTutorial,
-body.has-touch #lobby #lbExit{right:10px;z-index:3;display:none!important}
-body.has-touch.lbMoreOpen #lobby #lbLayout{display:block!important;top:calc(env(safe-area-inset-top,0px) + 130px)}
-body.has-touch.lbMoreOpen #lobby #lbTutorial{display:block!important;top:calc(env(safe-area-inset-top,0px) + 172px)}
-body.has-touch.lbMoreOpen #lobby #lbExit{display:block!important;top:calc(env(safe-area-inset-top,0px) + 214px)}
-/* 좌상단: 계정 레벨 + 티어 (전적은 그 아래 축소) */
+body.has-touch #lobby #lbExit{right:10px;z-index:3}
+body.has-touch #lobby #lbLayout{top:calc(env(safe-area-inset-top,0px) + 88px)}
+body.has-touch #lobby #lbTutorial{top:calc(env(safe-area-inset-top,0px) + 130px)}
+body.has-touch #lobby #lbExit{top:calc(env(safe-area-inset-top,0px) + 172px)}
+/* 좌상단: 랭크·레벨 통합 배지 (전적은 그 아래 축소) */
 body.has-touch #lobby .lbStatRow{position:absolute;left:10px;top:calc(env(safe-area-inset-top,0px) + 4px);flex-direction:column;align-items:flex-start;width:auto;max-width:170px;transform:none;margin:0;gap:6px;z-index:2}
-body.has-touch #lobby #lbLevel,
-body.has-touch #lobby #lbTier{width:100%}
+body.has-touch #lobby #lbRankLevel{width:100%}
 body.has-touch #lobby #lbStats{width:100%;transform:scale(.82);transform-origin:left top}
 /* 중앙: 캐릭터 프리뷰가 화면을 채움 */
 body.has-touch #lobby .lbPreview{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:0;min-width:0}
@@ -781,11 +804,11 @@ body.has-touch #lobby #pvCanvas{width:min(46vh,58vw);height:min(80vh,62vh)}
 body.has-touch #lobby .lbNickWrap{margin-top:-6px}
 
 /* ===== 조작키 설정 ===== */
-#keyList{display:flex;flex-direction:column;gap:5px;width:400px;max-height:52vh;overflow-y:auto;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);border-radius:10px;padding:12px}
+#keyList{display:flex;flex-direction:column;gap:5px;width:400px;max-height:52vh;overflow-y:auto;background:rgba(10,19,34,.7);border:1px solid rgba(125,243,255,.16);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:12px}
 .keyRow{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-bottom:1px solid rgba(125,243,255,.07)}
 .keyRow:last-child{border-bottom:none}
 .keyName{color:#e8f0f8;font-size:14px;font-weight:700;letter-spacing:.5px}
-.keyBtn{min-width:130px;padding:7px 14px;border-radius:5px;border:1px solid rgba(125,243,255,.3);background:linear-gradient(180deg,#26394e,#15243a);color:var(--cy2);font-size:13px;font-weight:900;letter-spacing:1px;transition:border-color .12s,box-shadow .12s;font-family:inherit}
+.keyBtn{min-width:130px;padding:7px 14px;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);border:1px solid rgba(125,243,255,.3);background:linear-gradient(180deg,#26394e,#15243a);color:var(--cy2);font-size:13px;font-weight:900;letter-spacing:1px;transition:border-color .12s,box-shadow .12s;font-family:inherit}
 .keyBtn:hover{border-color:var(--cy);box-shadow:0 0 12px rgba(49,230,255,.25)}
 .keyBtn.listening{border-color:var(--yl);color:var(--yl);animation:pkBlink 1s infinite;font-size:11.5px}
 
@@ -1181,11 +1204,9 @@ body.layout-edit #joyHint{display:none}
         <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY</span></button>
         <button class="mItem" id="lbModeChange"><span class="mArrow">➔</span><span class="mTxt">모드 변경<small id="lbModeChangeSub">데스매치 1vs1</small></span></button>
         <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택</span></button>
-        <button class="mItem" id="lbTrain"><span class="mArrow">➔</span><span class="mTxt">체험하기</span></button>
         <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정</span></button>
         <button class="mItem" id="lbFriends"><span class="mArrow">➔</span><span class="mTxt">친구</span></button>
         <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정</span></button>
-        <button class="mItem mTouchOnly" id="lbMoreToggle"><span class="mArrow">➔</span><span class="mTxt">더보기</span></button>
         <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow">➔</span><span class="mTxt">버튼 위치 설정</span></button>
         <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼</span></button>
         <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료</span></button>
@@ -1193,21 +1214,14 @@ body.layout-edit #joyHint{display:none}
     </div>
     <div class="lbRight">
       <div class="lbStatRow">
-        <div id="lbLevel">
-          <div class="llIcon" id="llIcon">Lv</div>
-          <div class="ltInfo">
-            <div class="ltName" id="llNum">1</div>
-            <div class="ltBar"><div class="ltBarFill" id="llBarFill"></div></div>
-          </div>
-        </div>
-        <div id="lbTier">
-          <div class="ltIcon" id="ltIcon"></div>
+        <button type="button" id="lbRankLevel" title="랭크 · 레벨 보기">
+          <div class="ltIcon" id="ltIcon"><span></span><div class="llBadge" id="llBadge">1</div></div>
           <div class="ltInfo">
             <div class="ltName" id="ltName">브론즈</div>
             <div class="ltRp" id="ltRp">0 RP</div>
             <div class="ltBar"><div class="ltBarFill" id="ltBarFill"></div></div>
           </div>
-        </div>
+        </button>
         <div id="lbStats">
           <div class="lsRow"><span class="lsNum" id="lsWins">0</span><span class="lsLbl">승</span><span class="lsNum" id="lsLosses">0</span><span class="lsLbl">패</span><span class="lsNum" id="lsRate">0%</span><span class="lsLbl">승률</span></div>
           <div class="lsRow2"><span>K/D <b id="lsKD">0</b></span><span>연승 <b id="lsStreak">0</b></span><span>최고 <b id="lsBest">0</b></span></div>
@@ -1224,7 +1238,6 @@ body.layout-edit #joyHint{display:none}
           <div class="lbPvName" id="pvName">토끼</div>
         </div>
         <div class="tpLinks">
-          <button class="tpLink" id="tpJoinLink" style="display:none">초대 코드로 참가</button>
           <button class="tpLink" id="tpLeaveLink" style="display:none">파티 나가기</button>
         </div>
       </div>
@@ -1252,8 +1265,27 @@ body.layout-edit #joyHint{display:none}
   </div>
   <div class="csFoot">
     <span class="csHint">동물을 선택하세요 · 12종</span>
-    <button class="cfBtn ok" id="csConfirm">확인</button>
+    <div style="display:flex;gap:12px">
+      <button class="cfBtn" id="csTrain">체험하기</button>
+      <button class="cfBtn ok" id="csConfirm">확인</button>
+    </div>
   </div>
+</div>
+
+<!-- ===== 랭크 · 레벨 ===== -->
+<div class="ovl scr" id="rankScr" style="display:none">
+  <h1 style="font-size:28px">랭크 · 레벨</h1>
+  <div class="rsLevelRow">
+    <div class="rsLevelIcon" id="rsLevelIcon">Lv.1</div>
+    <div class="rsLevelInfo">
+      <div class="rsLevelLbl">계정 레벨</div>
+      <div class="ltBar"><div class="ltBarFill" id="rsLevelBarFill"></div></div>
+    </div>
+  </div>
+  <div class="rsTrackWrap">
+    <div class="rsTrack" id="rsTrack"></div>
+  </div>
+  <button class="pBtn pResume" id="rankBack" style="width:150px;margin-top:10px">← 뒤로</button>
 </div>
 
 <!-- ===== 조작키 설정 ===== -->
@@ -1282,49 +1314,28 @@ body.layout-edit #joyHint{display:none}
 <!-- ===== 무기 미리보기(로비 하단, 접힘) ===== -->
 <div class="wepRow" id="wepRow" style="display:none"></div>
 
-<!-- ===== PVP 입장 확인 (배너) ===== -->
-<div class="ovl scr" id="pvpConfirm" style="display:none">
+<!-- ===== 팀 파티: 친구 목록에서 선택해 초대 — 2vs2/3vs3 전용 ===== -->
+<div class="ovl" id="tpInviteOvl" style="display:none;z-index:78">
   <div class="cfBanner">
-    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
-    <div class="cfIcon">VS</div>
-    <div class="cfTitle">PVP MATCH</div>
-    <div class="cfSub">플레이 방식을 선택하세요</div>
+    <div class="cfIcon">👥</div>
+    <div class="cfTitle">친구 초대</div>
+    <div class="cfSub">초대할 친구를 선택하세요 (온라인 친구만 초대 가능)</div>
+    <div id="tpInviteList" class="friendList"></div>
     <div class="cfBtns">
-      <button class="cfBtn ok" id="pvpRandom">랜덤 매칭</button>
-      <button class="cfBtn" id="pvpFFA">개인전 (최대 5인)</button>
-      <button class="cfBtn" id="pvpCreate">방 만들기</button>
-      <button class="cfBtn" id="pvpJoin">코드 입장</button>
-      <button class="cfBtn" id="pvpCancel">취소</button>
+      <button class="cfBtn" id="tpInviteClose">닫기</button>
     </div>
   </div>
 </div>
 
-<!-- 방 코드 입력 -->
-<div class="ovl scr" id="joinRoomOvl" style="display:none">
+<!-- ===== 파티 초대 수신 알림 ===== -->
+<div class="ovl" id="tpInviteToast" style="display:none;z-index:90">
   <div class="cfBanner">
-    <div class="cfIcon">#</div>
-    <div class="cfTitle">코드 입장</div>
-    <div class="cfSub">친구에게 받은 6자리 방 코드를 입력하세요</div>
-    <input type="text" id="roomCodeInput" maxlength="6" placeholder="ABC123" autocomplete="off" style="text-transform:uppercase">
-    <div id="joinError"></div>
+    <div class="cfIcon">👥</div>
+    <div class="cfTitle">파티 초대</div>
+    <div class="cfSub" id="tpInviteToastMsg">님이 파티에 초대했습니다</div>
     <div class="cfBtns">
-      <button class="cfBtn ok" id="joinConfirm">입장</button>
-      <button class="cfBtn" id="joinBack">뒤로</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 팀 파티(초대) 코드로 참가 — 2vs2/3vs3 전용 ===== -->
-<div class="ovl" id="tpJoinOvl" style="display:none;z-index:78">
-  <div class="cfBanner">
-    <div class="cfIcon">#</div>
-    <div class="cfTitle">파티 참가</div>
-    <div class="cfSub">친구에게 받은 6자리 초대 코드를 입력하세요</div>
-    <input type="text" id="tpJoinCodeInput" maxlength="6" placeholder="ABC123" autocomplete="off" style="text-transform:uppercase">
-    <div id="tpJoinError"></div>
-    <div class="cfBtns">
-      <button class="cfBtn ok" id="tpJoinConfirm">참가</button>
-      <button class="cfBtn" id="tpJoinBack">뒤로</button>
+      <button class="cfBtn ok" id="tpInviteAccept">수락</button>
+      <button class="cfBtn" id="tpInviteDecline">거절</button>
     </div>
   </div>
 </div>
@@ -1334,178 +1345,8 @@ body.layout-edit #joyHint{display:none}
   <h1 style="font-size:30px">모드 선택</h1>
   <div class="modeCards grid6" id="queueModeGrid"></div>
   <div class="modeScrFoot">
-    <button class="pBtn" id="modeLegacyPvp" style="width:210px">1:1 코드 대결 · 개인전(5인)</button>
-    <button class="pBtn" id="modeCustomLink" style="width:210px">커스텀 대전 (코드 초대 · AI 대전)</button>
     <button class="pBtn" id="modeBack" style="width:130px">← 뒤로</button>
   </div>
-</div>
-
-<!-- ===== 커스텀 대전 입구 (빠른 AI 대전 / 방 만들기) ===== -->
-<div class="ovl scr" id="customEntryOvl" style="display:none">
-  <div class="cfBanner">
-    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
-    <div class="cfIcon">CUSTOM</div>
-    <div class="cfTitle">CUSTOM MATCH</div>
-    <div class="cfSub">플레이 방식을 선택하세요</div>
-    <div class="cfBtns">
-      <button class="cfBtn ok" id="customPickRoom">커스텀 방 만들기</button>
-      <button class="cfBtn" id="customPickJoin">코드로 입장</button>
-      <button class="cfBtn" id="customPickAI">빠른 AI 대전</button>
-      <button class="cfBtn" id="customPickBack">뒤로</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 팀전 입구 (2vs2 / 3vs3) ===== -->
-<div class="ovl scr" id="teamPickOvl" style="display:none">
-  <div class="cfBanner">
-    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
-    <div class="cfIcon">TEAM</div>
-    <div class="cfTitle">TEAM MATCH</div>
-    <div class="cfSub">팀 규모를 선택하세요 · 봇 없음, 실제 플레이어만</div>
-    <div class="cfBtns">
-      <button class="cfBtn ok" id="teamPick2">2 vs 2</button>
-      <button class="cfBtn ok" id="teamPick3">3 vs 3</button>
-      <button class="cfBtn" id="teamPickBack">뒤로</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== 커스텀 대전 방 (친구 초대 + 봇 추가 + 팀 편성) ===== -->
-<div class="ovl scr" id="customRoomScr" style="display:none">
-  <h1 style="font-size:26px">커스텀 대전</h1>
-  <div class="roomLayout crLayout">
-    <div class="roomCol">
-      <div class="rhCodeCard">
-        <div class="rcLabel">방 코드</div>
-        <div class="rcCode" id="crCode">------</div>
-        <button class="cfBtn ok" id="crCopy">코드 복사</button>
-        <div class="rhHint">친구에게 코드를 공유하세요</div>
-      </div>
-      <div class="optSection" style="text-align:left;width:100%">
-        <div class="optLabel">참가자 (<span id="crCount">1</span>/<span id="crCap">5</span>)</div>
-        <div id="crSlots" class="crSlots"></div>
-      </div>
-    </div>
-    <div class="roomCol">
-      <div class="optSection crHostOnly">
-        <div class="optLabel">경기 방식</div>
-        <div class="optRow" id="crMatchType">
-          <button class="optBtn sel" data-mt="ffa">개인전<small>FFA · 최대 5인</small></button>
-          <button class="optBtn" data-mt="team">팀전<small>레드 vs 블루 · 최대 6인</small></button>
-        </div>
-      </div>
-      <div class="optSection crHostOnly">
-        <div class="optLabel">게임 모드</div>
-        <div class="optRow" id="crModeSel">
-          <button class="optBtn sel" data-mode="deathmatch">데스매치<small>먼저 5킬</small></button>
-          <button class="optBtn" data-mode="timeattack">타임어택<small>2분 최다킬</small></button>
-        </div>
-      </div>
-      <div class="optSection crHostOnly">
-        <div class="optLabel">맵</div>
-        <div class="optRow mapGrid" id="crMapSel">
-          <button class="optBtn sel" data-map="random">랜덤</button>
-          <button class="optBtn" data-map="arena">아레나</button>
-          <button class="optBtn" data-map="ruins">폐허</button>
-          <button class="optBtn" data-map="factory">공장</button>
-          <button class="optBtn" data-map="garden">정원</button>
-          <button class="optBtn" data-map="ice">설원</button>
-        </div>
-      </div>
-      <div class="optSection crHostOnly">
-        <div class="optLabel">봇 난이도</div>
-        <div class="diffCol" id="crDiffSel">
-          <button class="diffBtn sel" data-diff="easy">쉬움<small>아주 약한 상대</small></button>
-          <button class="diffBtn" data-diff="normal">보통<small>노련한 상대</small></button>
-          <button class="diffBtn" data-diff="hard">어려움<small>맹수 같은 상대</small></button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="crBtnRow">
-    <button class="pBtn pQuit" id="crCancel" style="width:160px">방 나가기</button>
-    <button class="pBtn crHostOnly" id="crStart" style="width:160px;background:linear-gradient(180deg,#3ef58a,#1c9660)">시작하기</button>
-  </div>
-  <div id="crGuestHint" style="display:none;color:var(--tx2);font-size:13px;margin-top:10px;flex-shrink:0">방장이 시작하기를 누르면 게임이 시작됩니다</div>
-</div>
-
-<!-- ===== 커스텀 방: 빈 슬롯 추가 선택 팝업 (친구 초대 / 랜덤 봇 추가) ===== -->
-<div class="ovl" id="crAddOvl" style="display:none;z-index:80">
-  <div class="cfmCard">
-    <div class="cfmTitle">추가하기</div>
-    <div class="cfmMsg">이 슬롯에 무엇을 추가할까요?</div>
-    <div class="crAddBtns">
-      <button class="pBtn" id="crAddFriend">친구 초대 (코드 복사)</button>
-      <button class="pBtn" id="crAddBotOpt">랜덤 봇 추가</button>
-      <button class="pBtn pQuit" id="crAddCancel">취소</button>
-    </div>
-  </div>
-</div>
-
-<!-- 봇 동물 선택 팝업 -->
-<div class="ovl scr" id="botSpecOvl" style="display:none">
-  <div class="cfBanner">
-    <div class="cfTitle" style="font-size:28px">봇 동물 선택</div>
-    <div class="cfSub">동물을 클릭하면 바로 적용됩니다</div>
-    <div class="csGrid crSpecGrid" id="botSpecGrid"></div>
-    <div class="cfBtns">
-      <button class="cfBtn" id="botSpecClose">닫기</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== AI 모드 선택 (1:1 / 개인전) — 기존 그대로, 커스텀 대전 입구의 "빠른 AI 대전"에서 진입 ===== -->
-<div class="ovl scr" id="aiPickOvl" style="display:none">
-  <div class="cfBanner">
-    <div class="cfDeco cfD1"></div><div class="cfDeco cfD2"></div><div class="cfDeco cfD3"></div><div class="cfDeco cfD4"></div>
-    <div class="cfIcon">AI</div>
-    <div class="cfTitle">AI MATCH</div>
-    <div class="cfSub">플레이 방식을 선택하세요</div>
-    <div class="cfBtns">
-      <button class="cfBtn ok" id="aiPick1v1">AI 대전 (1:1)</button>
-      <button class="cfBtn" id="aiPickFfa">AI 개인전 (5인)</button>
-      <button class="cfBtn" id="aiPickBack">뒤로</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== AI 게임 설정 (2단 레이아웃) ===== -->
-<div class="ovl scr" id="diffScr" style="display:none">
-  <h1 style="font-size:26px;margin-bottom:14px">게임 설정</h1>
-  <div class="setupGrid">
-    <div class="setupCol">
-      <div class="optSection">
-        <div class="optLabel">게임 모드</div>
-        <div class="optRow" id="modeSel">
-          <button class="optBtn sel" data-mode="deathmatch">데스매치<small>먼저 5킬 승리</small></button>
-          <button class="optBtn" data-mode="timeattack">타임어택<small>2분 내 최다킬</small></button>
-        </div>
-      </div>
-      <div class="optSection">
-        <div class="optLabel">맵</div>
-        <div class="optRow mapGrid" id="mapSel">
-          <button class="optBtn sel" data-map="random">랜덤</button>
-          <button class="optBtn" data-map="arena">아레나</button>
-          <button class="optBtn" data-map="ruins">폐허</button>
-          <button class="optBtn" data-map="factory">공장</button>
-          <button class="optBtn" data-map="garden">정원</button>
-          <button class="optBtn" data-map="ice">설원</button>
-        </div>
-      </div>
-    </div>
-    <div class="setupCol">
-      <div class="optSection">
-        <div class="optLabel">난이도 (상대 실력)</div>
-        <div class="diffCol">
-          <button class="diffBtn" id="dEasy">쉬움<small>아주 약한 상대</small></button>
-          <button class="diffBtn" id="dNorm">보통<small>노련한 상대</small></button>
-          <button class="diffBtn" id="dHard">어려움<small>맹수 같은 상대</small></button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <button class="pBtn" id="diffBack" style="margin-top:16px;width:160px">← 뒤로</button>
 </div>
 
 <!-- 맵 룰렛 (PVP 매칭 후) -->
@@ -1514,55 +1355,6 @@ body.layout-edit #joyHint{display:none}
   <div style="color:#9fd8ff;font-size:13px;margin-bottom:20px">전장 결정 중...</div>
   <div id="rouletteWindow"><div id="rouletteTrack"></div><div id="rouletteMarker"></div></div>
   <div id="rouletteResult"></div>
-</div>
-
-<!-- ===== PVP 매칭 중 ===== -->
-<div class="ovl scr" id="matchScr" style="display:none">
-  <h1 style="font-size:28px" id="matchTitle">랜덤 매칭 중</h1>
-  <div class="matchSpin"></div>
-  <div id="matchStatus">상대를 찾는 중...</div>
-  <div id="matchSub">1 vs 1 · 랜덤 상대</div>
-  <button class="pBtn pQuit" id="matchCancel" style="margin-top:24px;width:180px">취소</button>
-</div>
-
-<!-- ===== 방 만들기 (호스트) ===== -->
-<div class="ovl scr" id="roomHostScr" style="display:none">
-  <h1 style="font-size:26px;margin-bottom:8px">방 만들기</h1>
-  <div class="roomLayout">
-    <div class="roomCol">
-      <div class="rhCodeCard">
-        <div class="rcLabel">방 코드</div>
-        <div class="rcCode" id="rhCode">------</div>
-        <button class="cfBtn ok" id="rhCopy">코드 복사</button>
-        <div class="rhHint">친구에게 코드를 공유하세요</div>
-      </div>
-      <div class="rhStatus" id="rhStatus">
-        <span class="rhDot waiting" id="rhDot"></span>
-        <span id="rhStatusText">친구를 기다리는 중...</span>
-      </div>
-    </div>
-    <div class="roomCol">
-      <div class="optSection">
-        <div class="optLabel">게임 모드</div>
-        <div class="optRow" id="rhModeSel">
-          <button class="optBtn sel" data-mode="deathmatch">데스매치<small>먼저 5킬</small></button>
-          <button class="optBtn" data-mode="timeattack">타임어택<small>2분 최다킬</small></button>
-        </div>
-      </div>
-      <div class="optSection">
-        <div class="optLabel">맵</div>
-        <div class="optRow mapGrid" id="rhMapSel">
-          <button class="optBtn sel" data-map="random">랜덤</button>
-          <button class="optBtn" data-map="arena">아레나</button>
-          <button class="optBtn" data-map="ruins">폐허</button>
-          <button class="optBtn" data-map="factory">공장</button>
-          <button class="optBtn" data-map="garden">정원</button>
-          <button class="optBtn" data-map="ice">설원</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <button class="pBtn pQuit" id="rhCancel" style="margin-top:14px;width:180px">방 나가기</button>
 </div>
 
 <div class="ovl" id="menu" style="display:none"></div>
@@ -4174,12 +3966,13 @@ class AIBot extends Character {
     this.lastPos=new THREE.Vector3(); this.stuckT=0;
     this.noProgressT=0; this.lastEnemyHp=CFG.maxHP; this.rushT=0;
   }
-  // 가장 가까운 생존 적 선택 (AI 개인전: 플레이어든 다른 봇이든 전부 적)
+  // 가장 가까운 생존 적 선택 (개인전: 전부 적 / 팀전: 같은 팀은 제외)
   pickTarget(){
     const list=Game.chars||[];
-    let best=Game.player, bd=1e9;
+    let best=null, bd=1e9;
     for(const c of list){
       if(!c || c===this || c.dead) continue;
+      if(this.team && c.team && c.team===this.team) continue; // 아군은 공격 대상에서 제외
       const dd=Math.hypot(c.pos.x-this.pos.x, c.pos.z-this.pos.z);
       if(dd<bd){ bd=dd; best=c; }
     }
@@ -4396,6 +4189,7 @@ class AIBot extends Character {
     let best=null, bd=1e9;
     for(const s of Summons.all()){
       if(s.owner===this) continue;
+      if(this.team && s.owner && s.owner.team && s.owner.team===this.team) continue; // 아군 소환물은 조준 대상에서 제외
       const d=Math.hypot(s.pos.x-this.pos.x, s.pos.z-this.pos.z);
       if(d<bd){ bd=d; best=s; }
     }
@@ -4547,12 +4341,24 @@ const Game = (() => {
   let killCam=null; // {t, victim, won, angle} — 마지막 킬 슬로우모션 연출
   const $=id=>document.getElementById(id);
 
+  // 이전 매치의 캐릭터(플레이어/봇/온라인 상대/파티봇)를 씬에서 확실히 제거 —
+  // 팀 외곽선 메시는 캐릭터 group의 자식이라 그룹만 지우면 함께 사라짐.
+  // 어떤 매치 타입(오프라인/FFA/1:1 온라인/파티전)에서 왔든 상관없이 매치 시작 시 항상 전부 호출해
+  // 이전 매치 참가자가 맵에 색깔 실루엣으로 남는 유령 버그를 막는다.
+  function disposeAllChars(){
+    const seen=new Set();
+    const rm=(c)=>{ if(c && c.group && !seen.has(c.group)){ seen.add(c.group); scene.remove(c.group); } };
+    rm(player); rm(bot);
+    for(const b of aiBots) rm(b);
+    if(Net.peers) Net.peers.forEach(rm);
+    if(Net.myBotList) Net.myBotList.forEach(rm);
+    rm(Net.opp);
+  }
+
   function start(diff, aiFfa){
     lastDiff=diff;
     // clean old
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
@@ -4602,9 +4408,7 @@ const Game = (() => {
   }
   function startTraining(){
     lastDiff='train';
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
     currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
@@ -4633,9 +4437,7 @@ const Game = (() => {
   // 승패 판정은 기존 오프라인 개인전과 동일하게 개인 킬수 기준(팀 취합 판정 없음) — team 태그는 Phase 4의 팀 외곽선/팀킬 방지용으로만 사용.
   function startWithBotFill(botCount, assignTeams){
     lastDiff='normal';
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
     currentMap=(selectedMap==='random'||!selectedMap)?MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)]:selectedMap;
@@ -5245,8 +5047,7 @@ const Game = (() => {
   requestAnimationFrame(loop);
 
   /* ===== screen navigation ===== */
-  const SCREENS=['titleScr','lobby','charScr','modeScr','aiPickOvl','diffScr','pvpConfirm','joinRoomOvl','matchScr','roomHostScr','keysScr','layoutScr','tutorialScr',
-    'customEntryOvl','teamPickOvl','customRoomScr','botSpecOvl'];
+  const SCREENS=['titleScr','lobby','charScr','modeScr','keysScr','layoutScr','tutorialScr','rankScr'];
   function showScreen(id){
     SCREENS.forEach(s=>{ const el=$(s); if(!el) return;
       if(s==='charScr'){ el.classList.toggle('csShow', s===id); el.style.display = (s===id)?'':'none'; }
@@ -5265,17 +5066,45 @@ const Game = (() => {
     updateLevelBadge();
   }
   function updateLevelBadge(){
-    const num=$('llNum'); if(num) num.textContent=AccountLevel.level;
-    const bar=$('llBarFill'); if(bar) bar.style.width=(AccountLevel.progress()*100)+'%';
+    const num=$('llBadge'); if(num) num.textContent=AccountLevel.level;
   }
   function updateTierBadge(){
-    const t=Rank.tier(); const tierEl=$('lbTier'); if(!tierEl) return;
+    const t=Rank.tier(); const tierEl=$('lbRankLevel'); if(!tierEl) return;
     tierEl.style.setProperty('--tierCol', t.color);
     tierEl.style.setProperty('--tierGlow', t.glow);
-    const icon=$('ltIcon'); if(icon) icon.innerHTML='<span>'+t.name.charAt(0)+'</span>';
+    const iconSpan=document.querySelector('#ltIcon>span'); if(iconSpan) iconSpan.textContent=t.name.charAt(0);
     const nm=$('ltName'); if(nm) nm.textContent=t.name;
     const rp=$('ltRp'); if(rp){ const nxt=Rank.nextTier(); rp.textContent = nxt ? (Rank.rp+' / '+nxt.min+' RP') : (Rank.rp+' RP · 최고 티어'); }
     const bar=$('ltBarFill'); if(bar) bar.style.width=(Rank.progress()*100)+'%';
+  }
+  // 랭크 화면: TIERS를 가로 트랙으로 그리고 현재 위치를 표시 (보상 슬롯은 추후 보상 연결 전까지 빈 자리로 표시)
+  function renderRankScreen(){
+    const track=$('rsTrack'); if(!track) return;
+    const curTier=Rank.tier();
+    track.innerHTML='';
+    TIERS.forEach((t,i)=>{
+      const reached=Rank.rp>=t.min, isCur=(t.key===curTier.key);
+      if(i>0){
+        const conn=document.createElement('div'); conn.className='rsConnector'+(reached?' filled':'');
+        track.appendChild(conn);
+      }
+      const node=document.createElement('div'); node.className='rsNode'+(reached?' reached':'')+(isCur?' current':'');
+      node.style.setProperty('--tierCol', t.color); node.style.setProperty('--tierGlow', t.glow);
+      const range = TIERS[i+1] ? (t.min+' ~ '+(TIERS[i+1].min-1)+' RP') : (t.min+'+ RP');
+      node.innerHTML =
+        (isCur?'<div class="rsNodePin">현재</div>':'')
+        +'<div class="rsNodeIcon"><span>'+t.name.charAt(0)+'</span></div>'
+        +'<div class="rsNodeName">'+t.name+'</div>'
+        +'<div class="rsNodeRange">'+range+'</div>'
+        +'<div class="rsNodeReward">보상 준비 중</div>';
+      track.appendChild(node);
+    });
+    const lvlIcon=$('rsLevelIcon'); if(lvlIcon) lvlIcon.textContent='Lv.'+AccountLevel.level;
+    const lvlBar=$('rsLevelBarFill'); if(lvlBar) lvlBar.style.width=(AccountLevel.progress()*100)+'%';
+    requestAnimationFrame(()=>{
+      const curEl=track.querySelector('.rsNode.current'); const wrap=track.parentElement;
+      if(curEl && wrap) wrap.scrollLeft = curEl.offsetLeft - wrap.clientWidth/2 + curEl.offsetWidth/2;
+    });
   }
   // 화면 콘텐츠를 뷰포트에 맞게 스케일 (짤림/스크롤 방지) — 전체를 한 덩어리로 축소
   function fitScreen(id){
@@ -5557,13 +5386,14 @@ const Game = (() => {
   bindBtn('lbPlay',()=>{ Sfx.unlock(); onLbPlayClick(); }); // 매칭 중이 아니면 선택된 모드로 바로 매칭 시작, 매칭 중이면 취소
   bindBtn('lbModeChange',()=>{ Sfx.unlock(); if(matching) return; showScreen('modeScr'); });
   bindBtn('lbChar',()=>{ Sfx.unlock(); pvWeaponId=null; if(pvCharParts&&pvCharParts.hand){ while(pvCharParts.hand.children.length) pvCharParts.hand.remove(pvCharParts.hand.children[0]); } showScreen('charScr'); if(window.__csResize) setTimeout(window.__csResize,30); });
-  bindBtn('lbTrain',()=>{ Sfx.unlock(); rankedMode=false; startTraining(); });
+  bindBtn('csTrain',()=>{ Sfx.unlock(); rankedMode=false; startTraining(); });
   bindBtn('csConfirm',()=>{ Sfx.pickup(); showScreen('lobby'); if(window.__pvResize) setTimeout(window.__pvResize,30); });
+  bindBtn('lbRankLevel',()=>{ renderRankScreen(); showScreen('rankScr'); });
+  bindBtn('rankBack',()=>showScreen('lobby'));
   bindBtn('lbSettings',()=>{ openSettings(false); });
   bindBtn('lbTutorial',()=>{ openTutorial(false); });
   bindBtn('lbKeys',()=>{ buildKeyList(); showScreen('keysScr'); });
   bindBtn('lbLayout',()=>{ document.body.classList.add('layout-edit'); showScreen('layoutScr'); });
-  bindBtn('lbMoreToggle',()=>{ document.body.classList.toggle('lbMoreOpen'); });
   bindBtn('lbExit',()=>{
     // 게임 종료: 전체화면 해제 + 창 닫기 시도, 안 되면 안내
     try{ if(document.fullscreenElement) document.exitFullscreen&&document.exitFullscreen(); }catch(e){}
@@ -5738,86 +5568,30 @@ const Game = (() => {
   function refreshAbilityKeys(){ const el=$('abRollKey'); if(el) el.textContent=KeyBinds.label(KeyBinds.map.roll); const pk=$('pickKey'); if(pk) pk.textContent=KeyBinds.label(KeyBinds.map.pick); const uk=$('abUltKey'); if(uk) uk.textContent=KeyBinds.label(KeyBinds.map.ult); }
   refreshAbilityKeys();
   bindBtn('modeBack',()=>showScreen('lobby'));
-  let aiFfaPick=false; // 난이도 화면 진입 경로 (1대1 vs 개인전)
-  // 신규 6종 모드 그리드(#queueModeGrid)가 메인 진입점 — 아래는 그 밖에 유지되는 기존 기능들의 보조 진입점
-  bindBtn('modeCustomLink',()=>{ showScreen('customEntryOvl'); }); // 커스텀 대전: 빠른 AI 대전 / 방 만들기 선택 팝업부터 노출
-  bindBtn('modeLegacyPvp',()=>{ showScreen('pvpConfirm'); }); // 1:1 코드 대결 · 개인전(최대 5인) — 6종 모드에 없는 기존 기능 유지
-  bindBtn('customPickAI',()=>{ showScreen('aiPickOvl'); }); // 기존 AI 대전 기능 100% 그대로 재사용
-  bindBtn('customPickRoom',()=>{ openCustomRoom(); });
-  bindBtn('customPickBack',()=>{ showScreen('modeScr'); });
-  bindBtn('aiPick1v1',()=>{ rankedMode=false; aiFfaPick=false; showScreen('diffScr'); });
-  bindBtn('aiPickFfa',()=>{ rankedMode=false; aiFfaPick=true; showScreen('diffScr'); });
-  bindBtn('aiPickBack',()=>{ showScreen('customEntryOvl'); });
-  bindBtn('teamPick2',()=>{ rankedMode=false; startNet('team2'); });
-  bindBtn('teamPick3',()=>{ rankedMode=false; startNet('team3'); });
-  bindBtn('teamPickBack',()=>{ showScreen('modeScr'); });
-  bindBtn('pvpRandom',()=>{ rankedMode=false; startNet('random'); });
-  bindBtn('pvpFFA',()=>{ rankedMode=false; startNet('ffa'); });
-  bindBtn('pvpCreate',()=>{ startNet('create'); });
-  bindBtn('pvpJoin',()=>{ joinMode='pvp'; $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
-  bindBtn('pvpCancel',()=>{ showScreen('modeScr'); });
-  bindBtn('customPickJoin',()=>{ joinMode='party'; $('joinError').textContent=''; $('roomCodeInput').value=''; showScreen('joinRoomOvl'); });
-  bindBtn('joinBack',()=>{ showScreen(joinMode==='party' ? 'customEntryOvl' : 'pvpConfirm'); });
-  bindBtn('joinConfirm',()=>{ const code=$('roomCodeInput').value.toUpperCase().trim(); if(code.length!==6){ $('joinError').textContent='6자리 코드를 입력하세요'; return; }
-    if(joinMode==='party') openCustomJoin(code); else startNet('join', code); });
-  bindBtn('rhCopy',()=>{ const c=$('rhCode').textContent; if(!c||c==='------'){ return; } try{ navigator.clipboard.writeText(c); Game.msg('코드 복사됨: '+c); }catch(e){ Game.msg('코드: '+c); } });
-  bindBtn('rhCancel',()=>{ stopMatchmaking(); showScreen('modeScr'); });
-  // 방 만들기 화면: 모드/맵 선택 (호스트가 고르면 게스트에 동기화됨)
-  document.querySelectorAll('#rhModeSel .optBtn').forEach(b=>{
-    bindBtn2(b,()=>{ document.querySelectorAll('#rhModeSel .optBtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); Net._roomMode=b.dataset.mode; });
-  });
-  document.querySelectorAll('#rhMapSel .optBtn').forEach(b=>{
-    bindBtn2(b,()=>{ document.querySelectorAll('#rhMapSel .optBtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); Net._roomMap=b.dataset.map; });
-  });
-  // 커스텀 대전 방 화면: 경기 방식/모드/맵/봇 난이도 선택 (방장만 변경 가능)
-  document.querySelectorAll('#crMatchType .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(Party.isHost) setMatchType(b.dataset.mt); }); });
-  document.querySelectorAll('#crModeSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.gameMode=b.dataset.mode; renderPartySlots(); sendPartyConfig(); }); });
-  document.querySelectorAll('#crMapSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.map=b.dataset.map; renderPartySlots(); sendPartyConfig(); }); });
-  document.querySelectorAll('#crDiffSel .diffBtn').forEach(b=>{ bindBtn2(b,()=>{ if(!Party.isHost) return; Party.diff=b.dataset.diff; renderPartySlots(); sendPartyConfig(); }); });
-  bindBtn('crCopy',()=>{ const c=$('crCode').textContent; if(!c||c==='------'){ return; } try{ navigator.clipboard.writeText(c); Game.msg('코드 복사됨: '+c); }catch(e){ Game.msg('코드: '+c); } });
-  bindBtn('crCancel',()=>{ closeCustomRoom(); showScreen('modeScr'); });
-  bindBtn('crStart',()=>startCustomBattle());
-  bindBtn('botSpecClose',()=>{ showScreen('customRoomScr'); });
-  // 빈 슬롯 "+" -> 친구 초대(코드 복사) / 랜덤 봇 추가 선택 팝업
-  bindBtn('crAddFriend',()=>{
-    closeAddSlotChooser();
-    const c=Party.code; if(!c) return;
-    try{ navigator.clipboard.writeText(c); Game.msg('코드 복사됨: '+c+' · 친구에게 공유하세요'); }catch(e){ Game.msg('코드: '+c); }
-  });
-  bindBtn('crAddBotOpt',()=>{ closeAddSlotChooser(); addBotSlot(); });
-  bindBtn('crAddCancel',()=>closeAddSlotChooser());
-  // 코드 입력창: 엔터로 입장
-  { const ri=$('roomCodeInput'); if(ri) ri.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('joinConfirm').click(); } }); }
   // 팀 파티(초대) 코드로 참가
-  bindBtn('tpJoinLink',()=>openTpJoinOvl());
-  bindBtn('tpJoinBack',()=>closeTpJoinOvl());
-  bindBtn('tpJoinConfirm',()=>tpJoinWithCode());
   bindBtn('tpLeaveLink',()=>{ tpLeaveParty(); renderTeamPartySlots(); refreshPlayButtonLabel(); });
-  { const ti=$('tpJoinCodeInput'); if(ti) ti.addEventListener('keydown',e=>{ if(e.code==='Enter'){ e.preventDefault(); $('tpJoinConfirm').click(); } }); }
-  bindBtn('diffBack',()=>showScreen('aiPickOvl'));
-  // 모드/맵 선택 버튼
-  document.querySelectorAll('#modeSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{
-    document.querySelectorAll('#modeSel .optBtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); gameMode=b.dataset.mode; }); });
-  document.querySelectorAll('#mapSel .optBtn').forEach(b=>{ bindBtn2(b,()=>{
-    document.querySelectorAll('#mapSel .optBtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); selectedMap=b.dataset.map; }); });
-  bindBtn('matchCancel',()=>{ stopMatchmaking(); showScreen('modeScr'); });
-
-  /* difficulty -> start AI game */
-  const startDiff=d=>()=>{ Sfx.unlock(); SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';}); start(d, aiFfaPick); };
-  ['dEasy','dNorm','dHard'].forEach((id,i)=>{
-    const d=['easy','normal','hard'][i];
-    $(id).addEventListener('click',startDiff(d));
+  bindBtn('tpInviteClose',()=>closeTpInviteOvl());
+  bindBtn('tpInviteAccept',()=>{
+    const el=$('tpInviteToast'); if(el) el.style.display='none';
+    if(!pendingInviteCode) return;
+    const code=pendingInviteCode; pendingInviteCode=null;
+    tpConnect(()=>{ TP.ws.send(JSON.stringify({type:'team_party_join', code, species:selectedSpecies, nick:playerNick})); });
+  });
+  bindBtn('tpInviteDecline',()=>{
+    const el=$('tpInviteToast'); if(el) el.style.display='none';
+    if(pendingInviteCode){ const code=pendingInviteCode; frConnect(()=>{ FR.ws.send(JSON.stringify({type:'team_party_invite_decline', code})); }); }
+    pendingInviteCode=null;
   });
 
   /* restart -> back to lobby */
   $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; rankedMode=false; BGM.setScene('menu'); showScreen('lobby'); });
 
   /* ===== PVP: 매치메이킹 + 넷코드 ===== */
-  let mmTimer=null, mmWs=null, joinMode='pvp'; // joinMode: 'pvp'(1:1 코드 입장) | 'party'(커스텀 대전 코드 입장)
+  let mmTimer=null, mmWs=null;
   const Net = { ws:null, role:null, room:null, opp:null, seed:0, connected:false, lastSend:0, ended:false, oppNick:'', _pendingOppSpecies:null, ping:0 };
   function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; Net.ffa=false; Net.myIdx=0; Net.peers=[]; Net.peerByIdx={}; Net._ffaPlayers=null;
-    // 커스텀 대전(파티)/팀전 전용 상태
-    Net.party=false; Net.teamMode=false; Net.myTeam=null; Net.myBotIdx=null; Net.myBots=null; Net._botStateTimer=0; }
+    // 팀전 전용 상태
+    Net.teamMode=false; Net.myTeam=null; }
 
   function getDeviceToken(){ try{ return localStorage.getItem('aa_token')||''; }catch(e){ return ''; } }
   function saveDeviceIdentity(id,token){ try{ if(id) localStorage.setItem('aa_uid',id); if(token) localStorage.setItem('aa_token',token); }catch(e){} }
@@ -6073,37 +5847,6 @@ const Game = (() => {
         const p=Net.peerByIdx[d.idx]; if(p && !killCam) p.applyState(d);
         break;
       }
-      case 'party_created':
-        Party.code=d.code; Party.isHost=true; renderPartySlots();
-        break;
-      case 'party_joined':
-        Party.code=d.code; Party.isHost=false;
-        break;
-      case 'party_join_failed':
-        if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
-        showScreen('joinRoomOvl');
-        $('joinError').textContent=d.reason||'입장에 실패했습니다';
-        break;
-      case 'party_roster':
-        Party.roster=d.roster||[];
-        if(Party.isHost) reconcilePartyRoster(); else renderPartySlots();
-        break;
-      case 'party_config':
-        if(!Party.isHost) applyPartyConfig(d.config);
-        break;
-      case 'party_closed':
-        if($('customRoomScr').style.display!=='none'){ Game.msg&&Game.msg(d.reason||'방이 종료되었습니다'); showScreen('customEntryOvl'); }
-        break;
-      case 'party_kicked':
-        Party.code=null; Party.isHost=false;
-        if(Net.ws){ try{ Net.ws.close(); }catch(e){} }
-        Net.ws=null; Party.ws=null;
-        Game.msg&&Game.msg('방장이 당신을 내보냈습니다');
-        showScreen('customEntryOvl');
-        break;
-      case 'party_matched':
-        _startPartyMatch(d);
-        break;
       case 'team_wait':
         // 파티원이 호스트를 따라 매칭 큐에 들어온 경우(직접 PLAY를 누르지 않음) — 인라인 매칭 UI를 여기서 시작
         if(!matching){ enterMatchingState(()=>startBotFallback(d.gameMode||gameMode, d.size)); }
@@ -6178,9 +5921,7 @@ const Game = (() => {
   }
   function _startFFAMatch(){
     lastDiff='pvp';
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    disposeAllChars();
     aiBots=[];
     if(Net.peers) Net.peers.forEach(p=>scene.remove(p.group));
     Projectiles.clear(); Summons.clear();
@@ -6224,9 +5965,7 @@ const Game = (() => {
   }
   function _startPVPMatch(oppSpecies){
     lastDiff='pvp';
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
+    disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
     buildArena(Net.seed); // 양쪽 동일한 맵
@@ -6477,22 +6216,31 @@ const Game = (() => {
   function handleTeamPartyMessage(d){
     switch(d.type){
       case 'identified': saveDeviceIdentity(d.id,d.token); break;
-      case 'team_party_created':
-        TP.code=d.code; TP.isHost=true; TP.myIdx=0;
-        try{ navigator.clipboard.writeText(d.code); Game.msg && Game.msg('초대 코드 복사됨: '+d.code+' · 친구에게 공유하세요'); }
-        catch(e){ Game.msg && Game.msg('초대 코드: '+d.code); }
+      case 'team_party_invite_sent':
+        TP.code=d.code; TP.isHost=true; if(TP.myIdx==null) TP.myIdx=0;
+        Game.msg && Game.msg('초대를 보냈습니다');
+        closeTpInviteOvl();
         renderTeamPartySlots(); refreshPlayButtonLabel();
+        break;
+      case 'team_party_invite_failed':
+        Game.msg && Game.msg(d.reason||'초대에 실패했습니다');
+        break;
+      case 'team_party_invite_received':
+        onTeamPartyInviteReceived(d);
+        break;
+      case 'team_party_invite_declined':
+        Game.msg && Game.msg((d.nick||'친구')+' 님이 초대를 거절했습니다');
         break;
       case 'team_party_joined':
         TP.code=d.code; TP.isHost=false; TP.myIdx=d.idx; TP.size=d.size; TP.gameMode=d.gameMode;
-        closeTpJoinOvl();
+        pendingInviteCode=null; { const el=$('tpInviteToast'); if(el) el.style.display='none'; }
         renderTeamPartySlots(); refreshPlayButtonLabel();
         break;
       case 'team_party_join_failed':
-        { const err=$('tpJoinError'); if(err) err.textContent=d.reason||'참가에 실패했습니다'; }
+        Game.msg && Game.msg(d.reason||'참가에 실패했습니다');
         break;
       case 'team_party_roster':
-        TP.roster=d.roster||[]; TP.size=d.size; TP.gameMode=d.gameMode;
+        TP.code=d.code; TP.roster=d.roster||[]; TP.size=d.size; TP.gameMode=d.gameMode;
         renderTeamPartySlots(); refreshPlayButtonLabel();
         break;
       case 'team_party_closed':
@@ -6508,35 +6256,52 @@ const Game = (() => {
     if(TP.ws){ try{ TP.ws.send(JSON.stringify({type:'team_party_leave'})); TP.ws.close(); }catch(e){} }
     tpReset();
   }
-  // 로비의 빈 초대 슬롯 클릭 -> 파티 생성(없으면) 후 코드 복사(있으면 재복사)
+  // 로비의 빈 초대 슬롯 클릭 -> 친구 목록에서 선택해 초대 (코드 입력 없음)
   function onTapInviteSlot(){
     const qm=findQueueMode(selectedQueueMode);
     if(qm.size<=1) return;
-    if(TP.code){
-      try{ navigator.clipboard.writeText(TP.code); Game.msg && Game.msg('코드 복사됨: '+TP.code); }catch(e){}
-      return;
-    }
-    tpConnect(()=>{
-      TP.ws.send(JSON.stringify({type:'team_party_create', size:qm.size, gameMode:qm.gameMode, species:selectedSpecies, nick:playerNick}));
+    openTpInviteOvl();
+  }
+  let tpInvitePickerOpen=false, pendingInviteCode=null;
+  function openTpInviteOvl(){
+    const el=$('tpInviteOvl'); if(!el) return;
+    el.style.display='flex'; tpInvitePickerOpen=true;
+    const box=$('tpInviteList'); if(box) box.innerHTML='<div class="friendEmpty">불러오는 중...</div>';
+    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+  }
+  function closeTpInviteOvl(){ const el=$('tpInviteOvl'); if(el) el.style.display='none'; tpInvitePickerOpen=false; }
+  function renderTpInviteList(friends){
+    const box=$('tpInviteList'); if(!box) return;
+    if(!friends.length){ box.innerHTML='<div class="friendEmpty">친구를 먼저 추가해주세요</div>'; return; }
+    box.innerHTML='';
+    friends.forEach(f=>{
+      const row=document.createElement('div'); row.className='friendRow';
+      row.innerHTML='<span class="frDot '+(f.online?'on':'')+'"></span><span class="frName">'+(f.nickname||'(닉네임 없음)')+'</span><span class="frId">'+f.id+'</span><button type="button"'+(f.online?'':' disabled')+'>초대</button>';
+      const btn=row.querySelector('button'); if(f.online) bindBtn2(btn, ()=>sendTpInvite(f.id));
+      box.appendChild(row);
     });
   }
-  function openTpJoinOvl(){ const el=$('tpJoinOvl'); if(!el) return; const err=$('tpJoinError'); if(err) err.textContent=''; const inp=$('tpJoinCodeInput'); if(inp) inp.value=''; el.style.display='flex'; }
-  function closeTpJoinOvl(){ const el=$('tpJoinOvl'); if(el) el.style.display='none'; }
-  function tpJoinWithCode(){
-    const inp=$('tpJoinCodeInput'); const code=(inp?inp.value:'').toUpperCase().trim();
-    if(code.length!==6){ const err=$('tpJoinError'); if(err) err.textContent='6자리 코드를 입력하세요'; return; }
+  function sendTpInvite(targetId){
+    const qm=findQueueMode(selectedQueueMode);
     tpConnect(()=>{
-      TP.ws.send(JSON.stringify({type:'team_party_join', code, species:selectedSpecies, nick:playerNick}));
+      TP.ws.send(JSON.stringify({type:'team_party_invite_send', targetId,
+        size: TP.code?TP.size:qm.size, gameMode: TP.code?TP.gameMode:qm.gameMode,
+        species:selectedSpecies, nick:playerNick}));
     });
+  }
+  // 파티 초대 수신 — FR(상시 접속)이든 TP든 어느 소켓으로 와도 동일하게 처리
+  function onTeamPartyInviteReceived(d){
+    pendingInviteCode=d.code;
+    const m=$('tpInviteToastMsg'); if(m) m.textContent=(d.fromNick||'친구')+' 님이 '+d.size+'vs'+d.size+' 파티에 초대했습니다';
+    const el=$('tpInviteToast'); if(el) el.style.display='flex';
   }
   // 로비 초대 슬롯 렌더: 1vs1은 슬롯 없음, 2vs2는 오른쪽 1개, 3vs3은 좌우 2개
   function renderTeamPartySlots(){
     const qm=findQueueMode(selectedQueueMode);
     const showR=qm.size>=2, showL=qm.size>=3;
-    const slotL=$('tpSlotL'), slotR=$('tpSlotR'), joinLink=$('tpJoinLink'), leaveLink=$('tpLeaveLink');
+    const slotL=$('tpSlotL'), slotR=$('tpSlotR'), leaveLink=$('tpLeaveLink');
     if(slotL) slotL.style.display = showL?'flex':'none';
     if(slotR) slotR.style.display = showR?'flex':'none';
-    if(joinLink) joinLink.style.display = (showR && !TP.code && !matching) ? 'block' : 'none';
     if(leaveLink) leaveLink.style.display = (showR && !!TP.code && !matching) ? 'block' : 'none';
     if(!showR) return;
     const others = TP.code ? TP.roster.filter(r=>r.i!==TP.myIdx).sort((a,b)=>a.i-b.i) : [];
@@ -6588,7 +6353,11 @@ const Game = (() => {
         if(d.ok){ Game.msg && Game.msg((d.nickname||'친구')+' 님을 추가했습니다'); frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); }); }
         else Game.msg && Game.msg(d.reason||'추가에 실패했습니다');
         break;
-      case 'friend_list_result': renderFriendList(d.friends||[]); break;
+      case 'friend_list_result':
+        renderFriendList(d.friends||[]);
+        if(tpInvitePickerOpen) renderTpInviteList(d.friends||[]);
+        break;
+      case 'team_party_invite_received': onTeamPartyInviteReceived(d); break;
       case 'nickname_set':
         playerNick=d.nickname; try{ localStorage.setItem('aa_nick',playerNick); }catch(e){}
         refreshNicknameUI();
@@ -6621,279 +6390,9 @@ const Game = (() => {
       box.appendChild(row);
     });
   }
-
-  /* ===================================================================
-     ===== 커스텀 대전(파티 방: 친구 초대 + 봇 + 팀 편성) + 팀전(빠른 매칭) =====
-     기존 PVP 코드방(createroom/joinroom)과 FFA(startFFA/_startFFAMatch) 로직을
-     최대한 그대로 재사용한다. 봇은 방장(host) 클라이언트에서만 AIBot으로 시뮬레이션되고,
-     다른 클라이언트에는 NetOpponent 퍼펫(bot_state로 조종)으로 보인다.
-     =================================================================== */
-  const Party = {
-    ws:null, code:null, isHost:false,
-    roster:[],  // 서버가 알려준 실제 접속 멤버 [{partyIdx,species,nick,isHost}]
-    slots:[],   // 최종 구성(방장이 편집): [{type:'player'|'bot', partyIdx?, species, nick, team}]
-    matchType:'ffa', gameMode:'deathmatch', map:'random', diff:'easy'
-  };
-  const PARTY_SLOT_MAX=6; // 방에 항상 표시되는 고정 슬롯 수(호스트 포함)
-  function partyCapacity(mt){ return mt==='ffa'?5 : 6; } // 개인전은 최대 5명, 팀전(레드/블루 자유 편성)은 최대 6명
-  function resolveSpeciesPick(key){ return (!key||key==='random') ? PLAYER_SPECIES[Math.floor(Math.random()*PLAYER_SPECIES.length)] : key; }
-
-  function openCustomRoom(){
-    Sfx.unlock(); resetNet();
-    Party.code=null; Party.isHost=true; Party.roster=[];
-    Party.slots=[{type:'player', partyIdx:0, species:selectedSpecies, nick:playerNick, team:'red'}];
-    Party.matchType='ffa'; Party.gameMode='deathmatch'; Party.map='random'; Party.diff='easy';
-    showScreen('customRoomScr');
-    $('crCode').textContent='------';
-    renderPartySlots();
-    const MM_URL = window.__PVP_SERVER || null;
-    if(!MM_URL){ Game.msg&&Game.msg('PVP 서버 미연결 (window.__PVP_SERVER 설정 필요)'); return; }
-    try{
-      const ws=new WebSocket(MM_URL); Net.ws=ws; Party.ws=ws;
-      ws.onopen=()=>{ ws.send(JSON.stringify({type:'party_create', species:selectedSpecies, nick:playerNick})); };
-      ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleNetMessage(d); };
-      ws.onerror=()=>{ Game.msg&&Game.msg('서버 연결 실패'); };
-      ws.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
-    }catch(e){ Game.msg&&Game.msg('서버 연결 실패'); }
-  }
-  function openCustomJoin(code){
-    Sfx.unlock(); resetNet();
-    Party.code=null; Party.isHost=false; Party.roster=[]; Party.slots=[];
-    const MM_URL = window.__PVP_SERVER || null;
-    if(!MM_URL){ $('joinError').textContent='PVP 서버 미연결'; return; }
-    try{
-      const ws=new WebSocket(MM_URL); Net.ws=ws; Party.ws=ws;
-      ws.onopen=()=>{ ws.send(JSON.stringify({type:'party_join', code, species:selectedSpecies, nick:playerNick})); };
-      ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleNetMessage(d); };
-      ws.onerror=()=>{ $('joinError').textContent='서버 연결 실패'; };
-      ws.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
-    }catch(e){ $('joinError').textContent='서버 연결 실패'; }
-  }
-  function closeCustomRoom(){
-    if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'party_leave'})); Net.ws.close(); }catch(e){} }
-    Net.ws=null; Party.ws=null;
-  }
-
-  // 호스트: 실제 접속자 로스터가 바뀔 때(친구 입장/퇴장) Party.slots를 재구성 — 봇/팀 배치는 유지
-  function reconcilePartyRoster(){
-    const seen={}; for(const r of Party.roster) seen[r.partyIdx]=r;
-    Party.slots = Party.slots.filter(s => s.type!=='player' || seen[s.partyIdx]);
-    for(const r of Party.roster){
-      if(r.partyIdx===0) continue; // 호스트 본인 슬롯은 항상 이미 존재
-      const ex=Party.slots.find(s=>s.type==='player' && s.partyIdx===r.partyIdx);
-      if(!ex){
-        const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
-        Party.slots.push({type:'player', partyIdx:r.partyIdx, species:r.species, nick:r.nick, team: redN<=blueN?'red':'blue'});
-      } else { ex.species=r.species; ex.nick=r.nick; }
-    }
-    const cap=partyCapacity(Party.matchType);
-    while(Party.slots.length>cap){ const ri=[...Party.slots].reverse().findIndex(s=>s.type==='bot'); if(ri<0) break; Party.slots.splice(Party.slots.length-1-ri,1); }
-    renderPartySlots();
-    sendPartyConfig();
-  }
-  function sendPartyConfig(){
-    if(!Party.isHost || !Net.ws || Net.ws.readyState!==1) return;
-    Net.ws.send(JSON.stringify({ type:'party_config', config:{
-      matchType:Party.matchType, gameMode:Party.gameMode, map:Party.map, diff:Party.diff, slots:Party.slots
-    }}));
-  }
-  function applyPartyConfig(config){
-    if(!config) return;
-    Party.matchType=config.matchType||'ffa'; Party.gameMode=config.gameMode||'deathmatch';
-    Party.map=config.map||'random'; Party.diff=config.diff||'easy'; Party.slots=config.slots||[];
-    renderPartySlots();
-  }
-  function setMatchType(mt){
-    if(!Party.isHost) return;
-    Party.matchType=mt;
-    const cap=partyCapacity(mt);
-    while(Party.slots.length>cap){ const ri=[...Party.slots].reverse().findIndex(s=>s.type==='bot'); if(ri<0) break; Party.slots.splice(Party.slots.length-1-ri,1); }
-    renderPartySlots(); sendPartyConfig();
-  }
-  function addBotSlot(){
-    if(!Party.isHost) return;
-    const cap=partyCapacity(Party.matchType);
-    if(Party.slots.length>=cap) return;
-    const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
-    Party.slots.push({type:'bot', species:resolveSpeciesPick('random'), nick:'봇', team: redN<=blueN?'red':'blue'});
-    renderPartySlots(); sendPartyConfig();
-  }
-  // 슬롯 제거: 봇은 즉시 로컬에서 제거, 실제 참가자는 서버에 강퇴 요청(응답으로 온 party_roster가 슬롯을 정리함)
-  function kickSlot(i){
-    if(!Party.isHost) return;
-    const s=Party.slots[i]; if(!s) return;
-    if(s.type==='bot'){ Party.slots.splice(i,1); renderPartySlots(); sendPartyConfig(); return; }
-    if(s.partyIdx===0) return; // 호스트 본인은 제거 불가
-    if(Net.ws && Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'party_kick', partyIdx:s.partyIdx}));
-  }
-  function cycleSlotTeam(i){
-    if(!Party.isHost) return;
-    const s=Party.slots[i]; if(!s) return;
-    s.team = (s.team==='red') ? 'blue' : 'red';
-    renderPartySlots(); sendPartyConfig();
-  }
-  let botSpecTarget=-1;
-  function openBotSpeciesPicker(i){ if(!Party.isHost) return; botSpecTarget=i; showScreen('botSpecOvl'); renderBotSpecGrid(); }
-  // 봇 동물 선택: 스크롤 없이 12마리를 6x2 그리드로 한번에 표시, 클릭 즉시 적용 후 방 화면으로 복귀
-  function renderBotSpecGrid(){
-    const grid=$('botSpecGrid'); if(!grid) return;
-    grid.innerHTML='';
-    const cur = (botSpecTarget>=0 && Party.slots[botSpecTarget]) ? Party.slots[botSpecTarget].species : null;
-    PLAYER_SPECIES.forEach(key=>{
-      const b=document.createElement('button'); b.className='specBtn'+(key===cur?' sel':'');
-      const cv=document.createElement('canvas'); cv.width=96; cv.height=96; cv.className='specPortrait'; b.appendChild(cv);
-      try{ drawPortrait(cv,key); }catch(e){}
-      const nm=document.createElement('span'); nm.className='specName'; nm.textContent=SPECIES[key]?SPECIES[key].name:key; b.appendChild(nm);
-      b.addEventListener('click',()=>{
-        if(botSpecTarget>=0 && Party.slots[botSpecTarget]){ Party.slots[botSpecTarget].species=key; renderPartySlots(); sendPartyConfig(); }
-        Sfx.unlock(); Sfx.pickup();
-        showScreen('customRoomScr');
-      });
-      grid.appendChild(b);
-    });
-  }
-  function openAddSlotChooser(){ if(!Party.isHost) return; const o=$('crAddOvl'); if(o) o.style.display='flex'; }
-  function closeAddSlotChooser(){ const o=$('crAddOvl'); if(o) o.style.display='none'; }
-  // 참가 슬롯 목록: 스크롤 없이 항상 PARTY_SLOT_MAX(6)개 행을 고정으로 그림 —
-  // 채워진 슬롯 / 이 경기 방식에서 아직 비어있는 "+" 슬롯 / 정원 초과라 이번 판엔 쓰지 않는 잠긴 슬롯
-  function renderPartySlots(){
-    const root=$('customRoomScr'); if(!root) return;
-    root.classList.toggle('guestView', !Party.isHost);
-    $('crCode').textContent = Party.code || '------';
-    const cap=partyCapacity(Party.matchType);
-    const cnt=$('crCount'), capEl=$('crCap'); if(cnt) cnt.textContent=Party.slots.length; if(capEl) capEl.textContent=cap;
-    document.querySelectorAll('#crMatchType .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.mt===Party.matchType));
-    document.querySelectorAll('#crModeSel .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.mode===Party.gameMode));
-    document.querySelectorAll('#crMapSel .optBtn').forEach(b=>b.classList.toggle('sel', b.dataset.map===Party.map));
-    document.querySelectorAll('#crDiffSel .diffBtn').forEach(b=>b.classList.toggle('sel', b.dataset.diff===Party.diff));
-    const showTeam = Party.matchType!=='ffa';
-    const host=$('crSlots'); if(!host) return;
-    host.innerHTML='';
-    for(let i=0;i<PARTY_SLOT_MAX;i++){
-      const s=Party.slots[i];
-      if(s){
-        const row=document.createElement('div'); row.className='crSlotRow';
-        const tag=document.createElement('span'); tag.className='crTag '+(s.type==='bot'?'crBot':(s.partyIdx===0?'crHost':'crFriend'));
-        tag.textContent = s.type==='bot' ? 'BOT' : (s.partyIdx===0?'HOST':'GUEST');
-        const pw=document.createElement('span'); pw.className='crPortrait';
-        const cv=document.createElement('canvas'); cv.width=48; cv.height=48; pw.appendChild(cv);
-        try{ drawPortrait(cv, s.species||'rabbit'); }catch(e){}
-        const specName = SPECIES[s.species]?SPECIES[s.species].name:'동물';
-        const nm=document.createElement('span'); nm.className='crName';
-        nm.textContent = s.type==='bot' ? (specName+' 봇') : (s.nick || specName);
-        row.appendChild(tag); row.appendChild(pw); row.appendChild(nm);
-        if(showTeam){
-          const tb=document.createElement('button'); tb.className='crTeamPill crHostOnly '+(s.team==='blue'?'blue':'red'); tb.textContent=(s.team==='blue'?'BLUE':'RED');
-          tb.addEventListener('click',()=>cycleSlotTeam(i));
-          row.appendChild(tb);
-        }
-        if(s.type==='bot'){
-          const sb=document.createElement('button'); sb.className='crMiniBtn crHostOnly'; sb.textContent='동물'; sb.addEventListener('click',()=>openBotSpeciesPicker(i));
-          row.appendChild(sb);
-        }
-        const isHostSlot = (s.type==='player' && s.partyIdx===0);
-        if(!isHostSlot){
-          const rb=document.createElement('button'); rb.className='crMiniBtn crRemove crHostOnly'; rb.textContent='제거'; rb.addEventListener('click',()=>kickSlot(i));
-          row.appendChild(rb);
-        }
-        host.appendChild(row);
-      } else if(i<cap){
-        const row=document.createElement('button'); row.type='button'; row.className='crSlotRow crSlotAdd crHostOnly';
-        row.innerHTML='<span class="crAddIcon">+</span><span>추가하기</span>';
-        row.addEventListener('click',()=>openAddSlotChooser());
-        host.appendChild(row);
-      } else {
-        const row=document.createElement('div'); row.className='crSlotRow crSlotLocked';
-        row.textContent='이 경기 방식에서는 사용하지 않음';
-        host.appendChild(row);
-      }
-    }
-    const guestHint=$('crGuestHint'); if(guestHint) guestHint.style.display = Party.isHost ? 'none' : '';
-  }
-  function startCustomBattle(){
-    if(!Party.isHost) return;
-    const cap=partyCapacity(Party.matchType);
-    // 팀 모드에서 정원 미달이면 남는 자리를 무작위 종족 봇으로 자동 채움(작은 팀부터) — 인원 부족해도 시작 가능
-    if(Party.matchType!=='ffa'){
-      while(Party.slots.length<cap){
-        const redN=Party.slots.filter(s=>s.team==='red').length, blueN=Party.slots.filter(s=>s.team==='blue').length;
-        Party.slots.push({type:'bot', species:resolveSpeciesPick('random'), nick:'봇', team: redN<=blueN?'red':'blue'});
-      }
-    }
-    const roster = Party.slots.map(s => s.type==='bot'
-      ? { type:'bot', species: resolveSpeciesPick(s.species), nick:'봇', team: Party.matchType==='ffa'?'ffa':s.team }
-      : { type:'player', partyIdx:s.partyIdx, team: Party.matchType==='ffa'?'ffa':s.team });
-    renderPartySlots();
-    Net.ws.send(JSON.stringify({ type:'party_start', roster, gameMode:Party.gameMode, map:Party.map }));
-  }
-
-  // ===== 커스텀 대전 매치 시작 (party_matched 수신 시) =====
-  function _startPartyMatch(d){
-    Net.role = (d.idx===0)?'host':'guest'; // party_start에서 항상 idx0=호스트로 배정
-    Net.connected=true; Net.ffa=true; Net.party=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
-    Net._partyPlayers=d.players||[];
-    gameMode=d.gameMode||'deathmatch'; selectedMap=d.map||'random';
-    const mine=Net._partyPlayers.find(p=>p.idx===d.idx);
-    Net.myTeam = mine ? mine.team : 'ffa';
-    Net.teamMode = Net._partyPlayers.some(p=>p.team==='red'||p.team==='blue');
-    currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length];
-    showMapRoulette(currentMap, ()=>_startPartyMatchReal());
-  }
-  function _startPartyMatchReal(){
-    lastDiff='pvp';
-    if(player){ scene.remove(player.group); }
-    if(bot){ scene.remove(bot.group); }
-    for(const b of aiBots){ if(b!==bot) scene.remove(b.group); }
-    aiBots=[];
-    if(Net.peers) Net.peers.forEach(p=>scene.remove(p.group));
-    if(Net.myBotList) Net.myBotList.forEach(b=>scene.remove(b.group));
-    Projectiles.clear(); Summons.clear();
-    buildArena(Net.seed);
-    const pSpec = selectedSpecies || 'rabbit';
-    player=new Player(pSpec); player.team=Net.myTeam;
-    const sp=FFA_SPAWNS[Net.myIdx]||FFA_SPAWNS[0];
-    player.pos.set(sp[0],0,sp[1]);
-    Net.peers=[]; Net.peerByIdx={}; Net.myBotIdx=new Set(); Net.myBotList=[];
-    for(const info of Net._partyPlayers){
-      if(info.idx===Net.myIdx) continue;
-      const s=FFA_SPAWNS[info.idx]||[14,0];
-      if(info.bot){
-        if(Net.role==='host'){
-          // 방장: 이 봇을 직접 시뮬레이션 (기존 AIBot 그대로 재사용)
-          const sp2=resolveSpeciesPick(info.species);
-          const b=new AIBot(Party.diff||'easy', sp2);
-          b.name=(SPECIES[sp2]?SPECIES[sp2].name:'봇')+' 봇';
-          b.team=info.team; b.isPartyBot=true; b.netIdx=info.idx;
-          b.pos.set(s[0],0,s[1]);
-          Net.myBotIdx.add(info.idx); Net.myBotList.push(b); Net.peerByIdx[info.idx]=b;
-        } else {
-          // 게스트: 봇은 bot_state로 조종되는 퍼펫 (NetOpponent 그대로 재사용)
-          const sp2=resolveSpeciesPick(info.species);
-          const o=new NetOpponent(sp2);
-          o.netIdx=info.idx; o.name=(SPECIES[sp2]?SPECIES[sp2].name:'봇')+' 봇'; o.team=info.team;
-          o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
-          Net.peers.push(o); Net.peerByIdx[info.idx]=o;
-        }
-      } else {
-        const o=new NetOpponent(info.species||'fox');
-        o.netIdx=info.idx; o.name=info.nick||(SPECIES[info.species]?SPECIES[info.species].name:'상대'); o.team=info.team;
-        o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
-        Net.peers.push(o); Net.peerByIdx[info.idx]=o;
-      }
-    }
-    Net.opp=Net.peers[0]||Net.myBotList[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
-    chars=[player, ...Net.peers, ...(Net.role==='host'?Net.myBotList:[])];
-    Pickups.init(Net.seed);
-    time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
-    document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
-    const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
-    setProfileAvatar(pSpec);
-    const feed=$('killFeed'); if(feed) feed.innerHTML='';
-    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
-    $('winOvl').style.display='none';
-    updateHUD(); updateScore();
-    if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
-  }
+  // 파티 초대(team_party_invite_received)를 로비에 가만히 있어도 받을 수 있도록 접속을 상시 유지
+  frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+  setInterval(()=>{ if(!FR.ws || FR.ws.readyState!==WebSocket.OPEN) frConnect(()=>{}); }, 20000);
 
   // ===== 팀전(빠른 매칭) 시작: 기존 FFA 부트스트랩(_startFFAMatch) 그대로 재사용 =====
   function _prepTeamMatch(d){
@@ -7096,7 +6595,12 @@ const Game = (() => {
   on('sSens','input',e=>{ Settings.sens=e.target.value/100; $('sSensVal').textContent=Settings.sens.toFixed(1); });
   on('sSens','change',()=>Settings.save());
   on('sVib','change',e=>{ Settings.vib=e.target.checked; Settings.save(); if(Settings.vib) vibrate(30); });
-  bindBtn('sLayoutBtn',()=>{ document.body.classList.add('layout-edit'); showScreen('layoutScr'); });
+  bindBtn('sLayoutBtn',()=>{
+    // 설정 화면(#settingsOvl)은 SCREENS 배열 밖의 별도 오버레이라 showScreen()이 못 건드림 —
+    // 여기서 직접 닫아주지 않으면 버튼 위치 설정을 마치고 나올 때 설정 화면이 그대로 남아있는 버그가 생김.
+    Settings.save(); $('settingsOvl').style.display='none';
+    document.body.classList.add('layout-edit'); showScreen('layoutScr');
+  });
 
   /* ---- 닉네임 변경(설정 화면 — 2~12자 · 중복 불가 · 특수문자/비속어 필터, 서버가 최종 검증) ---- */
   bindBtn('setNickBtn',()=>{
