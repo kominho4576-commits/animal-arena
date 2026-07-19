@@ -348,7 +348,11 @@ body.pc #keyGuide{display:block}
 .modeCards.grid6 .modeCard.sel{border-color:var(--cy);box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 24px rgba(49,230,255,.35)}
 .mcDM{background:linear-gradient(135deg,#96701c,#0d1e30);font-size:18px}
 .mcTA{background:linear-gradient(135deg,#1c6a96,#0d1e30);font-size:16px}
-.modeScrFoot{display:flex;gap:12px;margin-top:20px}
+.modeScrFoot{display:flex;gap:12px;margin-top:16px;flex-shrink:0}
+/* 모드 선택 화면: 제목(위)·카드(가운데, 넘치면 스크롤)·뒤로버튼(아래)이 항상 화면 안에 들어오도록 구조적으로 고정 */
+#modeScr{justify-content:flex-start;padding:calc(env(safe-area-inset-top,0px) + 10px) 8px calc(env(safe-area-inset-bottom,0px) + 10px)}
+#modeScr>h1{flex-shrink:0;margin:0 0 8px}
+#modeScr .modeCards.grid6{flex:1 1 auto;min-height:0;align-content:center;overflow-y:auto;margin-top:0}
 @media (max-height:620px){
   .modeCards.grid6{gap:9px 10px}
   .modeCards.grid6 .modeCard{padding:10px 5px;gap:5px}
@@ -776,13 +780,16 @@ body.has-touch #lobby .mItem::before{display:none}
 body.has-touch #lobby .mItem .mArrow{display:none}
 body.has-touch #lobby .mItem .mTxt{font-size:12px;letter-spacing:.5px;display:flex;flex-direction:column;align-items:center;gap:1px;background:rgba(10,19,34,.75);border:1px solid rgba(125,243,255,.3);clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);padding:7px 11px;box-shadow:0 6px 18px rgba(0,0,0,.4);min-width:58px;color:#fff}
 body.has-touch #lobby .mItem .mTxt small{color:#8fb2cc;font-size:8px}
-body.has-touch #lobby .mItem:active .mTxt{transform:scale(.95)}
+/* 누를 때 크기 변화 없이 밝기로만 피드백(활성화 시 크기 변경 금지) */
+body.has-touch #lobby .mItem:active .mTxt{filter:brightness(1.25)}
 body.has-touch #lobby .mItem.play .mTxt{background:linear-gradient(180deg,rgba(23,84,53,.9),rgba(10,40,26,.92));border-color:rgba(62,245,138,.55);color:#dcffe9}
-body.has-touch.aa-matching #lobby .mItem.play .mTxt{color:var(--cy);min-width:100px}
-/* 우하단: 플레이 + 모드 변경 */
-/* 게임 모드 버튼 + 플레이 버튼을 세로가 아닌 가로로 나란히 배치 */
+/* 매칭 중에도 색만 바뀌고 크기는 그대로 유지 */
+body.has-touch.aa-matching #lobby .mItem.play .mTxt{color:var(--cy)}
+/* 우하단: 플레이 + 모드 변경 — 가로로 나란히, 두 버튼 크기 동일 고정 */
+body.has-touch #lobby #lbPlay .mTxt,
+body.has-touch #lobby #lbModeChange .mTxt{width:86px;min-width:86px;box-sizing:border-box}
 body.has-touch #lobby #lbPlay{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
-body.has-touch #lobby #lbModeChange{right:104px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
+body.has-touch #lobby #lbModeChange{right:106px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
 /* 좌하단: 캐릭터 선택 */
 body.has-touch #lobby #lbChar{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
 /* 우상단: 친구 + 설정 + 버튼 위치 설정 + 튜토리얼 + 게임 종료 (항상 노출) */
@@ -1425,6 +1432,29 @@ const DIFF = {
   hard:   { acc: 0.82, react: 0.26, spd: 1.0, rollCh: 0.62, coverHp: 30, fireJit: 0.85, dmgMult: 1.0, hpMult: 1.0 },
 };
 
+/* ===== 봇을 진짜 유저처럼 보이게: 그럴듯한 닉네임 + 방장 랭크에 맞춘 실력 =====
+   상대가 봇인지 티 나지 않도록 "여우 봇" 같은 표기 대신 실제 유저풍 닉네임을 붙인다. */
+const BOT_NICKS = ['제로','칼바람','야옹이','불꽃여우','다크나이트','sniper_K','한방있음','슈가','고구마','바람돌이',
+  '무민','토깽이','청설모','달빛','새벽감성','폭풍전야','노랑이','민초단','귀요미','철벽수비',
+  '겜잘알','원샷원킬','샐러드','초코송이','빵야','라이언','흑표범','은하수','soju','치즈볼',
+  '까칠이','파랑새','한여름','설탕커피','도토리','호두과자','밤톨','냥냥펀치','불도저','로켓단'];
+function pickBotNicks(n){
+  const pool=BOT_NICKS.slice();
+  const out=[];
+  for(let i=0;i<n;i++){
+    if(!pool.length){ out.push('Player'+(100+Math.floor(Math.random()*899))); continue; }
+    out.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+  }
+  return out;
+}
+// 방장(플레이어) 랭크 티어에 맞춰 봇 난이도 결정 — 낮은 티어는 약하게, 높은 티어는 강하게
+function botDiffForRank(){
+  const key = (typeof Rank!=='undefined' && Rank.tier) ? Rank.tier().key : 'bronze';
+  if(key==='bronze' || key==='silver') return 'easy';
+  if(key==='gold' || key==='platinum') return 'normal';
+  return 'hard'; // diamond, master
+}
+
 /* ---------------- WEAPON DATABASE ---------------- */
 /* type: hitscan | pellet | proj | arc | flame | melee
    headMult: 총기류 헤드샷 배율(1.5). 폭발물/화염/근접은 헤드샷 없음(headMult 없음) */
@@ -2063,13 +2093,26 @@ const arenaMeshes = []; // dynamic obstacle/decor meshes to clear between matche
 let SPAWN_POINTS = []; // regenerated per layout
 /* ---------------- MAP PRESETS (맵 프리셋) ---------------- */
 const MAPS = {
+  // ===== 1vs1 전용 맵: 낮은 엄폐물 위주, 벽 낮음(오픈 아레나 느낌) =====
   arena:   { name:'아레나', wall:0x5fb0d8, wall2:0x58a5cc, types:['lowwall','crate','pillar','bigbox','barrel'], density:[5,7], flags:0xffd166 },
   ruins:   { name:'폐허',   wall:0x9a8d78, wall2:0x8a7d68, types:['pillar','lowwall','bigbox','pillar'], density:[6,8], flags:0xd9c48a },
   factory: { name:'공장',   wall:0x556570, wall2:0x4a5a64, types:['crate','bigbox','crate','barrel','lowwall'], density:[7,9], flags:0xff8a3d },
   garden:  { name:'정원',   wall:0x6ac48a, wall2:0x5ab47a, types:['barrel','pillar','lowwall','barrel'], density:[5,7], flags:0xff6ec4 },
   ice:     { name:'설원',   wall:0x9ac8e0, wall2:0x8ab8d4, types:['crate','bigbox','lowwall','crate'], density:[6,8], flags:0x7fd8ff },
+  // ===== 2vs2 / 3vs3 전용 FPS풍 맵: 벽이 높고 엄폐물이 커서 시야가 막히는 진지전 =====
+  bunker:    { name:'벙커',   wall:0x4a545e, wall2:0x3f4852, types:['block','highwall','crate','block','highwall'], density:[7,9], flags:0xff8a3d, wallH:5.5, teamMap:true },
+  citadel:   { name:'성채',   wall:0x6b5f7a, wall2:0x5c516a, types:['tower','highwall','block','tower'],            density:[6,8], flags:0xc9a0ff, wallH:6.2, teamMap:true },
+  warehouse: { name:'창고',   wall:0x7a6a4a, wall2:0x6a5c40, types:['block','crate','highwall','block','crate'],   density:[8,10], flags:0xffc24a, wallH:5.2, teamMap:true },
 };
-const MAP_KEYS = Object.keys(MAPS);
+const SOLO_MAP_KEYS = ['arena','ruins','factory','garden','ice']; // 1vs1 전용
+const TEAM_MAP_KEYS = ['bunker','citadel','warehouse'];            // 2vs2/3vs3 전용
+const MAP_KEYS = Object.keys(MAPS); // 전체(룰렛/색 테이블 참조용)
+// 매치 규모에 맞는 맵 풀에서 선택 (isTeam이면 팀 전용 FPS 맵). seed를 주면 결정적(온라인 양쪽 동일)
+function pickMapKey(isTeam, seed){
+  const pool = isTeam ? TEAM_MAP_KEYS : SOLO_MAP_KEYS;
+  const i = (seed!==undefined && seed!==null) ? (seed % pool.length) : Math.floor(Math.random()*pool.length);
+  return pool[i];
+}
 let currentMap = 'arena';
 
 function addObstacleBox(x,z,w,d,h,color,geoOverride){
@@ -2087,6 +2130,9 @@ const GROUND_COLORS={
   arena:[0x7ecb62,0x8fdb72,0x6fb85a], ruins:[0xb0a890,0xc2ba9e,0xa39a82],
   factory:[0x6a7580,0x78838e,0x5a6570], garden:[0x7ec86a,0x92d67e,0x6eb85a],
   ice:[0xcfe4f2,0xe0f0fa,0xbcd6e8],
+  // 팀 전용 FPS 맵: 콘크리트/철재 느낌의 어두운 바닥
+  bunker:[0x565e66,0x626b74,0x4a525a], citadel:[0x585065,0x655c74,0x4c4557],
+  warehouse:[0x6a5f4c,0x77694f,0x5c5342],
 };
 function buildArenaStatic(){
   if(arenaStatic) return; arenaStatic=true;
@@ -2123,7 +2169,7 @@ function buildArena(seed){
   buildArenaStatic();
   recolorGround(currentMap);
   const M = MAPS[currentMap] || MAPS.arena;
-  const gw=CFG.arenaW, gd=CFG.arenaD, hw=CFG.wallH;
+  const gw=CFG.arenaW, gd=CFG.arenaD, hw=M.wallH||CFG.wallH; // 팀 FPS 맵은 경계 벽이 더 높음
   // boundary walls (always, blocking) — 맵 색상 적용
   addObstacleBox(0,-gd/2-0.4, gw+2, 0.8, hw, M.wall);
   addObstacleBox(0, gd/2+0.4, gw+2, 0.8, hw, M.wall);
@@ -2153,28 +2199,38 @@ function buildArena(seed){
     pillar: {kind:'pillar',  h:3.4,  color:0xff8fb2},
     bigbox: {kind:'bigbox',  h:1.6,  color:0xc9b58a},
     barrel: {kind:'barrel',  h:1.3,  color:0x6ec4a0},
+    // 팀 FPS 맵용 키 큰 엄폐물(시야 완전 차단)
+    highwall:{kind:'highwall', h:3.0, color:0x8a94a0},
+    tower:   {kind:'tower',    h:4.6, color:0x9aa4b0},
+    block:   {kind:'block',    h:2.6, color:0x7a8490},
   };
   // 맵별 색조 보정
-  const tint={arena:null, ruins:0x9a8d78, factory:0x6a7580, garden:0x7ec86a, ice:0xd0e4f0}[currentMap];
-  const TYPES = M.types.map(k=>{ const t={...TYPEDEF[k]}; if(tint && t.kind!=='pillar') t.color=tint; return t; });
+  const tint={arena:null, ruins:0x9a8d78, factory:0x6a7580, garden:0x7ec86a, ice:0xd0e4f0,
+    bunker:0x596470, citadel:0x655c78, warehouse:0x726448}[currentMap];
+  const TYPES = M.types.map(k=>{ const t={...TYPEDEF[k]}; if(tint && t.kind!=='pillar' && t.kind!=='tower') t.color=tint; return t; });
   function placePair(x,z,t){
     // mirror to (-x,-z); if a piece lands near the axis it becomes its own mirror-safe
     const makeOne=(px,pz)=>{
-      if(t.kind==='lowwall'){
+      if(t.kind==='lowwall' || t.kind==='highwall'){
+        // highwall = 키 큰 벽(시야 완전 차단), lowwall = 낮은 엄폐물
         const horiz=rnd()<0.5;
-        const w=horiz?(3+rnd()*2.5):1, d=horiz?1:(3+rnd()*2.5);
+        const len = t.kind==='highwall' ? (4+rnd()*3) : (3+rnd()*2.5);
+        const w=horiz?len:1.1, d=horiz?1.1:len;
         addObstacleBox(px,pz,w,d,t.h,t.color);
       } else if(t.kind==='crate'){
         addObstacleBox(px,pz,1.7,1.7,t.h,t.color);
-      } else if(t.kind==='bigbox'){
-        addObstacleBox(px,pz,2.2,2.2,t.h,t.color);
+      } else if(t.kind==='bigbox' || t.kind==='block'){
+        // block = 컨테이너/콘크리트 블록(팀 맵용 큰 엄폐물)
+        const s = t.kind==='block' ? 2.8 : 2.2;
+        addObstacleBox(px,pz,s,s,t.h,t.color);
       } else if(t.kind==='barrel'){
         const m=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.7,t.h,8), cmat(t.color));
         m.position.set(px,t.h/2,pz); addDecor(m);
         obstacles.push({minx:px-0.65,minz:pz-0.65,maxx:px+0.65,maxz:pz+0.65,h:t.h});
-      } else if(t.kind==='pillar'){
-        addObstacleBox(px,pz,1.4,1.4,t.h,t.color);
-        const cap=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.3,1.7), cmat(0xffc2d6));
+      } else if(t.kind==='pillar' || t.kind==='tower'){
+        const s = t.kind==='tower' ? 1.7 : 1.4;
+        addObstacleBox(px,pz,s,s,t.h,t.color);
+        const cap=new THREE.Mesh(new THREE.BoxGeometry(s+0.3,0.3,s+0.3), cmat(t.kind==='tower'?0xb0bcc8:0xffc2d6));
         cap.position.set(px,t.h+0.15,pz); addDecor(cap);
       }
     };
@@ -2190,7 +2246,7 @@ function buildArena(seed){
     const x = -(1.2 + rnd()*(gw/2-2.6));
     const z = (rnd()*2-1)*(gd/2-1.6);
     const t = TYPES[Math.floor(rnd()*TYPES.length)];
-    const r = t.kind==='lowwall'?2.4 : (t.kind==='bigbox'?1.6:1.1);
+    const r = (t.kind==='lowwall'||t.kind==='highwall')?3.0 : (t.kind==='bigbox')?1.6 : (t.kind==='block')?2.0 : (t.kind==='tower')?1.3 : 1.1;
     if(!fits(x,z,r) || !fits(-x,-z,r)) continue;
     placed.push({x,z,r}); placed.push({x:-x,z:-z,r});
     placePair(x,z,t);
@@ -4361,22 +4417,24 @@ const Game = (() => {
     disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
-    currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
+    currentMap = (selectedMap && selectedMap!=='random' && MAPS[selectedMap]) ? selectedMap : pickMapKey(false); // 1vs1: 솔로 전용 맵
     buildArena(); // fresh random symmetric layout each match
     const pSpec = selectedSpecies || 'rabbit';
     // bot picks a visibly different species
     const botPool = PLAYER_SPECIES.filter(s=>s!==pSpec);
     const bSpec = botPool[Math.floor(Math.random()*botPool.length)];
     player=new Player(pSpec);
+    const botDiff=botDiffForRank(); // 방장(나) 랭크에 맞춘 봇 실력
     if(aiFfa){
       // AI 개인전: 나 + 봇 4마리, 종족 서로 다르게, 5지점 분산 스폰
       const AI_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11]];
       player.pos.set(AI_SPAWNS[0][0],0,AI_SPAWNS[0][1]);
       const pool=botPool.slice();
+      const nicks=pickBotNicks(4);
       for(let i=0;i<4;i++){
         const sp=pool.splice(Math.floor(Math.random()*pool.length),1)[0]||'fox';
-        const b=new AIBot(diff,sp);
-        b.name=SPECIES[sp]?SPECIES[sp].name:'봇';
+        const b=new AIBot(botDiff,sp);
+        b.name=nicks[i];
         b.pos.set(AI_SPAWNS[i+1][0],0,AI_SPAWNS[i+1][1]);
         aiBots.push(b);
       }
@@ -4384,7 +4442,8 @@ const Game = (() => {
       Game.player=player; Game.bot=bot;
       chars=[player,...aiBots];
     } else {
-      bot=new AIBot(diff,bSpec);
+      bot=new AIBot(botDiff,bSpec);
+      bot.name=pickBotNicks(1)[0];
       Game.player=player; Game.bot=bot;
       chars=[player,bot];
     }
@@ -4411,7 +4470,7 @@ const Game = (() => {
     disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
-    currentMap = (selectedMap==='random'||!selectedMap) ? MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)] : selectedMap;
+    currentMap = (selectedMap && selectedMap!=='random' && MAPS[selectedMap]) ? selectedMap : pickMapKey(false); // 체험하기: 솔로 맵
     buildArena();
     const pSpec = selectedSpecies || 'rabbit';
     player=new Player(pSpec);
@@ -4427,7 +4486,7 @@ const Game = (() => {
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
     const feed=$('killFeed'); if(feed) feed.innerHTML='';
-    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    hideAllScreensForGame();
     $('winOvl').style.display='none';
     updateHUD();
     updateScore(); // 새 판 스코어 0:0 즉시 초기화
@@ -4440,7 +4499,8 @@ const Game = (() => {
     disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
-    currentMap=(selectedMap==='random'||!selectedMap)?MAP_KEYS[Math.floor(Math.random()*MAP_KEYS.length)]:selectedMap;
+    // 2vs2/3vs3(assignTeams) 봇 매치는 팀 전용 FPS 맵, 1vs1은 솔로 맵
+    currentMap = pickMapKey(!!assignTeams);
     buildArena();
     const pSpec=selectedSpecies||'rabbit';
     const SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11],[11,-11]];
@@ -4448,10 +4508,12 @@ const Game = (() => {
     player.pos.set(SPAWNS[0][0],0,SPAWNS[0][1]);
     if(assignTeams) player.team='red';
     const pool=PLAYER_SPECIES.filter(s=>s!==pSpec);
+    const diff=botDiffForRank();          // 방장(나) 랭크에 맞춘 봇 실력
+    const nicks=pickBotNicks(botCount);   // 봇마다 겹치지 않는 유저풍 닉네임
     for(let i=0;i<botCount;i++){
       const sp=pool.length?pool.splice(Math.floor(Math.random()*pool.length),1)[0]:'fox';
-      const b=new AIBot('normal',sp);
-      b.name=(SPECIES[sp]?SPECIES[sp].name:'봇')+' 봇';
+      const b=new AIBot(diff,sp);
+      b.name=nicks[i];                     // "여우 봇" 대신 실제 유저처럼 보이는 닉네임
       const sp2=SPAWNS[(i+1)%SPAWNS.length];
       b.pos.set(sp2[0],0,sp2[1]);
       if(assignTeams) b.team=((i+1)%2===0)?'red':'blue';
@@ -5058,6 +5120,12 @@ const Game = (() => {
     // 화면 내용이 세로로 넘치면 자동 축소 (스크롤 없이 항상 화면 안에)
     requestAnimationFrame(()=>fitScreen(id));
   }
+  // 게임을 시작할 때 모든 메뉴 화면을 확실히 감춘다.
+  // charScr은 .csShow{display:flex!important} 규칙 때문에 인라인 display:none으로는 안 사라지므로
+  // 클래스를 직접 제거해야 한다(이걸 빼먹으면 체험하기 등에서 캐릭터 화면이 게임 위를 덮어 터치를 가로챔).
+  function hideAllScreensForGame(){
+    SCREENS.forEach(s=>{ const el=$(s); if(!el) return; if(s==='charScr') el.classList.remove('csShow'); el.style.display='none'; });
+  }
   function updateStatsDisplay(){
     const set=(k,v)=>{ const e=$(k); if(e) e.textContent=v; };
     set('lsWins',Stats.wins); set('lsLosses',Stats.losses); set('lsRate',Stats.winRate()+'%');
@@ -5109,7 +5177,7 @@ const Game = (() => {
   // 화면 콘텐츠를 뷰포트에 맞게 스케일 (짤림/스크롤 방지) — 전체를 한 덩어리로 축소
   function fitScreen(id){
     // 자체 flex 레이아웃을 쓰는 화면은 스케일 래핑 제외 (래핑하면 flex 확장이 깨짐)
-    if(id==='charScr' || id==='lobby' || id==='layoutScr') return; // 실제 조작 버튼이 그대로 비쳐야 해서 래핑/스케일 제외
+    if(id==='charScr' || id==='lobby' || id==='layoutScr' || id==='modeScr') return; // 자체 flex 레이아웃(제목/본문/푸터 고정)을 쓰는 화면은 래핑/스케일 제외
     const el=$(id); if(!el) return;
     let wrap=el.querySelector(':scope > .fitWrap');
     if(!wrap){
@@ -5596,87 +5664,37 @@ const Game = (() => {
   function getDeviceToken(){ try{ return localStorage.getItem('aa_token')||''; }catch(e){ return ''; } }
   function saveDeviceIdentity(id,token){ try{ if(id) localStorage.setItem('aa_uid',id); if(token) localStorage.setItem('aa_token',token); }catch(e){} }
 
-  function startNet(mode, code){
+  // 6종 모드 큐 매칭 — 로비 화면 안에서 인라인으로 진행(별도 매칭 화면 없음).
+  // size 1 = 1vs1('queue' -> 'matched'), size 2/3 = 팀전('queue_team' -> 'team_matched').
+  function startNet(mode){
     Sfx.unlock();
     resetNet(); // 재경기 시 이전 매치 상태 완전 초기화
     Net._mode=mode;
-    const queueMode=QUEUE_MODES.find(m=>m.key===mode) || null; // 6종 모드 큐(dm1/dm2/dm3/ta1/ta2/ta3) 여부
-    if(mode==='create'){
-      // 방 만들기: 전용 화면
-      showScreen('roomHostScr');
-      $('rhCode').textContent='------';
-      $('rhDot').className='rhDot waiting';
-      $('rhStatusText').textContent='서버에 연결 중...';
-    } else if(queueMode){
-      // 6종 모드 큐: 별도 화면 없이 로비 화면에서 그대로 인라인 매칭 (E: 매칭 인라인화)
-      gameMode=queueMode.gameMode; selectedMap='random'; rankedMode=!!queueMode.ranked;
-    } else {
-      showScreen('matchScr');
-      if(mode==='join'){ $('matchTitle').textContent='방 입장 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='코드 '+code; }
-      else if(mode==='ffa'){ $('matchTitle').textContent='개인전 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='최대 5인 · 각자도생'; }
-      else if(mode==='team2'||mode==='team3'){ const sz=mode==='team2'?2:3; $('matchTitle').textContent=sz+'vs'+sz+' 팀전 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent=sz+' vs '+sz+' · 실제 플레이어만'; }
-      else { $('matchTitle').textContent='랜덤 매칭 중'; $('matchStatus').textContent='서버에 연결 중...'; $('matchSub').textContent='1 vs 1 · 랜덤 상대'; }
-    }
+    const queueMode=QUEUE_MODES.find(m=>m.key===mode) || QUEUE_MODES[0];
+    gameMode=queueMode.gameMode; selectedMap='random'; rankedMode=!!queueMode.ranked;
     const MM_URL = window.__PVP_SERVER || null;
-    if(!MM_URL){
-      if(mode==='create'){ $('rhStatusText').textContent='PVP 서버 미연결 (window.__PVP_SERVER 설정 필요)'; return; }
-      if(queueMode) return; // 인라인 모드: 조용히 대기 -> 봇 자동전환 타이머(F)가 처리
-      let dots=0;
-      mmTimer=setInterval(()=>{ dots=(dots+1)%4; $('matchStatus').textContent='상대를 찾는 중'+'.'.repeat(dots); },500);
-      setTimeout(()=>{
-        if($('matchScr').style.display!=='none'){
-          $('matchStatus').textContent='PVP 서버가 아직 연결되지 않았습니다';
-          $('matchSub').textContent='window.__PVP_SERVER 에 Render 주소 설정 필요';
-          if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
-        }
-      }, 3000);
-      return;
-    }
+    if(!MM_URL) return; // 서버 미연결: 조용히 대기 -> 봇 자동전환 타이머가 처리
     try{
       mmWs=new WebSocket(MM_URL);
       Net.ws=mmWs;
       mmWs.onopen=()=>{
         try{ mmWs.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){}
-        if(mode==='create'){ $('rhStatusText').textContent='방 생성 중...'; mmWs.send(JSON.stringify({type:'createroom',species:selectedSpecies,nick:playerNick})); }
-        else if(mode==='join'){ $('matchStatus').textContent='방 입장 중...'; mmWs.send(JSON.stringify({type:'joinroom',species:selectedSpecies,nick:playerNick,code:code})); }
-        else if(mode==='ffa'){ $('matchStatus').textContent='플레이어를 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_ffa',species:selectedSpecies,nick:playerNick})); }
-        else if(mode==='team2'||mode==='team3'){ $('matchStatus').textContent='팀원을 모으는 중...'; mmWs.send(JSON.stringify({type:'queue_team',size:(mode==='team2'?2:3),species:selectedSpecies,nick:playerNick})); }
-        else if(queueMode){
-          if(queueMode.size===1) mmWs.send(JSON.stringify({type:'queue',gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
-          else mmWs.send(JSON.stringify({type:'queue_team',size:queueMode.size,gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
-        }
-        else { $('matchStatus').textContent='상대를 찾는 중...'; mmWs.send(JSON.stringify({type:'queue',gameMode:'deathmatch',species:selectedSpecies,nick:playerNick})); }
+        if(queueMode.size===1) mmWs.send(JSON.stringify({type:'queue',gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
+        else mmWs.send(JSON.stringify({type:'queue_team',size:queueMode.size,gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
       };
       mmWs.onmessage=(ev)=>{
         let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; }
         if(d.type==='identified'){ saveDeviceIdentity(d.id,d.token); return; }
         handleNetMessage(d);
       };
-      mmWs.onerror=()=>{ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else if(!queueMode){ $('matchStatus').textContent='서버 연결 실패'; $('matchSub').textContent='잠시 후 다시 시도해주세요'; } };
       mmWs.onclose=()=>{ if(Net.connected && running){ onOpponentLeft(); } };
-    }catch(e){ if(mode==='create'){ $('rhStatusText').textContent='서버 연결 실패'; } else if(!queueMode){ $('matchStatus').textContent='서버 연결 실패'; } }
+    }catch(e){}
   }
-  // 하위호환
-  function startMatchmaking(){ startNet('random'); }
 
   function handleNetMessage(d){
     switch(d.type){
       case 'queued':
-        $('matchStatus').textContent='상대를 찾는 중...'; break;
-      case 'ffa_wait': {
-        // 개인전 대기 현황: 인원수 + 시작까지 남은 초 (새 인원 입장 시 10초 리셋)
-        $('matchStatus').textContent='대기 인원 '+d.count+' / 5';
-        $('matchSub').textContent = d.secs>=0 ? (d.secs+'초 후 시작 · 5명 차면 즉시 시작') : '2명 이상 모이면 시작합니다';
-        break; }
-      case 'ffa_matched': {
-        Net.connected=true; Net.ffa=true; Net.myIdx=d.idx; Net.room=d.room; Net.seed=d.seed;
-        Net.role = d.idx===0 ? 'host' : 'guest'; // 픽업 리스폰 권위(idx 0) — 기존 host 게이팅 재사용
-        Net._ffaPlayers=d.players||[];
-        gameMode='deathmatch'; selectedMap='random';
-        $('matchStatus').textContent='매칭 완료! '+Net._ffaPlayers.length+'명';
-        $('matchSub').textContent='잠시 후 시작합니다';
-        setTimeout(()=>startFFA(), 700);
-        break; }
+        break; // 인라인 매칭 UI(updateMatchingUI)가 상태를 표시하므로 별도 처리 없음
       case 'peer_left': {
         if(!Net.ffa) break;
         const p=Net.peerByIdx[d.idx];
@@ -5690,44 +5708,23 @@ const Game = (() => {
           if(Net.peers.length===0 && running && !Net.ended){ onOpponentLeft(); }
         }
         break; }
-      case 'room_created':
-        // 방 생성됨 -> 전용 화면에 코드 표시하고 친구 대기
-        $('rhCode').textContent=d.code;
-        $('rhDot').className='rhDot waiting';
-        $('rhStatusText').textContent='친구를 기다리는 중...';
-        Net._roomCode=d.code;
-        break;
-      case 'join_failed':
-        // 입장 실패 -> 코드 입력 화면으로 되돌림
-        if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
-        if(mmWs){ try{ mmWs.close(); }catch(e){} mmWs=null; }
-        showScreen('joinRoomOvl');
-        $('joinError').textContent=d.reason||'입장에 실패했습니다';
-        break;
       case 'matched':
+        // 1vs1 큐 매칭 성사. host가 시드 생성해서 보내고, guest는 받은 시드로 같은 맵 생성.
         Net.role=d.role; Net.room=d.room; Net.connected=true;
         clearBotFallbackTimer(); // 상대를 찾았으므로 봇 자동전환 타이머 해제
-        // host가 시드 생성해서 보냄; guest는 받은 시드로 같은 맵 생성
         if(Net.role==='host'){
           Net.seed=(Math.random()*1e9)|0; Net.oppNick=d.opponentNick||'';
-          // 호스트 화면: 친구 입장 표시
-          if($('roomHostScr').style.display!=='none'){
-            $('rhDot').className='rhDot joined';
-            $('rhStatusText').textContent=(Net.oppNick||'친구')+' 입장! 곧 시작합니다';
-          }
-          // 1:1 코드 방(create/join)일 때만 방장이 고른 모드/맵을 게스트에 전달 — 6종 큐 매칭은 큐 진입 전 이미 같은 gameMode로 페어링됐으므로 덮어쓰지 않음
-          const isCodeRoom=(Net._mode==='create'||Net._mode==='join');
-          const hostMode=isCodeRoom ? (Net._roomMode||'deathmatch') : (d.gameMode||gameMode);
-          const hostMap=isCodeRoom ? (Net._roomMap||'random') : selectedMap;
-          if(isCodeRoom){ gameMode=hostMode; selectedMap=hostMap; }
+          const hostMode=d.gameMode||gameMode, hostMap=selectedMap;
           Net.ws.send(JSON.stringify({type:'spawn',seed:Net.seed,mode:hostMode,map:hostMap}));
           endMatchingUI();
-          setTimeout(()=>startPVP(d.opponentSpecies), 900); // 잠깐 "입장!" 보여주고 시작
+          setTimeout(()=>startPVP(d.opponentSpecies), 500);
         }
-        else { $('matchStatus').textContent='상대를 찾았습니다!'; Net._pendingOppSpecies=d.opponentSpecies; Net.oppNick=d.opponentNick||'';
+        else {
+          Net._pendingOppSpecies=d.opponentSpecies; Net.oppNick=d.opponentNick||'';
           if(d.gameMode) gameMode=d.gameMode;
           endMatchingUI();
-          if(Net._pendingSpawn){ Net._pendingSpawn=false; startPVP(Net._pendingOppSpecies); } }
+          if(Net._pendingSpawn){ Net._pendingSpawn=false; startPVP(Net._pendingOppSpecies); }
+        }
         break;
       case 'spawn':
         // guest: 시드+모드+맵 받고 시작 (matched를 아직 못 받았으면 저장하고 대기)
@@ -5850,8 +5847,6 @@ const Game = (() => {
       case 'team_wait':
         // 파티원이 호스트를 따라 매칭 큐에 들어온 경우(직접 PLAY를 누르지 않음) — 인라인 매칭 UI를 여기서 시작
         if(!matching){ enterMatchingState(()=>startBotFallback(d.gameMode||gameMode, d.size)); }
-        $('matchStatus').textContent='대기 인원 '+d.count+' / '+d.need;
-        $('matchSub').textContent=d.size+' vs '+d.size+' · 실제 플레이어만';
         break;
       case 'team_matched':
         _prepTeamMatch(d);
@@ -5876,16 +5871,18 @@ const Game = (() => {
   function showMapRoulette(targetMap, cb){
     const ovl=$('mapRoulette'), track=$('rouletteTrack'), result=$('rouletteResult');
     if(!ovl||!track){ cb&&cb(); return; }
-    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    hideAllScreensForGame();
     result.classList.remove('show'); result.textContent='';
     ovl.style.display='flex';
     const CARD=162; // 카드폭+마진(150+12)
-    const grd={arena:['#7ecb62','#8fdb72'],ruins:['#b0a890','#c2ba9e'],factory:['#6a7580','#78838e'],garden:['#7ec86a','#92d67e'],ice:['#cfe4f2','#e0f0fa']};
-    // 카드 스트립 생성 (여러 바퀴 반복 + 마지막에 목표 맵)
+    const grd={arena:['#7ecb62','#8fdb72'],ruins:['#b0a890','#c2ba9e'],factory:['#6a7580','#78838e'],garden:['#7ec86a','#92d67e'],ice:['#cfe4f2','#e0f0fa'],
+      bunker:['#4a545e','#626b74'],citadel:['#6b5f7a','#8a7ca8'],warehouse:['#7a6a4a','#9a8656']};
+    // 카드 스트립 생성 (여러 바퀴 반복 + 마지막에 목표 맵) — 목표가 팀 맵이면 팀 맵만, 아니면 솔로 맵만 노출
+    const reelKeys = (MAPS[targetMap] && MAPS[targetMap].teamMap) ? TEAM_MAP_KEYS : SOLO_MAP_KEYS;
     const loops=8; const seq=[];
-    for(let i=0;i<loops;i++){ for(const k of MAP_KEYS) seq.push(k); }
-    const tIdx=MAP_KEYS.indexOf(targetMap);
-    const finalIndex=(loops-2)*MAP_KEYS.length + tIdx; // 목표 위치
+    for(let i=0;i<loops;i++){ for(const k of reelKeys) seq.push(k); }
+    const tIdx=reelKeys.indexOf(targetMap);
+    const finalIndex=(loops-2)*reelKeys.length + tIdx; // 목표 위치
     track.innerHTML='';
     seq.forEach(k=>{ const M=MAPS[k]; const c=document.createElement('div'); c.className='rouletteCard';
       const g=grd[k]||['#888','#aaa'];
@@ -5916,7 +5913,8 @@ const Game = (() => {
   const FFA_SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11],[11,-11]]; // idx별 시작 위치 (개인전 최대 5인 / 팀전 3vs3=6인)
   function startFFA(){
     if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
-    currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length];
+    // 팀전(2vs2/3vs3)이면 팀 전용 FPS 맵, 아니면 솔로 맵 — seed로 양쪽 클라이언트가 같은 맵 선택
+    currentMap = pickMapKey(!!Net.teamMode, Net.seed);
     showMapRoulette(currentMap, ()=>_startFFAMatch());
   }
   function _startFFAMatch(){
@@ -5951,7 +5949,7 @@ const Game = (() => {
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
     const feed=$('killFeed'); if(feed) feed.innerHTML='';
-    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    hideAllScreensForGame();
     $('winOvl').style.display='none';
     updateHUD(); updateScore();
     if(window.__PC_ALWAYS_AIM){ const cv=document.getElementById('c'); setTimeout(()=>{ try{ cv.requestPointerLock&&cv.requestPointerLock(); }catch(e){} }, 80); }
@@ -5959,7 +5957,7 @@ const Game = (() => {
 
   function startPVP(oppSpecies){
     if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
-    currentMap = MAP_KEYS[Net.seed % MAP_KEYS.length]; // 시드로 맵 결정 (양쪽 동일)
+    currentMap = pickMapKey(false, Net.seed); // 1vs1: 솔로 전용 맵 (시드로 양쪽 동일)
     // 맵 룰렛 연출 후 실제 시작
     showMapRoulette(currentMap, ()=>_startPVPMatch(oppSpecies));
   }
@@ -5985,7 +5983,7 @@ const Game = (() => {
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
     const feed=$('killFeed'); if(feed) feed.innerHTML='';
-    SCREENS.forEach(s=>{const el=$(s);if(el)el.style.display='none';});
+    hideAllScreensForGame();
     $('winOvl').style.display='none';
     updateHUD();
     updateScore(); // 새 판 스코어 0:0 즉시 초기화
@@ -6094,7 +6092,6 @@ const Game = (() => {
     if(mmTimer){ clearInterval(mmTimer); mmTimer=null; }
     if(mmWs){ try{ mmWs.send(JSON.stringify({type:'cancel'})); mmWs.close(); }catch(e){} mmWs=null; }
     Net.connected=false; Net.ws=null;
-    $('matchSub').textContent='1 vs 1 · 랜덤 상대';
   }
 
   /* ===== 6종 모드 인라인 매칭 (로비 PLAY 버튼) + 시간 초과 시 봇 자동전환 ===== */
@@ -6157,7 +6154,8 @@ const Game = (() => {
     const btn=$('lbPlay'); if(!btn) return;
     const mm=Math.floor(matchElapsedSec/60), ss=matchElapsedSec%60;
     const t=mm>0 ? (mm+':'+String(ss).padStart(2,'0')) : (ss+'초');
-    const txt=btn.querySelector('.mTxt'); if(txt) txt.textContent='매칭 중... '+t;
+    // 매칭 중 PLAY 버튼을 다시 누르면 취소된다는 걸 라벨로 안내 (mTxt는 flex column이라 두 줄로 표시됨)
+    const txt=btn.querySelector('.mTxt'); if(txt) txt.innerHTML='매칭 중 '+t+'<small>다시 눌러 취소</small>';
   }
   function endMatchingUI(){
     if(!matching) return;
@@ -6181,8 +6179,8 @@ const Game = (() => {
     stopMatchmaking();
     endMatchingUI();
     gameMode=gm; selectedMap='random'; rankedMode=false; // 봇 상대는 랭킹전 RP에 영향을 주지 않음
-    SCREENS.forEach(s=>{ const el=$(s); if(el) el.style.display='none'; }); // 로비 등 메뉴 화면을 감추고 게임 캔버스로 전환
-    Game.msg && Game.msg('상대를 찾지 못해 AI와 대전합니다');
+    hideAllScreensForGame(); // 로비 등 메뉴 화면을 감추고 게임 캔버스로 전환
+    Game.msg && Game.msg('매칭 완료!'); // 상대가 봇임을 드러내지 않음
     const totalBots=size*2-1; // 1v1=1, 2v2=3, 3v3=5
     startWithBotFill(totalBots, size>1);
   }
@@ -6403,10 +6401,8 @@ const Game = (() => {
     const mine=Net._ffaPlayers.find(p=>p.idx===d.idx);
     Net.myTeam = mine ? mine.team : 'red';
     gameMode=d.gameMode||'deathmatch'; selectedMap='random';
-    $('matchStatus').textContent='매칭 완료! '+d.size+'vs'+d.size;
-    $('matchSub').textContent='잠시 후 시작합니다';
     endMatchingUI();
-    setTimeout(()=>startFFA(), 700);
+    setTimeout(()=>startFFA(), 500);
   }
 
   // ===== 봇 피격/킬 처리 (호스트 전용: 호스트가 자신의 봇을 대신 판정) =====
