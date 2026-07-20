@@ -269,6 +269,8 @@ body.has-touch #abilityRow{display:none!important}
 .tpAdd:hover{border-color:var(--cy);transform:scale(1.05)}
 .tpAdd:active{transform:scale(.94)}
 .tpPortrait{width:64px;height:64px;border-radius:50%;border:2px solid rgba(125,243,255,.35);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.tpModelWrap{width:72px;height:78px;border-radius:14px;border:2px solid rgba(125,243,255,.3);background:linear-gradient(160deg,rgba(20,34,54,.85),rgba(8,15,26,.9));box-shadow:0 4px 14px rgba(0,0,0,.4);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.tpModel{width:100%;height:100%;display:block}
 .tpName{font-size:11px;color:#cfe0ee;font-weight:700;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tpReady{font-size:9px;color:#8fb2cc;font-weight:700;letter-spacing:.5px}
 .tpReady.on{color:var(--gn)}
@@ -567,6 +569,15 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .friendRow .frId{color:#8fb2cc;font-size:10px;font-weight:600}
 .friendRow button{background:none;border:1px solid rgba(125,243,255,.3);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);color:var(--cy2);font-size:11px;font-weight:700;padding:4px 9px}
 .friendEmpty{color:#5a7085;font-size:12px;text-align:center;padding:8px 0}
+/* 친구 초대 목록: 온라인/오프라인 그룹 헤더 + 상태 버튼 */
+.friendGroupHdr{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:1px;color:var(--cy2);text-transform:uppercase;padding:6px 4px 2px;border-bottom:1px solid rgba(125,243,255,.12);margin-top:4px}
+.friendGroupHdr .fgCount{color:#8fb2cc;background:rgba(125,243,255,.1);border-radius:8px;padding:1px 6px;font-size:9px}
+.friendRow.off{opacity:.5}
+.frInviteBtn{background:none;border:1px solid rgba(125,243,255,.3);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);color:var(--cy2);font-size:11px;font-weight:800;padding:4px 10px;min-width:56px;text-align:center;transition:transform .1s}
+.frInviteBtn:active{transform:scale(.93)}
+.frInviteBtn.invited{border-color:rgba(255,216,61,.5);color:var(--yl);background:rgba(255,216,61,.08)}
+.frInviteBtn.joined{border-color:rgba(62,245,138,.5);color:var(--gn);background:rgba(62,245,138,.1)}
+.frInviteBtn:disabled{opacity:.55}
 
 #rotate{position:absolute;inset:0;background:var(--bg0);z-index:99;display:none;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;text-align:center;pointer-events:auto}
 @media (orientation:portrait){#rotate{display:flex}}
@@ -1345,7 +1356,7 @@ body.layout-edit #joyHint{display:none}
   <div class="cfBanner">
     <div class="cfIcon cfIconSvg" data-ic="users"></div>
     <div class="cfTitle">친구 초대</div>
-    <div class="cfSub">초대할 친구를 선택하세요 (온라인 친구만 초대 가능)</div>
+    <div class="cfSub">온라인 친구를 눌러 파티에 초대하세요 · 초대됨/참가완료 상태가 표시됩니다</div>
     <div id="tpInviteList" class="friendList"></div>
     <div class="cfBtns">
       <button class="cfBtn" id="tpInviteClose">닫기</button>
@@ -5729,7 +5740,9 @@ const Game = (() => {
   const Net = { ws:null, role:null, room:null, opp:null, seed:0, connected:false, lastSend:0, ended:false, oppNick:'', _pendingOppSpecies:null, ping:0 };
   function resetNet(){ Net.role=null; Net.room=null; Net.opp=null; Net.seed=0; Net.connected=false; Net.lastSend=0; Net.ended=false; Net.oppNick=''; Net._pendingOppSpecies=null; Net.myDeaths=0; Net._seenDeaths={}; Net._roomMode='deathmatch'; Net._roomMap='random'; Net._roomCode=null; Net.ffa=false; Net.myIdx=0; Net.peers=[]; Net.peerByIdx={}; Net._ffaPlayers=null;
     // 팀전 전용 상태
-    Net.teamMode=false; Net.myTeam=null; }
+    Net.teamMode=false; Net.myTeam=null;
+    // 봇 채움 매치(호스트가 봇 시뮬레이션) 전용 상태
+    Net.party=false; Net.myBotList=null; Net.myBotIdx=null; Net._botDeaths=null; Net._botStateTimer=0; }
 
   function getDeviceToken(){ try{ return localStorage.getItem('aa_token')||''; }catch(e){ return ''; } }
   function saveDeviceIdentity(id,token){ try{ if(id) localStorage.setItem('aa_uid',id); if(token) localStorage.setItem('aa_token',token); }catch(e){} }
@@ -5835,15 +5848,17 @@ const Game = (() => {
         if(Net.ffa){
           if(d.to!==undefined && d.to!==Net.myIdx) break; // 내가 대상이 아님
           if(player && !player.dead && player.invuln<=0){
-            const attacker=Net.peerByIdx[d.from];
+            // 봇이 쏜 공격(fromBot)은 발신 호스트가 아닌 봇에게 킬 크레딧이 가야 함
+            const aIdx=(d.fromBot!==undefined)?d.fromBot:d.from;
+            const attacker=Net.peerByIdx[aIdx];
             player.hp-=d.dmg; player.hurtT=0.25; showDamage(); Sfx.hurt(); shake(0.25);
             if(player.hp<=0){
               player.hp=0; player.die(attacker||Net.opp, true, d.cause);
               Net.myDeaths=(Net.myDeaths||0)+1;
               if(attacker){ attacker.kills=(attacker.kills||0)+1; }
               updateScore(); killBanner('사망','#ff5252');
-              // 죽인 사람에게만 킬 확정 통지 (서버가 to로 라우팅) — cause를 그대로 돌려보내 공격자 킬피드에도 반영
-              if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',to:d.from,did:Net.myDeaths,cause:d.cause}));
+              // 죽인 사람에게만 킬 확정 통지 (서버가 to로 라우팅, 봇이면 브로드캐스트되어 호스트가 처리) — cause를 그대로 돌려보내 공격자 킬피드에도 반영
+              if(Net.ws&&Net.ws.readyState===1) Net.ws.send(JSON.stringify({type:'kill',who:'opp',to:aIdx,did:Net.myDeaths,cause:d.cause}));
             }
           }
           break;
@@ -5999,20 +6014,35 @@ const Game = (() => {
     const sp=FFA_SPAWNS[Net.myIdx]||FFA_SPAWNS[0];
     player.pos.set(sp[0],0,sp[1]);
     player.team = Net.myTeam!=null ? Net.myTeam : undefined; // 팀전(빠른 매칭)일 때만 설정, 일반 개인전은 undefined
-    // 원격 플레이어 퍼펫 생성
+    // 원격 플레이어 퍼펫 + (봇 채움 매치) AI 봇 생성
+    // 서버가 정원 미달 시 부족한 자리를 봇으로 채워 보냄(players[].bot=true) —
+    // 호스트(idx 0, 항상 실제 플레이어)가 봇을 직접 시뮬레이션하고 bot_state로 브로드캐스트,
+    // 다른 클라이언트는 퍼펫(NetOpponent)으로 표시. 판정은 기존 파티봇 경로(applyBotHit 등) 재사용.
     Net.peers=[]; Net.peerByIdx={};
+    Net.party=(Net._ffaPlayers||[]).some(p=>p.bot);
+    Net.myBotList=[]; Net.myBotIdx=new Set();
+    const botDiff=botDiffForRank();
     for(const info of Net._ffaPlayers){
       if(info.idx===Net.myIdx) continue;
+      const s=FFA_SPAWNS[info.idx]||[14,0];
+      if(info.bot && Net.role==='host'){
+        const b=new AIBot(botDiff, info.species||'fox');
+        b.isPartyBot=true; b.netIdx=info.idx;
+        b.name=info.nick||b.name; b.team=info.team;
+        b.pos.set(s[0],0,s[1]);
+        Net.myBotList.push(b); Net.myBotIdx.add(info.idx);
+        Net.peerByIdx[info.idx]=b; // hit/kill 라우팅용
+        continue;
+      }
       const o=new NetOpponent(info.species||'fox');
       o.netIdx=info.idx;
       o.name=info.nick||(SPECIES[info.species]?SPECIES[info.species].name:'상대');
       o.team=info.team;
-      const s=FFA_SPAWNS[info.idx]||[14,0];
       o.pos.set(s[0],0,s[1]); o.netPos.set(s[0],0,s[1]);
       Net.peers.push(o); Net.peerByIdx[info.idx]=o;
     }
-    Net.opp=Net.peers[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
-    chars=[player, ...Net.peers];
+    Net.opp=Net.peers[0]||Net.myBotList[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
+    chars=[player, ...Net.peers, ...Net.myBotList];
     Pickups.init(Net.seed);
     time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
     document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
@@ -6183,14 +6213,16 @@ const Game = (() => {
   }
   function onLbPlayClick(){
     if(matching){ cancelQueueMatch(); return; }
-    const qm=findQueueMode(selectedQueueMode);
-    if(TP.code && qm.size>1 && !TP.isHost){
+    // 파티에 속해 있으면 파티의 인원수(TP.size)를 기준으로 판단 — 내가 로비에서 고른 모드(qm)와 무관하게
+    // 파티원 전원이 동일 조건에서 준비/시작 버튼을 보게 한다.
+    const inParty = !!TP.code && TP.size>1;
+    if(inParty && !TP.isHost){
       // 초대받은 파티원: PLAY 버튼 = 준비 완료 토글 (매칭 시작은 파티장만 가능)
       const ready=!tpAmIReady();
       try{ TP.ws.send(JSON.stringify({type:'team_party_ready',ready})); }catch(e){}
       return;
     }
-    if(TP.code && qm.size>1 && TP.isHost){
+    if(inParty && TP.isHost){
       const others=TP.roster.filter(r=>r.i!==TP.myIdx);
       if(others.length>0 && !others.every(o=>o.ready)){ Game.msg && Game.msg('파티원이 아직 준비되지 않았습니다'); return; }
       beginPartyQueueMatch();
@@ -6247,8 +6279,8 @@ const Game = (() => {
   function refreshPlayButtonLabel(){
     if(matching) return;
     const txt=document.querySelector('#lbPlay .mTxt'); if(!txt) return;
-    const qm=findQueueMode(selectedQueueMode);
-    if(TP.code && qm.size>1 && !TP.isHost) txt.innerHTML = tpAmIReady() ? ('준비완료 '+licSvg('check')) : '준비하기';
+    // 파티(초대) 상태를 기준으로 라벨 결정 — 파티원(비호스트)에겐 항상 준비 버튼을 노출
+    if(TP.code && TP.size>1 && !TP.isHost) txt.innerHTML = tpAmIReady() ? ('준비완료 '+licSvg('check')) : '준비하기';
     else txt.textContent='PLAY';
   }
   function startBotFallback(gm,size){
@@ -6293,9 +6325,11 @@ const Game = (() => {
       case 'identified': saveDeviceIdentity(d.id,d.token); break;
       case 'team_party_invite_sent':
         TP.code=d.code; TP.isHost=true; if(TP.myIdx==null) TP.myIdx=0;
+        if(d.targetId) tpInviteState.set(d.targetId,'invited');
         Game.msg && Game.msg('초대를 보냈습니다');
-        closeTpInviteOvl();
+        // 3vs3 등 추가 초대를 위해 목록은 열어두고 상태만 갱신 (한 자리만 필요하면 사용자가 닫으면 됨)
         renderTeamPartySlots(); refreshPlayButtonLabel();
+        if(tpInvitePickerOpen) frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
         break;
       case 'team_party_invite_failed':
         Game.msg && Game.msg(d.reason||'초대에 실패했습니다');
@@ -6304,10 +6338,14 @@ const Game = (() => {
         onTeamPartyInviteReceived(d);
         break;
       case 'team_party_invite_declined':
+        if(d.aid) tpInviteState.delete(d.aid); // 거절 -> 다시 초대 가능 상태로
         Game.msg && Game.msg((d.nick||'친구')+' 님이 초대를 거절했습니다');
+        if(tpInvitePickerOpen) frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
         break;
       case 'team_party_joined':
         TP.code=d.code; TP.isHost=false; TP.myIdx=d.idx; TP.size=d.size; TP.gameMode=d.gameMode;
+        // 파티 모드에 맞춰 로비의 선택 모드도 동기화 (준비 버튼/슬롯이 항상 올바르게 표시되도록)
+        { const pm=QUEUE_MODES.find(m=>m.gameMode===d.gameMode && m.size===d.size); if(pm){ selectedQueueMode=pm.key; try{ localStorage.setItem('aa_queueMode',pm.key); }catch(e){} const sub=$('lbModeChangeSub'); if(sub) sub.textContent=pm.label+' '+pm.short; markSelectedQueueCard(); } }
         pendingInviteCode=null; { const el=$('tpInviteToast'); if(el) el.style.display='none'; }
         renderTeamPartySlots(); refreshPlayButtonLabel();
         break;
@@ -6316,10 +6354,14 @@ const Game = (() => {
         break;
       case 'team_party_roster':
         TP.code=d.code; TP.roster=d.roster||[]; TP.size=d.size; TP.gameMode=d.gameMode;
+        // 로스터에 들어온 인원은 초대상태에서 제거(참가완료로 표시됨)
+        for(const r of TP.roster){ if(r.aid) tpInviteState.delete(r.aid); }
         renderTeamPartySlots(); refreshPlayButtonLabel();
+        if(tpInvitePickerOpen) frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
         break;
       case 'team_party_closed':
         Game.msg && Game.msg(d.reason||'파티가 종료되었습니다');
+        tpInviteState.clear();
         tpReset(); renderTeamPartySlots(); refreshPlayButtonLabel();
         break;
       case 'team_party_start_failed':
@@ -6329,6 +6371,7 @@ const Game = (() => {
   }
   function tpLeaveParty(){
     if(TP.ws){ try{ TP.ws.send(JSON.stringify({type:'team_party_leave'})); TP.ws.close(); }catch(e){} }
+    tpInviteState.clear();
     tpReset();
   }
   // 로비의 빈 초대 슬롯 클릭 -> 친구 목록에서 선택해 초대 (코드 입력 없음)
@@ -6338,6 +6381,7 @@ const Game = (() => {
     openTpInviteOvl();
   }
   let tpInvitePickerOpen=false, pendingInviteCode=null;
+  const tpInviteState=new Map(); // targetAccountId -> 'invited' | 'joined'
   function openTpInviteOvl(){
     const el=$('tpInviteOvl'); if(!el) return;
     el.style.display='flex'; tpInvitePickerOpen=true;
@@ -6345,19 +6389,43 @@ const Game = (() => {
     frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
   }
   function closeTpInviteOvl(){ const el=$('tpInviteOvl'); if(el) el.style.display='none'; tpInvitePickerOpen=false; }
+  // 현재 파티 로스터에 이미 들어온 친구(수락 완료)를 표시하기 위해 accountId 집합 계산
+  function tpJoinedAidSet(){
+    const s=new Set();
+    for(const r of (TP.roster||[])){ if(r.aid && r.i!==TP.myIdx) s.add(r.aid); }
+    return s;
+  }
   function renderTpInviteList(friends){
     const box=$('tpInviteList'); if(!box) return;
     if(!friends.length){ box.innerHTML='<div class="friendEmpty">친구를 먼저 추가해주세요</div>'; return; }
+    const joined=tpJoinedAidSet();
+    // 파티가 가득 찼는지 (자기 자신 포함)
+    const partyFull = TP.code && TP.size>1 && (TP.roster.length>=TP.size);
+    const online=friends.filter(f=>f.online), offline=friends.filter(f=>!f.online);
     box.innerHTML='';
-    friends.forEach(f=>{
-      const row=document.createElement('div'); row.className='friendRow';
-      row.innerHTML='<span class="frDot '+(f.online?'on':'')+'"></span><span class="frName">'+(f.nickname||'(닉네임 없음)')+'</span><span class="frId">'+f.id+'</span><button type="button"'+(f.online?'':' disabled')+'>초대</button>';
-      const btn=row.querySelector('button'); if(f.online) bindBtn2(btn, ()=>sendTpInvite(f.id));
+    const addHeader=(txt,cnt)=>{ const h=document.createElement('div'); h.className='friendGroupHdr'; h.innerHTML=txt+' <span class="fgCount">'+cnt+'</span>'; box.appendChild(h); };
+    const addRow=(f)=>{
+      const row=document.createElement('div'); row.className='friendRow'+(f.online?'':' off');
+      let statusCls='wait', statusTxt='초대', disabled=!f.online;
+      if(joined.has(f.id)){ statusCls='joined'; statusTxt='참가완료'; disabled=true; }
+      else if(tpInviteState.get(f.id)==='invited'){ statusCls='invited'; statusTxt='초대됨'; disabled=false; } // 재초대 허용
+      else if(!f.online){ statusTxt='오프라인'; }
+      else if(partyFull){ statusTxt='가득참'; disabled=true; }
+      row.innerHTML='<span class="frDot '+(f.online?'on':'')+'"></span>'
+        +'<span class="frName">'+(f.nickname||'(닉네임 없음)')+'</span>'
+        +'<span class="frId">'+f.id+'</span>'
+        +'<button type="button" class="frInviteBtn '+statusCls+'"'+(disabled?' disabled':'')+'>'+statusTxt+'</button>';
+      const btn=row.querySelector('button');
+      if(!disabled && f.online) bindBtn2(btn, ()=>sendTpInvite(f.id));
       box.appendChild(row);
-    });
+    };
+    if(online.length){ addHeader('온라인', online.length); online.forEach(addRow); }
+    if(offline.length){ addHeader('오프라인', offline.length); offline.forEach(addRow); }
   }
   function sendTpInvite(targetId){
     const qm=findQueueMode(selectedQueueMode);
+    tpInviteState.set(targetId,'invited');
+    if(tpInvitePickerOpen){ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); }); } // 상태 즉시 갱신
     tpConnect(()=>{
       TP.ws.send(JSON.stringify({type:'team_party_invite_send', targetId,
         size: TP.code?TP.size:qm.size, gameMode: TP.code?TP.gameMode:qm.gameMode,
@@ -6373,12 +6441,14 @@ const Game = (() => {
   // 로비 초대 슬롯 렌더: 1vs1은 슬롯 없음, 2vs2는 오른쪽 1개, 3vs3은 좌우 2개
   function renderTeamPartySlots(){
     const qm=findQueueMode(selectedQueueMode);
-    const showR=qm.size>=2, showL=qm.size>=3;
+    // 파티에 속해 있으면 파티 인원(TP.size)을 기준으로, 아니면 선택한 모드(qm.size) 기준으로 슬롯 표시
+    const effSize = (TP.code && TP.size>1) ? TP.size : qm.size;
+    const showR=effSize>=2, showL=effSize>=3;
     const slotL=$('tpSlotL'), slotR=$('tpSlotR'), leaveLink=$('tpLeaveLink');
     if(slotL) slotL.style.display = showL?'flex':'none';
     if(slotR) slotR.style.display = showR?'flex':'none';
     if(leaveLink) leaveLink.style.display = (showR && !!TP.code && !matching) ? 'block' : 'none';
-    if(!showR) return;
+    if(!showR){ if(slotR) tpDisposeMini(slotR); if(slotL) tpDisposeMini(slotL); return; }
     const others = TP.code ? TP.roster.filter(r=>r.i!==TP.myIdx).sort((a,b)=>a.i-b.i) : [];
     tpFillSlot(slotR, others[0]);
     if(showL) tpFillSlot(slotL, others[1]);
@@ -6386,17 +6456,82 @@ const Game = (() => {
   function tpFillSlot(el, info){
     if(!el) return;
     if(!info){
+      tpDisposeMini(el);
+      el._tpSpec=null; el._tpSig=null;
       el.innerHTML='<button class="tpAdd" type="button">+</button>';
       const btn=el.querySelector('.tpAdd'); if(btn) bindBtn2(btn, onTapInviteSlot);
       return;
     }
     const spName = SPECIES[info.species] ? SPECIES[info.species].name : '플레이어';
-    el.innerHTML='<canvas class="tpPortrait" width="72" height="72"></canvas>'
+    const spec=info.species||'rabbit';
+    const sig=spec+'|'+(info.nick||spName)+'|'+(info.ready?1:0)+'|'+(info.isHost?1:0);
+    if(el._tpSig===sig) return; // 변화 없음 — 살아있는 3D 렌더 유지(재생성 시 애니메이션 끊김/GPU 누수 방지)
+    // 같은 캐릭터면 캔버스는 그대로 두고 이름/상태 텍스트만 갱신
+    if(el._tpSpec===spec && el.querySelector('canvas.tpModel')){
+      const nm=el.querySelector('.tpName'); if(nm) nm.textContent=info.nick||spName;
+      let rd=el.querySelector('.tpReady'); if(rd){ rd.className='tpReady '+(info.ready?'on':''); rd.textContent=info.ready?'준비완료':'대기중'; }
+      let ht=el.querySelector('.tpHostTag');
+      if(info.isHost && !ht){ ht=document.createElement('div'); ht.className='tpHostTag'; ht.textContent='파티장'; el.appendChild(ht); }
+      else if(!info.isHost && ht){ ht.remove(); }
+      el._tpSig=sig;
+      return;
+    }
+    // 종이 바뀌었거나 첫 렌더: 새 캔버스 마운트
+    tpDisposeMini(el);
+    el.innerHTML='<div class="tpModelWrap"><canvas class="tpModel" width="140" height="150"></canvas></div>'
       +'<div class="tpName">'+(info.nick||spName)+'</div>'
       +'<div class="tpReady '+(info.ready?'on':'')+'">'+(info.ready?'준비완료':'대기중')+'</div>'
       +(info.isHost?'<div class="tpHostTag">파티장</div>':'');
-    const cv=el.querySelector('canvas'); if(cv){ try{ drawPortrait(cv, info.species||'rabbit'); }catch(e){} }
+    const cv=el.querySelector('canvas.tpModel');
+    if(cv){ try{ tpMountMini(cv, spec); }catch(e){} }
+    el._tpSpec=spec; el._tpSig=sig;
   }
+  /* 파티 슬롯 소형 3D 프리뷰: 각 슬롯 캔버스에 실제 캐릭터 모델을 렌더 (로비 메인 프리뷰와 동일 스타일, 축소) */
+  const _tpMinis=new Map(); // canvas -> {renderer,scene,cam,char,raf,spec}
+  function tpMountMini(cv, spec){
+    const prev=_tpMinis.get(cv);
+    if(prev && prev.spec===spec) return; // 같은 종이면 재생성 불필요
+    if(prev) tpDisposeMiniCanvas(cv);
+    let renderer;
+    try{ renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); }catch(e){ return; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(cv.width, cv.height, false);
+    const scene=new THREE.Scene();
+    const cam=new THREE.PerspectiveCamera(34, cv.width/cv.height, 0.1, 50);
+    cam.position.set(0,1.05,3.2); cam.lookAt(0,0.9,0);
+    scene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.15));
+    const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(2,4,3); scene.add(dl);
+    const built=buildAnimal(spec); const char=built.group; char.position.y=0; scene.add(char);
+    const rec={renderer,scene,cam,char,parts:built.parts,spec,t:Math.random()*6,raf:0,alive:true};
+    _tpMinis.set(cv, rec);
+    (function loop(){
+      if(!rec.alive) return;
+      rec.raf=requestAnimationFrame(loop);
+      // 캔버스가 화면에서 사라지면(파티 화면 벗어남) 렌더 스킵해 GPU 절약
+      if(!cv.isConnected){ tpDisposeMiniCanvas(cv); return; }
+      rec.t+=0.045;
+      char.rotation.y=Math.sin(rec.t*0.5)*0.35;
+      char.position.y=Math.abs(Math.sin(rec.t))*0.04;
+      const p=rec.parts;
+      if(p){ const sw=Math.sin(rec.t*1.2)*0.16;
+        if(p.legL) p.legL.rotation.x=sw; if(p.legR) p.legR.rotation.x=-sw;
+        if(p.armR){ p.armR.rotation.x=-sw*0.6; p.armR.rotation.z=0; }
+        if(p.armL){ p.armL.rotation.x=sw*0.6; p.armL.rotation.z=0; }
+        if(p.ears) p.ears.rotation.x=Math.sin(rec.t)*0.12-0.05;
+      }
+      renderer.render(scene,cam);
+    })();
+  }
+  function tpDisposeMiniCanvas(cv){
+    const rec=_tpMinis.get(cv); if(!rec) return;
+    rec.alive=false; if(rec.raf) cancelAnimationFrame(rec.raf);
+    try{ if(rec.char) rec.scene.remove(rec.char); }catch(e){}
+    try{ rec.renderer.dispose&&rec.renderer.dispose(); }catch(e){}
+    // WebGL 컨텍스트 명시적 해제 (브라우저 동시 컨텍스트 제한 회피)
+    try{ const gl=rec.renderer.getContext&&rec.renderer.getContext(); const ext=gl&&gl.getExtension('WEBGL_lose_context'); if(ext) ext.loseContext(); }catch(e){}
+    _tpMinis.delete(cv);
+  }
+  function tpDisposeMini(el){ const cv=el.querySelector('canvas.tpModel'); if(cv) tpDisposeMiniCanvas(cv); }
 
   /* ===================================================================
      ===== 친구 시스템: ID 검색 · 추가 · 목록 + 닉네임 서버 검증 =====
@@ -6422,6 +6557,8 @@ const Game = (() => {
       case 'identified':
         saveDeviceIdentity(d.id,d.token); myAccountId=d.id;
         { const el=$('myIdVal'); if(el) el.textContent=d.id; }
+        // 서버가 기억하는 닉네임이 있는데 로컬이 비어있으면 복원 (기기 변경/캐시 삭제 후에도 등록 닉네임 유지)
+        if(d.nickname && !playerNick){ playerNick=d.nickname; try{ localStorage.setItem('aa_nick',playerNick); }catch(e){} refreshNicknameUI(); }
         break;
       case 'friend_search_result': renderFriendSearchResults(d.results||[]); break;
       case 'friend_add_result':
