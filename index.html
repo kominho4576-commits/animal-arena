@@ -48,6 +48,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg0);font-fami
 #c{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
 #hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
 button{font-family:inherit;cursor:pointer}
+/* 통일 벡터 아이콘 (Lucide 스타일) */
+.lic{width:1em;height:1em;display:inline-block;vertical-align:-0.125em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
 /* ============ HUD ============ */
 #topbar{position:absolute;z-index:20;top:env(safe-area-inset-top,10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:flex-start}
@@ -63,17 +65,30 @@ button{font-family:inherit;cursor:pointer}
 .ffaRow.me .fn,.ffaRow.me .fk{color:var(--cy);text-shadow:0 0 10px rgba(49,230,255,.5)}
 .ffaRow.top .fr{color:var(--yl)}
 .ffaRow.dead2{opacity:.45}
-#teamBoard{min-width:150px;padding:5px 14px}
-#teamAliveRow{display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Black Han Sans',sans-serif;font-size:18px;margin:2px 0 4px}
-#teamAliveMine{color:#5ec6ff;text-shadow:0 0 10px rgba(94,198,255,.5)}
-#teamAliveTheirs{color:#ff6d6d;text-shadow:0 0 10px rgba(255,109,109,.5)}
-#teamAliveMid{font-size:11px;color:var(--tx2);font-family:inherit;letter-spacing:1px}
+#teamBoard{min-width:172px;padding:5px 14px}
+#teamScoreRow{display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Black Han Sans',sans-serif;font-size:24px;margin:1px 0 2px}
+#teamScoreMine{color:#4db6ff;text-shadow:0 0 14px rgba(77,182,255,.6);min-width:26px;text-align:right}
+#teamScoreTheirs{color:#ff5d69;text-shadow:0 0 14px rgba(255,93,105,.6);min-width:26px;text-align:left}
+#teamScoreMid{font-size:16px;color:var(--tx2)}
+#teamAliveRow{display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Black Han Sans',sans-serif;font-size:13px;margin:0 0 4px}
+#teamAliveRow .taLbl{font-family:'Noto Sans KR',sans-serif;font-size:9px;color:var(--tx2);letter-spacing:1px;font-weight:700}
+#teamAliveMine{color:#5ec6ff;text-shadow:0 0 10px rgba(94,198,255,.5);min-width:14px;text-align:center}
+#teamAliveTheirs{color:#ff6d6d;text-shadow:0 0 10px rgba(255,109,109,.5);min-width:14px;text-align:center}
+#teamAliveMid{font-size:10px;color:var(--tx2);font-family:inherit;letter-spacing:1px}
 .teamRosterRow{display:flex;align-items:center;gap:6px;font-size:11.5px;line-height:1.4;color:var(--tx);text-align:left}
 .teamRosterRow .trDot{width:7px;height:7px;border-radius:50%;background:#3ef58a;flex-shrink:0}
 .teamRosterRow.dead .trDot{background:#ff5252}
 .teamRosterRow.dead{opacity:.5}
 .teamRosterRow .trName{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
 .teamRosterRow.me .trName{color:var(--cy)}
+/* 값이 바뀌어도 폭이 흔들리지 않도록 숫자 칸 폭 고정 (UI 안정성) */
+#scoreP,#scoreB{display:inline-block;min-width:26px;text-align:center}
+#scoreMid{display:inline-block;min-width:14px;text-align:center}
+#scoreChip>div:last-child{display:flex;align-items:center;justify-content:center}
+#fpsVal{display:inline-block;min-width:24px;text-align:center}
+#hpNum{display:inline-block;min-width:34px;text-align:right}
+#ultPct,#bUltPct{display:inline-block;min-width:30px;text-align:center}
+#wepAmmo{min-width:44px;text-align:center}
 #scoreP{color:var(--cy);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(49,230,255,.6)}
 #scoreB{color:var(--rd);font-family:'Black Han Sans',sans-serif;font-size:24px;text-shadow:0 0 14px rgba(255,77,94,.6)}
 #scoreMid{color:#5b7288;font-size:16px;margin:0 7px}
@@ -84,7 +99,9 @@ button{font-family:inherit;cursor:pointer}
 
 #killFeed{position:absolute;top:calc(env(safe-area-inset-top,10px) + 40px);right:14px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;max-width:360px}
 .kfRow{background:linear-gradient(90deg,rgba(9,17,32,.55),rgba(9,17,32,.9));border-right:3px solid var(--rd);border-radius:3px;padding:5px 12px;font-size:12px;font-weight:700;color:#e8f0f8;white-space:nowrap;animation:kfIn .22s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 3px 12px rgba(0,0,0,.4)}
-.kfRow .kfA{color:var(--cy)}.kfRow .kfB{color:var(--rd)}.kfRow .kfW{color:var(--yl);margin:0 4px}
+.kfRow .kfA{color:var(--cy)}.kfRow .kfB{color:var(--rd)}.kfRow .kfW{color:var(--yl);margin:0 4px;display:inline-flex;align-items:center;gap:2px}
+.kfW .kfIc{width:.85em;height:.85em}
+.btnIc{width:.9em;height:.9em;vertical-align:-0.1em}
 @keyframes kfIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
 
 #profileBox{position:absolute;z-index:20;left:14px;top:calc(env(safe-area-inset-top,10px) + 4px);display:flex;align-items:flex-start;gap:12px}
@@ -242,7 +259,7 @@ body.has-touch #abilityRow{display:none!important}
 .lbTitle span{background:linear-gradient(180deg,#fff 15%,var(--yl) 55%,#e08a1e 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes titleIn{from{opacity:0;transform:translateY(-24px) scale(.92)}to{opacity:1;transform:none}}
 .lbCols{display:flex;gap:24px;align-items:stretch;max-width:780px;margin-top:16px}
-.lbPreview{display:flex;flex-direction:column;align-items:center;min-width:232px}
+.lbPreview{display:flex;flex-direction:column;align-items:center;min-width:232px;transform:translateY(26px)}
 .lbPvLabel{display:none}
 #pvCanvas{width:min(260px,32vw);height:min(280px,42vh);display:block}
 /* 2vs2/3vs3 초대 슬롯: 캐릭터 프리뷰 좌우에 배치, 참가자는 나보다 약간 작게 */
@@ -268,13 +285,13 @@ body.has-touch #abilityRow{display:none!important}
 #nickInput:focus{border-color:var(--cy);box-shadow:0 0 0 3px rgba(49,230,255,.15),0 0 18px rgba(49,230,255,.2)}
 #nickInput::placeholder{color:#54718a;font-weight:400}
 .pickLbl{color:var(--cy2);font-size:11px;letter-spacing:3px;margin-bottom:8px;text-transform:uppercase;font-weight:700}
-.pickLbl::before{content:"◤ ";color:var(--yl);font-size:9px}
+.pickLbl::before{content:"";display:inline-block;width:0;height:0;border-left:6px solid var(--yl);border-top:3px solid transparent;border-bottom:3px solid transparent;margin-right:6px;vertical-align:middle}
 .specRow{display:flex;gap:10px;flex-wrap:wrap;max-width:440px}
 .specBtn{width:74px;height:88px;clip-path:polygon(9px 0,100% 0,calc(100% - 9px) 100%,0 100%);border:1px solid rgba(125,243,255,.18);background:linear-gradient(180deg,rgba(22,40,64,.55),rgba(10,19,34,.7));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#fff;transition:transform .12s,border-color .12s,box-shadow .12s;position:relative;overflow:hidden}
 .specBtn:hover{transform:translateY(-3px);border-color:rgba(125,243,255,.5)}
 .specBtn:active{transform:scale(.94)}
 .specBtn.sel{border-color:var(--cy);background:linear-gradient(180deg,rgba(49,230,255,.2),rgba(10,25,40,.85));box-shadow:0 0 18px rgba(49,230,255,.35),0 0 0 1px rgba(49,230,255,.4) inset}
-.specBtn.sel::after{content:"✓";position:absolute;top:4px;right:7px;color:var(--cy);font-size:12px;font-weight:900}
+.specBtn.sel::after{content:"";position:absolute;top:6px;right:7px;width:6px;height:11px;border:solid var(--cy);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
 .specPortrait{width:52px;height:52px;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,.3);box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .specDot{width:36px;height:36px;border-radius:50%;box-shadow:inset 0 -4px 8px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.35)}
 .specName{font-size:12px;font-weight:700;letter-spacing:1px}
@@ -491,8 +508,8 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 /* 인게임 상시 닉네임(모든 캐릭터 머리 위) — 팀 구분 색상과 함께 표시 */
 #nickLabelLayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:8}
 .nickLabel{position:absolute;transform:translate(-50%,-100%);font-size:11px;font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 1px 3px #000,0 0 6px rgba(0,0,0,.85);white-space:nowrap;will-change:left,top}
-.nickLabel.tmred{color:#ffb3b8}
-.nickLabel.tmblue{color:#b3ddff}
+.nickLabel.tmred{color:#ff5d69;text-shadow:0 1px 3px #000,0 0 8px rgba(255,60,80,.7)}
+.nickLabel.tmblue{color:#4db6ff;text-shadow:0 1px 3px #000,0 0 8px rgba(60,150,255,.7)}
 /* 적 머리 위 HP바 */
 #enemyHpBar{position:absolute;transform:translate(-50%,-100%);pointer-events:none;display:none;flex-direction:column;align-items:center;gap:2px;z-index:9;will-change:left,top}
 #enemyBuffs{display:flex;gap:3px;margin-bottom:2px;flex-wrap:wrap;justify-content:center;max-width:160px}
@@ -839,6 +856,7 @@ body.layout-edit #joyHint{display:none}
   background:linear-gradient(90deg,rgba(140,230,250,.95),rgba(190,245,255,.97) 30%,rgba(190,245,255,.97) 70%,rgba(140,230,250,.95));
   box-shadow:0 0 60px rgba(49,230,255,.25);color:#0a1826}
 .cfIcon{font-family:'Black Han Sans',sans-serif;font-size:44px;line-height:1;margin-bottom:4px;font-style:italic;color:#12202e;text-shadow:-3px 0 0 rgba(255,60,80,.75), 3px 0 0 rgba(40,200,255,.75);animation:tsBob 2.2s ease-in-out infinite}
+.cfIconSvg{color:var(--cy2);text-shadow:none;font-size:42px;font-style:normal}
 .cfTitle{font-family:'Black Han Sans',sans-serif;font-size:46px;letter-spacing:4px;font-style:italic;transform:skew(-5deg);color:#0d1a28;text-shadow:3px 3px 0 var(--yl)}
 .cfSub{font-size:13.5px;font-weight:800;margin-top:8px;color:#20364c;letter-spacing:1px}
 .cfBtns{display:flex;gap:14px;justify-content:center;margin-top:18px;flex-wrap:wrap}
@@ -1015,7 +1033,7 @@ body.layout-edit #joyHint{display:none}
   <div class="iosCard">
     <img src="icon-180.png" class="iosIcon" alt="">
     <div class="iosTxt"><b>홈 화면에 추가하고 앱처럼 즐기세요!</b><br>사파리 하단 <span class="iosShare">공유 ↑</span> → <b>"홈 화면에 추가"</b></div>
-    <button id="iosClose" class="iosX">✕</button>
+    <button id="iosClose" class="iosX" data-ic="x"></button>
   </div>
 </div>
 <div id="loadScr">
@@ -1030,11 +1048,12 @@ body.layout-edit #joyHint{display:none}
   <div id="fpsBox"><span id="fpsVal">60</span> FPS</div>
   <div id="topbar">
     <div class="tchip"><div class="score-lbl">TIME</div><div id="timer">00:00</div></div>
-    <div class="tchip" id="scoreChip"><div class="score-lbl">SCORE · 5킬 승리</div><div><span id="scoreP">0</span><span id="scoreMid">:</span><span id="scoreB">0</span></div></div>
-    <div class="tchip" id="ffaBoard" style="display:none"><div class="score-lbl">순위 · 5킬 승리</div><div id="ffaRows"></div></div>
+    <div class="tchip" id="scoreChip"><div class="score-lbl" id="scoreChipLbl">SCORE · 5킬 승리</div><div><span id="scoreP">0</span><span id="scoreMid">:</span><span id="scoreB">0</span></div></div>
+    <div class="tchip" id="ffaBoard" style="display:none"><div class="score-lbl" id="ffaBoardLbl">순위 · 5킬 승리</div><div id="ffaRows"></div></div>
     <div class="tchip" id="teamBoard" style="display:none">
-      <div class="score-lbl">TEAM · 전멸 승리</div>
-      <div id="teamAliveRow"><span id="teamAliveMine">0</span><span id="teamAliveMid">vs</span><span id="teamAliveTheirs">0</span></div>
+      <div class="score-lbl" id="teamScoreLbl">TEAM · 처치 점수</div>
+      <div id="teamScoreRow"><span id="teamScoreMine">0</span><span id="teamScoreMid">:</span><span id="teamScoreTheirs">0</span></div>
+      <div id="teamAliveRow"><span class="taLbl">생존</span><span id="teamAliveMine">0</span><span id="teamAliveMid">vs</span><span id="teamAliveTheirs">0</span></div>
       <div id="teamRoster"></div>
     </div>
   </div>
@@ -1052,26 +1071,26 @@ body.layout-edit #joyHint{display:none}
   <div id="weaponBox">
     <div id="abilityRow">
       <div class="abIc" id="abUlt"><div id="ultCd"><div id="ultCdRing"></div><div id="ultCdIc"><span id="ultPct">0%</span></div></div><span class="abKey" id="abUltKey">Q</span></div>
-      <div class="abIc" id="abRoll"><div id="rollCd"><div id="rollCdRing"></div><div id="rollCdIc">↻</div></div><span class="abKey" id="abRollKey">SHIFT</span></div>
+      <div class="abIc" id="abRoll"><div id="rollCd"><div id="rollCdRing"></div><div id="rollCdIc" data-ic="rotate-cw"></div></div><span class="abKey" id="abRollKey">SHIFT</span></div>
     </div>
     <div id="wepCard">
       <div id="wepIconWrap"><div id="wepIcon"></div><div id="wepCdOverlay"></div></div>
-      <div id="wepAmmo"><span>∞</span></div>
+      <div id="wepAmmo"><span data-ic="infinity"></span></div>
     </div>
   </div>
   <div id="joyBase"><div id="joyKnob"></div><div id="joyHint">끝까지 밀면 달리기</div></div>
-  <div class="btn" id="bFire"><div class="ic">⊕</div><div class="lb">조준·발사</div></div>
-  <div class="btn" id="bJump"><div class="ic">▲</div><div class="lb">점프</div></div>
-  <div class="btn" id="bRoll"><div class="ic">↻</div><div class="lb">구르기</div></div>
+  <div class="btn" id="bFire"><div class="ic" data-ic="crosshair"></div><div class="lb">조준·발사</div></div>
+  <div class="btn" id="bJump"><div class="ic" data-ic="chevron-up"></div><div class="lb">점프</div></div>
+  <div class="btn" id="bRoll"><div class="ic" data-ic="rotate-cw"></div><div class="lb">구르기</div></div>
   <div class="btn" id="bUlt"><div class="ic">Q</div><div class="lb" id="bUltPct">0%</div><div id="bUltRing"></div></div>
-  <div class="btn" id="bCrouch"><div class="ic">▼</div><div class="lb">앉기</div></div>
-  <div class="btn" id="bTurn"><div class="ic">↺</div><div class="lb">뒤돌기</div></div>
+  <div class="btn" id="bCrouch"><div class="ic" data-ic="chevron-down"></div><div class="lb">앉기</div></div>
+  <div class="btn" id="bTurn"><div class="ic" data-ic="rotate-ccw"></div><div class="lb">뒤돌기</div></div>
   <div class="btn" id="bPick"><div class="ic">E</div><div class="lb">줍기·버리기</div></div>
-  <div id="bPause"><div class="ic">❚❚</div></div>
+  <div id="bPause"><div class="ic" data-ic="pause"></div></div>
   <div id="dmgLayer"></div>
   <div id="nickLabelLayer"></div>
   <div id="myBuffs"></div>
-  <div id="enemyHpBar"><div id="enemyBuffs"></div><div id="enemyHpName"></div><div id="enemyHpTrack"><div id="enemyHpFill"></div></div></div>
+  <div id="enemyHpBar"><div id="enemyBuffs"></div><div id="enemyHpTrack"><div id="enemyHpFill"></div></div></div>
   <div id="respawnOvl"><div id="respawnBig">3</div><div id="respawnLbl">리스폰까지</div><div id="respawnKiller"></div></div>
   <div id="dmgVig"></div>
   <div id="scope">
@@ -1191,7 +1210,7 @@ body.layout-edit #joyHint{display:none}
 <div class="ovl scr" id="tutorialScr" style="display:none">
   <div class="tutCard">
     <div class="tutTitle" id="tutTitle">조작법</div>
-    <div class="tutIcon" id="tutIcon">🎮</div>
+    <div class="tutIcon" id="tutIcon" data-ic="gamepad"></div>
     <div class="tutBody" id="tutBody"></div>
     <div class="tutDots" id="tutDots"></div>
     <div class="tutBtns">
@@ -1208,21 +1227,21 @@ body.layout-edit #joyHint{display:none}
     <div class="lbLeft">
       <h1 class="lbTitle">ANIMAL <span>ARENA</span></h1>
       <div class="lbMenu">
-        <button class="mItem play" id="lbPlay"><span class="mArrow">➔</span><span class="mTxt">PLAY</span></button>
-        <button class="mItem" id="lbModeChange"><span class="mArrow">➔</span><span class="mTxt">모드 변경<small id="lbModeChangeSub">데스매치 1vs1</small></span></button>
-        <button class="mItem" id="lbChar"><span class="mArrow">➔</span><span class="mTxt">캐릭터 선택</span></button>
-        <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow">➔</span><span class="mTxt">조작키 설정</span></button>
-        <button class="mItem" id="lbFriends"><span class="mArrow">➔</span><span class="mTxt">친구</span></button>
-        <button class="mItem" id="lbSettings"><span class="mArrow">➔</span><span class="mTxt">환경설정</span></button>
-        <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow">➔</span><span class="mTxt">버튼 위치 설정</span></button>
-        <button class="mItem" id="lbTutorial"><span class="mArrow">➔</span><span class="mTxt">튜토리얼</span></button>
-        <button class="mItem mExitOnly" id="lbExit"><span class="mArrow">➔</span><span class="mTxt">게임 종료</span></button>
+        <button class="mItem play" id="lbPlay"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">PLAY</span></button>
+        <button class="mItem" id="lbModeChange"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">모드 변경<small id="lbModeChangeSub">데스매치 1vs1</small></span></button>
+        <button class="mItem" id="lbChar"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">캐릭터 선택</span></button>
+        <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">조작키 설정</span></button>
+        <button class="mItem" id="lbFriends"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">친구</span></button>
+        <button class="mItem" id="lbSettings"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">환경설정</span></button>
+        <button class="mItem mTouchOnly" id="lbLayout"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">버튼 위치 설정</span></button>
+        <button class="mItem" id="lbTutorial"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">튜토리얼</span></button>
+        <button class="mItem mExitOnly" id="lbExit"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">게임 종료</span></button>
       </div>
     </div>
     <div class="lbRight">
       <div class="lbStatRow">
-        <button type="button" id="lbRankLevel" title="랭크 · 레벨 보기">
-          <div class="ltIcon" id="ltIcon"><span></span><div class="llBadge" id="llBadge">1</div></div>
+        <button type="button" id="lbRankLevel" title="랭크 진행도 보기">
+          <div class="ltIcon" id="ltIcon"><span></span></div>
           <div class="ltInfo">
             <div class="ltName" id="ltName">브론즈</div>
             <div class="ltRp" id="ltRp">0 RP</div>
@@ -1241,7 +1260,7 @@ body.layout-edit #joyHint{display:none}
           <div class="tpSlot" id="tpSlotR" style="display:none"></div>
         </div>
         <div class="lbNickWrap">
-          <div class="lbNick" id="lbNick" title="터치하여 닉네임 변경(설정 화면으로 이동)">만찐두빵 <span class="lbNickEdit">✎</span></div>
+          <div class="lbNick" id="lbNick" title="터치하여 닉네임 변경(설정 화면으로 이동)">만찐두빵 <span class="lbNickEdit" data-ic="pencil"></span></div>
           <div class="lbPvName" id="pvName">토끼</div>
         </div>
         <div class="tpLinks">
@@ -1279,20 +1298,20 @@ body.layout-edit #joyHint{display:none}
   </div>
 </div>
 
-<!-- ===== 랭크 · 레벨 ===== -->
+<!-- ===== 랭크 진행도 ===== -->
 <div class="ovl scr" id="rankScr" style="display:none">
-  <h1 style="font-size:28px">랭크 · 레벨</h1>
+  <h1 style="font-size:28px">랭크 진행도</h1>
   <div class="rsLevelRow">
-    <div class="rsLevelIcon" id="rsLevelIcon">Lv.1</div>
+    <div class="rsLevelIcon" id="rsLevelIcon">B</div>
     <div class="rsLevelInfo">
-      <div class="rsLevelLbl">계정 레벨</div>
+      <div class="rsLevelLbl" id="rsLevelLbl">현재 랭크</div>
       <div class="ltBar"><div class="ltBarFill" id="rsLevelBarFill"></div></div>
     </div>
   </div>
   <div class="rsTrackWrap">
     <div class="rsTrack" id="rsTrack"></div>
   </div>
-  <button class="pBtn pResume" id="rankBack" style="width:150px;margin-top:10px">← 뒤로</button>
+  <button class="pBtn pResume" id="rankBack" style="width:150px;margin-top:10px"><span class="btnIc" data-ic="arrow-left"></span> 뒤로</button>
 </div>
 
 <!-- ===== 조작키 설정 ===== -->
@@ -1302,7 +1321,7 @@ body.layout-edit #joyHint{display:none}
   <div id="keyList"></div>
   <div style="display:flex;gap:12px;margin-top:18px">
     <button class="pBtn" id="keysReset" style="width:150px">기본값 복원</button>
-    <button class="pBtn pResume" id="keysBack" style="width:150px">← 뒤로</button>
+    <button class="pBtn pResume" id="keysBack" style="width:150px"><span class="btnIc" data-ic="arrow-left"></span> 뒤로</button>
   </div>
 </div>
 
@@ -1324,7 +1343,7 @@ body.layout-edit #joyHint{display:none}
 <!-- ===== 팀 파티: 친구 목록에서 선택해 초대 — 2vs2/3vs3 전용 ===== -->
 <div class="ovl" id="tpInviteOvl" style="display:none;z-index:78">
   <div class="cfBanner">
-    <div class="cfIcon">👥</div>
+    <div class="cfIcon cfIconSvg" data-ic="users"></div>
     <div class="cfTitle">친구 초대</div>
     <div class="cfSub">초대할 친구를 선택하세요 (온라인 친구만 초대 가능)</div>
     <div id="tpInviteList" class="friendList"></div>
@@ -1337,7 +1356,7 @@ body.layout-edit #joyHint{display:none}
 <!-- ===== 파티 초대 수신 알림 ===== -->
 <div class="ovl" id="tpInviteToast" style="display:none;z-index:90">
   <div class="cfBanner">
-    <div class="cfIcon">👥</div>
+    <div class="cfIcon cfIconSvg" data-ic="users"></div>
     <div class="cfTitle">파티 초대</div>
     <div class="cfSub" id="tpInviteToastMsg">님이 파티에 초대했습니다</div>
     <div class="cfBtns">
@@ -1352,7 +1371,7 @@ body.layout-edit #joyHint{display:none}
   <h1 style="font-size:30px">모드 선택</h1>
   <div class="modeCards grid6" id="queueModeGrid"></div>
   <div class="modeScrFoot">
-    <button class="pBtn" id="modeBack" style="width:130px">← 뒤로</button>
+    <button class="pBtn" id="modeBack" style="width:130px"><span class="btnIc" data-ic="arrow-left"></span> 뒤로</button>
   </div>
 </div>
 
@@ -1406,6 +1425,45 @@ body.layout-edit #joyHint{display:none}
 <script>window.__PVP_SERVER = "wss://animal-arena-server-mwjl.onrender.com";</script>
 <script>
 'use strict';
+/* =====================================================================
+   ICONS — 통일된 벡터 아이콘(Lucide 스타일 인라인 SVG). 모든 이모지를 대체.
+   licSvg('name') 로 문자열 생성, [data-ic] 요소는 hydrateIcons()로 자동 치환.
+   ===================================================================== */
+const LUCIDE = {
+  'chevron-right':'<path d="m9 18 6-6-6-6"/>',
+  'chevron-left':'<path d="m15 18-6-6 6-6"/>',
+  'chevron-up':'<path d="m18 15-6-6-6 6"/>',
+  'chevron-down':'<path d="m6 9 6 6 6-6"/>',
+  'arrow-left':'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  'arrow-right':'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  'pencil':'<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  'rotate-cw':'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  'rotate-ccw':'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  'refresh-cw':'<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/>',
+  'pause':'<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>',
+  'infinity':'<path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/>',
+  'crosshair':'<circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/>',
+  'target':'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  'gamepad':'<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>',
+  'zap':'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  'users':'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  'check':'<path d="M20 6 9 17l-5-5"/>',
+  'x':'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  'trophy':'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  'chevron-double-right':'<path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/>',
+};
+function licSvg(name, cls){
+  const p=LUCIDE[name]; if(!p) return '';
+  return '<svg class="lic'+(cls?(' '+cls):'')+'" viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg>';
+}
+function hydrateIcons(root){
+  const scope=root||document;
+  scope.querySelectorAll('[data-ic]:not([data-ic-done])').forEach(el=>{
+    const name=el.getAttribute('data-ic');
+    if(LUCIDE[name]){ el.innerHTML=licSvg(name); el.setAttribute('data-ic-done','1'); }
+  });
+}
+if(document.readyState!=='loading') hydrateIcons(); else document.addEventListener('DOMContentLoaded',()=>hydrateIcons());
 /* =====================================================================
    ANIMAL ARENA — mobile 3rd-person shooter prototype
    Modules: Config / Audio / Input / Models / Arena / Weapons /
@@ -1502,22 +1560,30 @@ const Stats = {
   teamWins:0, teamLosses:0, // 팀전(빠른 매칭) 전용 기록 — 랭킹전 RP/승패 기록에는 영향 없음
   load(){ try{ const s=JSON.parse(localStorage.getItem('aa_stats')||'{}'); Object.assign(this,s); }catch(e){} },
   save(){ try{ localStorage.setItem('aa_stats', JSON.stringify({wins:this.wins,losses:this.losses,draws:this.draws,kills:this.kills,deaths:this.deaths,games:this.games,streak:this.streak,bestStreak:this.bestStreak,teamWins:this.teamWins,teamLosses:this.teamLosses})); }catch(e){} },
-  record(result, kills, deaths){ // result: 'win'|'loss'|'draw'
+  record(result, kills, deaths, opts){ // result: 'win'|'loss'|'draw'  opts:{ranked,margin}
     this.games++; this.kills+=kills||0; this.deaths+=deaths||0;
     if(result==='win'){ this.wins++; this.streak++; if(this.streak>this.bestStreak) this.bestStreak=this.streak; }
     else if(result==='loss'){ this.losses++; this.streak=0; }
     else { this.draws++; }
     this.save();
-    AccountLevel.add(result==='win'?25:(result==='draw'?14:10));
+    // 경험치 획득 → 랭크 상승(통합). 랭킹전은 점수차(margin)에 따라 더 많은 경험치.
+    const o=opts||{}; const won=result==='win';
+    const margin=Math.max(0,Math.min(5,o.margin||0));
+    let xp;
+    if(o.ranked) xp = won ? (30+margin*4) : (result==='draw'?16:(12+margin*2));
+    else         xp = won ? 25 : (result==='draw'?14:10);
+    Rank.addXp(xp, result==='draw'?null:won);
   },
-  recordTeam(won){ if(won) this.teamWins++; else this.teamLosses++; this.save(); AccountLevel.add(won?20:8); },
+  recordTeam(won){ if(won) this.teamWins++; else this.teamLosses++; this.save(); Rank.addXp(won?20:8, won); },
   reset(){ this.wins=this.losses=this.draws=this.kills=this.deaths=this.games=this.streak=this.bestStreak=this.teamWins=this.teamLosses=0; this.save(); },
   kd(){ return this.deaths>0 ? (this.kills/this.deaths).toFixed(2) : String(this.kills); },
   winRate(){ const t=this.wins+this.losses+this.draws; return t>0 ? Math.round(this.wins/t*100) : 0; }
 };
 Stats.load();
 
-/* ---------------- 랭킹전 (RP·티어) ---------------- */
+/* ---------------- 랭크 (경험치 = 랭크로 통합) ----------------
+   기존의 '계정 레벨'과 '랭킹전 RP·티어'를 하나로 합쳤다.
+   이제 별도의 레벨 개념 없이, 경험치(xp)를 모으면 랭크(티어)가 올라간다. */
 const TIERS = [
   { key:'bronze',   name:'브론즈',   min:0,    color:'#cd7f4d', glow:'rgba(205,127,77,.5)' },
   { key:'silver',   name:'실버',     min:400,  color:'#b8c4d0', glow:'rgba(184,196,208,.5)' },
@@ -1526,51 +1592,46 @@ const TIERS = [
   { key:'diamond',  name:'다이아',   min:1600, color:'#5cc6ff', glow:'rgba(92,198,255,.6)' },
   { key:'master',   name:'마스터',   min:2000, color:'#c264ff', glow:'rgba(194,100,255,.65)' }
 ];
+function tierAt(xp){ let t=TIERS[0]; for(const x of TIERS){ if(xp>=x.min) t=x; } return t; }
 const Rank = {
-  rp:0, rankWins:0, rankLosses:0, placed:false,
-  load(){ try{ const s=JSON.parse(localStorage.getItem('aa_rank')||'{}'); Object.assign(this,s); }catch(e){} },
-  save(){ try{ localStorage.setItem('aa_rank', JSON.stringify({rp:this.rp,rankWins:this.rankWins,rankLosses:this.rankLosses,placed:this.placed})); }catch(e){} },
-  tier(){ let t=TIERS[0]; for(const x of TIERS){ if(this.rp>=x.min) t=x; } return t; },
+  xp:0, wins:0, losses:0,
+  _lastGain:null,
+  load(){
+    try{
+      const s=JSON.parse(localStorage.getItem('aa_rank')||'{}');
+      if(typeof s.xp==='number') this.xp=s.xp;
+      if(typeof s.wins==='number') this.wins=s.wins;
+      if(typeof s.losses==='number') this.losses=s.losses;
+      // 구버전 데이터 마이그레이션: 예전 랭크 RP + 별도 계정레벨 XP를 하나의 xp로 통합
+      if(!this.xp){
+        let mig=0;
+        if(typeof s.rp==='number') mig+=s.rp;
+        try{ const lv=JSON.parse(localStorage.getItem('aa_level')||'{}'); if(typeof lv.xp==='number') mig+=lv.xp; }catch(e){}
+        if(mig>0) this.xp=mig;
+      }
+      if(!this.wins && typeof s.rankWins==='number') this.wins=s.rankWins;
+      if(!this.losses && typeof s.rankLosses==='number') this.losses=s.rankLosses;
+      this.save();
+      try{ localStorage.removeItem('aa_level'); }catch(e){}
+    }catch(e){}
+  },
+  save(){ try{ localStorage.setItem('aa_rank', JSON.stringify({xp:this.xp,wins:this.wins,losses:this.losses})); }catch(e){} },
+  tier(){ return tierAt(this.xp); },
   nextTier(){ const cur=this.tier(); const i=TIERS.indexOf(cur); return i<TIERS.length-1?TIERS[i+1]:null; },
   // 티어 내 진행률 (0~1)
-  progress(){ const cur=this.tier(), nxt=this.nextTier(); if(!nxt) return 1; return Math.max(0,Math.min(1,(this.rp-cur.min)/(nxt.min-cur.min))); },
-  // 점수차(margin)로 획득/손실 RP 계산
-  gain(won, margin){
-    margin=Math.max(0,Math.min(5,margin||0));
-    let delta;
-    if(won){ delta = 20 + margin*3; }        // 승: 20(접전)~35(완승)
-    else   { delta = -(14 + margin*3); }      // 패: -14(접전)~-29(완패)
-    const before=this.rp;
-    this.rp=Math.max(0, this.rp+delta);
-    this.placed=true;
-    if(won) this.rankWins++; else this.rankLosses++;
+  progress(){ const cur=this.tier(), nxt=this.nextTier(); if(!nxt) return 1; return Math.max(0,Math.min(1,(this.xp-cur.min)/(nxt.min-cur.min))); },
+  // 경험치 획득 → 랭크 상승. won: true/false면 승/패 카운트도 갱신(null이면 카운트 제외).
+  addXp(amount, won){
+    const before=this.xp, tierBefore=tierAt(before);
+    this.xp=Math.max(0, this.xp+amount);
+    if(won===true) this.wins++; else if(won===false) this.losses++;
     this.save();
-    return { delta, before, after:this.rp, tierBefore:tierAt(before), tierAfter:this.tier() };
+    this._lastGain={ delta:amount, before, after:this.xp, tierBefore, tierAfter:this.tier() };
+    return this._lastGain;
   },
-  reset(){ this.rp=0; this.rankWins=0; this.rankLosses=0; this.placed=false; this.save(); }
+  reset(){ this.xp=0; this.wins=0; this.losses=0; this._lastGain=null; this.save(); }
 };
-function tierAt(rp){ let t=TIERS[0]; for(const x of TIERS){ if(rp>=x.min) t=x; } return t; }
 Rank.load();
-
-/* ---------------- 계정 레벨 (티어와 별도 관리) ---------------- */
-const AccountLevel = {
-  xp:0, level:1,
-  load(){ try{ const s=JSON.parse(localStorage.getItem('aa_level')||'{}'); Object.assign(this,s); }catch(e){} },
-  save(){ try{ localStorage.setItem('aa_level', JSON.stringify({xp:this.xp,level:this.level})); }catch(e){} },
-  xpForLevel(lv){ return 100*lv*lv; }, // 레벨 lv 완주에 필요한 누적 XP
-  add(amount){
-    this.xp+=amount;
-    while(this.xp>=this.xpForLevel(this.level)) this.level++;
-    this.save();
-  },
-  progress(){
-    const prev=this.level>1 ? this.xpForLevel(this.level-1) : 0;
-    const next=this.xpForLevel(this.level);
-    return Math.max(0,Math.min(1,(this.xp-prev)/Math.max(1,next-prev)));
-  },
-  reset(){ this.xp=0; this.level=1; this.save(); }
-};
-AccountLevel.load();
 
 /* ---------------- KEY BINDS (조작키 커스텀) ---------------- */
 const KeyBinds = {
@@ -3938,6 +3999,14 @@ class Player extends Character {
       const camY=Math.atan2(cd2.x,cd2.z), camP=Math.asin(Math.max(-1,Math.min(1,cd2.y)));
       const eye=new THREE.Vector3(this.pos.x,this.pos.y+this.eyeY,this.pos.z);
       const foes=[Game.bot,(typeof Net!=='undefined'&&Net.opp)].filter(c=>c&&!c.dead&&c!==this);
+      // 적 소환체(어미닭/여우 분신)도 조준 대상에 포함 — 소환체를 공격할 수 없던 문제 수정
+      if(typeof Summons!=='undefined'){
+        for(const s of Summons.all()){
+          if(s.owner===this) continue; // 내 소환체는 제외
+          const sy=(s.kind==='hen'?1.25:0.8);
+          foes.push({ pos:{ x:s.pos.x, y:s.y+sy-0.85, z:s.pos.z }, dead:false });
+        }
+      }
       let inAim=false;
       for(const c of foes){
         const vx=c.pos.x-eye.x, vy=(c.pos.y+0.85)-eye.y, vz=c.pos.z-eye.z;
@@ -4495,12 +4564,16 @@ const Game = (() => {
   // 매칭 시간 초과 시 봇 자동전환: start()의 개인전(aiFfa) 분기를 임의 인원수로 확장한 버전.
   // 승패 판정은 기존 오프라인 개인전과 동일하게 개인 킬수 기준(팀 취합 판정 없음) — team 태그는 Phase 4의 팀 외곽선/팀킬 방지용으로만 사용.
   function startWithBotFill(botCount, assignTeams){
+    // 2vs2/3vs3(assignTeams) 봇 매치는 팀 전용 FPS 맵, 1vs1은 솔로 맵
+    currentMap = pickMapKey(!!assignTeams);
+    // 매칭 완료 연출: 여러 맵이 빠르게 넘어가다 최종 맵에서 멈추는 룰렛 후 실제 시작
+    showMapRoulette(currentMap, ()=>_startBotFillMatch(botCount, assignTeams));
+  }
+  function _startBotFillMatch(botCount, assignTeams){
     lastDiff='normal';
     disposeAllChars();
     aiBots=[];
     Projectiles.clear(); Summons.clear();
-    // 2vs2/3vs3(assignTeams) 봇 매치는 팀 전용 FPS 맵, 1vs1은 솔로 맵
-    currentMap = pickMapKey(!!assignTeams);
     buildArena();
     const pSpec=selectedSpecies||'rabbit';
     const SPAWNS=[[-14,0],[14,0],[0,-14],[0,14],[-11,11],[11,-11]];
@@ -4579,15 +4652,29 @@ const Game = (() => {
     const pk=player.kills;
     const bk = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : bot.kills;
     const won = pk>bk, draw = pk===bk;
-    if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk); }
+    if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk, {ranked:rankedMode, margin:Math.abs(pk-bk)}); }
     $('winTitle').textContent = draw?'DRAW':(won?'VICTORY!':'DEFEAT');
     $('winTitle').style.color = draw?'#ffd166':(won?'#3ef58a':'#ff5252');
     if(aiBots.length>1){ $('winSub').textContent='타임어택 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=`${pk} : ${bk}  ·  타임어택 종료`; $('winStandings').style.display='none'; }
+    showRankGain(rankedMode && !trainingMode);
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     draw?Sfx.win():(won?Sfx.win():Sfx.lose());
     BGM.setScene('menu');
+  }
+  // 승리/패배 화면의 랭크(경험치) 획득 표시 — 통합 랭크 시스템(경험치=랭크)
+  function showRankGain(show){
+    const rpEl=$('winRp'); if(!rpEl) return;
+    if(!show){ rpEl.style.display='none'; return; }
+    const res=Rank._lastGain||{delta:0,after:Rank.xp,tierBefore:Rank.tier(),tierAfter:Rank.tier()};
+    const nxt=Rank.nextTier();
+    const toNext = nxt ? (' · 다음 '+nxt.name+'까지 '+Math.max(0,nxt.min-Rank.xp)+' XP') : ' · 최고 랭크';
+    rpEl.style.display='flex';
+    rpEl.innerHTML=`<span class="wrpDelta up">+${res.delta} XP</span><span class="wrpTotal">${res.tierAfter.name} · ${res.after} XP${toNext}</span>`;
+    if(res.tierAfter.key!==res.tierBefore.key){
+      setTimeout(()=>Game.msg&&Game.msg('랭크 상승! '+res.tierAfter.name), 400);
+    }
   }
   function finishGame(){
     running=false;
@@ -4597,51 +4684,55 @@ const Game = (() => {
     const won=killCam?killCam.won:false;
     hideFFAFinal();
     const topBotK = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : (bot?bot.kills:0);
-    if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0); }
+    if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0, {ranked:rankedMode, margin:Math.abs(player.kills-topBotK)}); }
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
     if(aiBots.length>1){ $('winSub').textContent=fmtTime(time); renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`; $('winStandings').style.display='none'; }
-    // 랭킹전: RP 변동 표시
-    const rpEl=$('winRp');
-    if(rankedMode && rpEl){
-      const margin=Math.abs(player.kills-bot.kills);
-      const res=Rank.gain(won, margin);
-      const sign=res.delta>=0?'+':'';
-      rpEl.style.display='block';
-      rpEl.innerHTML=`<span class="wrpDelta ${res.delta>=0?'up':'down'}">${sign}${res.delta} RP</span><span class="wrpTotal">${res.after} RP · ${res.tierAfter.name}</span>`;
-      // 티어 변동 알림
-      if(res.tierAfter.key!==res.tierBefore.key){
-        const up=res.tierAfter.min>res.tierBefore.min;
-        setTimeout(()=>Game.msg&&Game.msg((up?'티어 승급! ':'티어 강등 ')+res.tierAfter.name), 400);
-      }
-    } else if(rpEl){ rpEl.style.display='none'; }
+    showRankGain(rankedMode && !trainingMode);
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     won?Sfx.win():Sfx.lose();
     BGM.setScene('menu');
     killCam=null;
   }
+  // 팀전 여부: 실제 팀 매칭(Net.teamMode) 또는 봇 대체 팀전(캐릭터에 팀 지정 + 상대 팀 존재)
+  function isTeamGame(){
+    if(typeof Net!=='undefined' && Net.teamMode) return true;
+    return !!(player && player.team!=null && chars && chars.some(c=>c!==player && c.team!=null));
+  }
   function updateScore(){
+    if(!player) return;
     const ffa = typeof Net!=='undefined' && Net.ffa;
-    const teamMode = typeof Net!=='undefined' && Net.teamMode;
-    // 순위표는 개인전 + 봇전(AI 데스매치)에서 사용, 그 외(1대1 PVP·타임어택 등)는 기존 스코어 칩. 팀전은 전용 팀 보드.
-    const board = !teamMode && (ffa || (!pvpMode && !trainingMode && !!bot && (aiBots.length>1 || gameMode==='deathmatch')));
-    $('scoreChip').style.display = (board||teamMode) ? 'none' : '';
+    const team = isTeamGame();
+    // 게임 모드별 점수 UI 자동 적용:
+    //  · 팀전(2vs2/3vs3) → 팀 처치 점수 보드   · 다인 개인전/봇전(3인+) → 순위 보드   · 1vs1 → P:B 스코어 칩
+    const board = !team && ( (ffa && Net.peers && Net.peers.length>1) || (!pvpMode && !trainingMode && aiBots.length>1) );
+    $('scoreChip').style.display = (board||team) ? 'none' : '';
     $('ffaBoard').style.display = board ? '' : 'none';
-    $('teamBoard').style.display = teamMode ? '' : 'none';
+    $('teamBoard').style.display = team ? '' : 'none';
+    // 모드별 점수 라벨 자동 적용
+    const modeLbl = (gameMode==='timeattack') ? '시간내 최다 처치' : (CFG.killTarget+'킬 승리');
+    const scl=$('scoreChipLbl'); if(scl && scl.textContent!==('SCORE · '+modeLbl)) scl.textContent='SCORE · '+modeLbl;
+    const fbl=$('ffaBoardLbl'); if(fbl && fbl.textContent!==('순위 · '+modeLbl)) fbl.textContent='순위 · '+modeLbl;
+    const tsl=$('teamScoreLbl'); if(tsl){ const tl=(gameMode==='timeattack')?'TEAM · 시간내 최다 처치':'TEAM · 처치 점수'; if(tsl.textContent!==tl) tsl.textContent=tl; }
     $('scoreP').textContent=player.kills;
     if(ffa){ let top=0; for(const p of Net.peers){ top=Math.max(top,p.kills||0); } $('scoreB').textContent=top; }
     else if(aiBots.length>1){ let top=0; for(const b of aiBots){ top=Math.max(top,b.kills||0); } $('scoreB').textContent=top; }
     else $('scoreB').textContent=bot?bot.kills:0;
     if(board) updateFFABoard();
-    if(teamMode) updateTeamBoard();
+    if(team) updateTeamBoard();
   }
-  // 팀전 HUD: 우리 팀원 목록(생존 표시) + 우리팀/상대팀 생존 인원
+  // 팀전 HUD: 우리팀/상대팀 처치 점수(실시간) + 생존 인원 + 팀원 목록
   function updateTeamBoard(){
     if(!chars || !chars.length) return;
-    const mine=chars.filter(c=>c.team===Net.myTeam);
-    const theirs=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==Net.myTeam);
+    const myTeam=myTeamKey();
+    const mine=chars.filter(c=>c.team===myTeam);
+    const theirs=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==myTeam);
+    // 각 팀 처치 점수(팀원 킬 합계) — 실시간 갱신
+    const myKills=mine.reduce((s,c)=>s+(c.kills||0),0), theirKills=theirs.reduce((s,c)=>s+(c.kills||0),0);
+    const sm=$('teamScoreMine'), st=$('teamScoreTheirs');
+    if(sm) sm.textContent=myKills; if(st) st.textContent=theirKills;
     const mineAlive=mine.filter(c=>!c.dead).length, theirsAlive=theirs.filter(c=>!c.dead).length;
     const a=$('teamAliveMine'), b2=$('teamAliveTheirs');
     if(a) a.textContent=mineAlive; if(b2) b2.textContent=theirsAlive;
@@ -4862,7 +4953,7 @@ const Game = (() => {
     const vn=SPECIES[victimKind]?SPECIES[victimKind].name:'?';
     const wn=weaponName||'맨주먹';
     const row=document.createElement('div'); row.className='kfRow';
-    row.innerHTML='<span class="kfA">'+kn+'</span><span class="kfW">▸'+wn+'▸</span><span class="kfB">'+vn+'</span>';
+    row.innerHTML='<span class="kfA">'+kn+'</span><span class="kfW">'+licSvg('chevron-right','kfIc')+wn+licSvg('chevron-right','kfIc')+'</span><span class="kfB">'+vn+'</span>';
     feed.appendChild(row);
     while(feed.children.length>4) feed.removeChild(feed.firstChild);
     setTimeout(()=>{ if(row.parentNode) row.parentNode.removeChild(row); }, 5000);
@@ -4927,18 +5018,26 @@ const Game = (() => {
     const frac=Math.max(0,Math.min(1,enemy.hp/maxHp));
     const fill=$('enemyHpFill'); if(fill){ fill.style.width=(frac*100)+'%';
       fill.style.background = frac>0.5?'linear-gradient(90deg,#ff4d5e,#ff8a7a)':frac>0.25?'linear-gradient(90deg,#ff8a3d,#ffb44d)':'linear-gradient(90deg,#ff2d3e,#ff5e6e)'; }
-    const nm=$('enemyHpName'); if(nm){ const label=enemy.name||(SPECIES[enemy.kind]?SPECIES[enemy.kind].name:'상대'); if(nm.textContent!==label) nm.textContent=label; }
+    // 이름은 머리 위 상시 닉네임(updateNicknameLabels)이 단독으로 표시 — HP바에는 중복 표기하지 않음
     // 버프/디버프 뱃지 (변경 시에만 DOM 갱신)
     const eb=$('enemyBuffs'); if(eb){ const html=statusBadges(enemy); if(eb._html!==html){ eb._html=html; eb.innerHTML=html; } }
     bar.classList.add('show');
   }
-  // 인게임 상시 닉네임: 모든 캐릭터(플레이어/봇/원격 상대) 머리 위에 항상 표시 + 팀 색상(파랑/빨강)
+  // 인게임 상시 닉네임: 모든 캐릭터 머리 위에 항상 표시. 팀 구분은 닉네임 색상으로만(외곽선 없음).
+  //  - 아군(나 + 같은 팀): 파란색 닉네임
+  //  - 적군(다른 팀 / 개인전의 나 외 전원): 빨간색 닉네임
   const nickLabelPool=new Map(); // Character 인스턴스 -> DOM 엘리먼트 (매치가 바뀌면 chars에 없는 엔트리는 자동 정리됨)
+  function myTeamKey(){
+    if(typeof Net!=='undefined' && Net.myTeam!=null) return Net.myTeam;
+    if(player && player.team!=null) return player.team;
+    return null;
+  }
   function updateNicknameLabels(){
     const layer=$('nickLabelLayer'); if(!layer) return;
     const list=(chars&&chars.length)?chars:[player,bot].filter(Boolean);
     const active=new Set(list.filter(Boolean));
     for(const [c,el] of nickLabelPool){ if(!active.has(c)){ el.remove(); nickLabelPool.delete(c); } }
+    const myTeam=myTeamKey();
     for(const c of list){
       if(!c) continue;
       let el=nickLabelPool.get(c);
@@ -4952,39 +5051,13 @@ const Game = (() => {
       el.style.top=((-p.y*0.5+0.5)*innerHeight)+'px';
       const label = c.isPlayer ? (playerNick||'플레이어') : (c.name || (SPECIES[c.kind]?SPECIES[c.kind].name:'상대'));
       if(el._label!==label){ el._label=label; el.textContent=label; }
-      const teamCls = c.team==='red'?'tmred':(c.team==='blue'?'tmblue':'');
-      if(el._teamCls!==teamCls){ if(el._teamCls) el.classList.remove(el._teamCls); if(teamCls) el.classList.add(teamCls); el._teamCls=teamCls; }
-    }
-  }
-  // 팀 구분 캐릭터 외곽선(우리팀 파랑/상대팀 빨강) — inverted-hull 기법: 전체를 살짝 키운 뒤 뒷면만 그려 실루엣만 남김
-  function ensureOutlineMesh(c){
-    if(c._outlineMesh || !c.group) return c._outlineMesh;
-    const origNodes=[]; c.group.traverse(o=>origNodes.push(o));
-    const clone=c.group.clone(true);
-    const cloneNodes=[]; clone.traverse(o=>cloneNodes.push(o));
-    const outlineMat=new THREE.MeshBasicMaterial({color:0xffffff, side:THREE.BackSide});
-    clone.traverse(o=>{ if(o.isMesh) o.material=outlineMat; });
-    clone.scale.setScalar(1.1);
-    c.group.add(clone);
-    c._outlineMesh=clone; c._outlineMat=outlineMat;
-    // 루트(0번째)는 부모(c.group) 변환을 그대로 상속하므로 동기화 대상에서 제외 — 나머지 노드는 애니메이션(팔다리 움직임)을 매 프레임 따라가야 함
-    c._outlinePairs = origNodes.slice(1).map((o,i)=>[o, cloneNodes[i+1]]).filter(pair=>pair[1]);
-    return clone;
-  }
-  function updateTeamOutlines(){
-    const list=(chars&&chars.length)?chars:[player,bot].filter(Boolean);
-    for(const c of list){
-      if(!c || !c.group) continue;
-      if(c.team==='red'||c.team==='blue'){
-        if(!c._outlineMesh) ensureOutlineMesh(c);
-        if(c._outlineMesh){
-          c._outlineMesh.visible=!c.dead;
-          c._outlineMat.color.set(c.team==='red'?0xff3b46:0x3b8bff);
-          for(const [o,cl] of c._outlinePairs){ cl.position.copy(o.position); cl.quaternion.copy(o.quaternion); cl.scale.copy(o.scale); }
-        }
-      } else if(c._outlineMesh){
-        c._outlineMesh.visible=false;
-      }
+      // 팀 판별: 나/같은 팀 = 아군(파랑), 그 외 = 적(빨강)
+      let ally;
+      if(c.isPlayer || c===player) ally=true;
+      else if(myTeam!=null && c.team!=null) ally=(c.team===myTeam);
+      else ally=false;
+      const teamCls = ally ? 'tmblue' : 'tmred';
+      if(el._teamCls!==teamCls){ if(el._teamCls) el.classList.remove(el._teamCls); el.classList.add(teamCls); el._teamCls=teamCls; }
     }
   }
   /* floating damage number at a world position */
@@ -5097,7 +5170,6 @@ const Game = (() => {
       { const cd=new THREE.Vector3(); camera.getWorldDirection(cd); Sfx.setListener(camera.position, cd); }
       updateEnemyHpBar();
       updateNicknameLabels();
-      updateTeamOutlines();
       renderer.render(scene,camera);
       if(shakeAmt>0 && shakeT>0) camera.position.copy(camBase); // restore so next frame's lerp is clean
     } else {
@@ -5131,18 +5203,15 @@ const Game = (() => {
     set('lsWins',Stats.wins); set('lsLosses',Stats.losses); set('lsRate',Stats.winRate()+'%');
     set('lsKD',Stats.kd()); set('lsStreak',Stats.streak); set('lsBest',Stats.bestStreak);
     updateTierBadge();
-    updateLevelBadge();
   }
-  function updateLevelBadge(){
-    const num=$('llBadge'); if(num) num.textContent=AccountLevel.level;
-  }
+  // 좌상단: 현재 랭크(티어)만 표시 — 별도 레벨 표기 없음(통합)
   function updateTierBadge(){
     const t=Rank.tier(); const tierEl=$('lbRankLevel'); if(!tierEl) return;
     tierEl.style.setProperty('--tierCol', t.color);
     tierEl.style.setProperty('--tierGlow', t.glow);
     const iconSpan=document.querySelector('#ltIcon>span'); if(iconSpan) iconSpan.textContent=t.name.charAt(0);
     const nm=$('ltName'); if(nm) nm.textContent=t.name;
-    const rp=$('ltRp'); if(rp){ const nxt=Rank.nextTier(); rp.textContent = nxt ? (Rank.rp+' / '+nxt.min+' RP') : (Rank.rp+' RP · 최고 티어'); }
+    const rp=$('ltRp'); if(rp){ const nxt=Rank.nextTier(); rp.textContent = nxt ? (Rank.xp+' / '+nxt.min+' XP') : (Rank.xp+' XP · 최고 랭크'); }
     const bar=$('ltBarFill'); if(bar) bar.style.width=(Rank.progress()*100)+'%';
   }
   // 랭크 화면: TIERS를 가로 트랙으로 그리고 현재 위치를 표시 (보상 슬롯은 추후 보상 연결 전까지 빈 자리로 표시)
@@ -5151,14 +5220,14 @@ const Game = (() => {
     const curTier=Rank.tier();
     track.innerHTML='';
     TIERS.forEach((t,i)=>{
-      const reached=Rank.rp>=t.min, isCur=(t.key===curTier.key);
+      const reached=Rank.xp>=t.min, isCur=(t.key===curTier.key);
       if(i>0){
         const conn=document.createElement('div'); conn.className='rsConnector'+(reached?' filled':'');
         track.appendChild(conn);
       }
       const node=document.createElement('div'); node.className='rsNode'+(reached?' reached':'')+(isCur?' current':'');
       node.style.setProperty('--tierCol', t.color); node.style.setProperty('--tierGlow', t.glow);
-      const range = TIERS[i+1] ? (t.min+' ~ '+(TIERS[i+1].min-1)+' RP') : (t.min+'+ RP');
+      const range = TIERS[i+1] ? (t.min+' ~ '+(TIERS[i+1].min-1)+' XP') : (t.min+'+ XP');
       node.innerHTML =
         (isCur?'<div class="rsNodePin">현재</div>':'')
         +'<div class="rsNodeIcon"><span>'+t.name.charAt(0)+'</span></div>'
@@ -5167,8 +5236,9 @@ const Game = (() => {
         +'<div class="rsNodeReward">보상 준비 중</div>';
       track.appendChild(node);
     });
-    const lvlIcon=$('rsLevelIcon'); if(lvlIcon) lvlIcon.textContent='Lv.'+AccountLevel.level;
-    const lvlBar=$('rsLevelBarFill'); if(lvlBar) lvlBar.style.width=(AccountLevel.progress()*100)+'%';
+    const lvlIcon=$('rsLevelIcon'); if(lvlIcon){ lvlIcon.textContent=curTier.name.charAt(0); lvlIcon.style.background='linear-gradient(135deg,'+curTier.color+',#0d1e30)'; lvlIcon.style.boxShadow='0 0 14px '+curTier.glow; }
+    const lvlLbl=$('rsLevelLbl'); if(lvlLbl){ const nxt=Rank.nextTier(); lvlLbl.textContent='현재 랭크 · '+curTier.name+' · '+Rank.xp+' XP'+(nxt?(' (다음까지 '+Math.max(0,nxt.min-Rank.xp)+')'):' · 최고 랭크'); }
+    const lvlBar=$('rsLevelBarFill'); if(lvlBar) lvlBar.style.width=(Rank.progress()*100)+'%';
     requestAnimationFrame(()=>{
       const curEl=track.querySelector('.rsNode.current'); const wrap=track.parentElement;
       if(curEl && wrap) wrap.scrollLeft = curEl.offsetLeft - wrap.clientWidth/2 + curEl.offsetWidth/2;
@@ -5258,7 +5328,7 @@ const Game = (() => {
   // 닉네임 표시(머리 위/로비 프리뷰에 항상 표시). 변경은 설정 화면에서(중복/비속어 등 서버 검증) — lbNick 클릭은 설정 화면으로 이동
   function refreshNicknameUI(){
     const nick=$('lbNick'); if(!nick) return;
-    nick.innerHTML=(playerNick||'플레이어')+' <span class="lbNickEdit">✎</span>';
+    nick.innerHTML=(playerNick||'플레이어')+' <span class="lbNickEdit">'+licSvg('pencil')+'</span>';
   }
   refreshNicknameUI();
   function nickOrDefault(spec){ return playerNick || (SPECIES[spec]?SPECIES[spec].name:'플레이어'); }
@@ -5491,16 +5561,16 @@ const Game = (() => {
   // ===== 튜토리얼 =====
   let tutPage=0, tutFirstRun=false;
   const TUT_PAGES=[
-    { icon:'🎯', title:'애니멀 아레나', body:'동물 캐릭터로 1:1 대결을 펼치는 3인칭 슈터입니다.<br>먼저 <b>5킬</b>을 달성하면 승리!' },
-    { icon:'🕹️', title:'이동', body:()=>touch()
+    { icon:'target', title:'애니멀 아레나', body:'동물 캐릭터로 1:1 대결을 펼치는 3인칭 슈터입니다.<br>먼저 <b>5킬</b>을 달성하면 승리!' },
+    { icon:'gamepad', title:'이동', body:()=>touch()
       ? '왼쪽 <span class="tutKey">조이스틱</span>으로 이동합니다.<br>끝까지 밀면 <b>달리기</b>가 됩니다.'
       : '<span class="tutKey">W</span><span class="tutKey">A</span><span class="tutKey">S</span><span class="tutKey">D</span>로 이동, <span class="tutKey">SHIFT</span>로 구르기(회피).<br><span class="tutKey">SPACE</span> 점프, <span class="tutKey">C</span> 앉기.' },
-    { icon:'🔫', title:'조준 & 발사', body:()=>touch()
+    { icon:'crosshair', title:'조준 & 발사', body:()=>touch()
       ? '오른쪽 <b>조준·발사</b> 버튼을 누르고 있으면<br>자동으로 조준하고 발사합니다.<br>적이 조준선에 들어오면 사격해요.'
       : '마우스로 조준, <span class="tutKey">좌클릭</span> 발사.<br><span class="tutKey">우클릭</span>으로 정조준(줌)이 가능합니다.' },
-    { icon:'⚡', title:'궁극기', body:'피해를 주고받으면 <b>궁극기 게이지</b>가 충전됩니다.<br>가득 차면 <span class="tutKey">Q</span> 버튼으로 강력한 고유 궁극기를 사용하세요!' },
-    { icon:'🔄', title:'무기 & 아이템', body:'맵에 떨어진 무기를 <span class="tutKey">E</span>로 줍고,<br>다시 누르면 버립니다. 다양한 무기로 전략을 세우세요.' },
-    { icon:'👥', title:'친구와 대결', body:'PVP에서 <b>방 만들기</b>로 코드를 생성하고<br>친구에게 공유하면 <b>온라인 1:1</b> 대결을 즐길 수 있습니다!' }
+    { icon:'zap', title:'궁극기', body:'피해를 주고받으면 <b>궁극기 게이지</b>가 충전됩니다.<br>가득 차면 <span class="tutKey">Q</span> 버튼으로 강력한 고유 궁극기를 사용하세요!' },
+    { icon:'refresh-cw', title:'무기 & 아이템', body:'맵에 떨어진 무기를 <span class="tutKey">E</span>로 줍고,<br>다시 누르면 버립니다. 다양한 무기로 전략을 세우세요.' },
+    { icon:'users', title:'친구와 대결', body:'PVP에서 <b>방 만들기</b>로 코드를 생성하고<br>친구에게 공유하면 <b>온라인 1:1</b> 대결을 즐길 수 있습니다!' }
   ];
   function touch(){ return document.body.classList.contains('has-touch'); }
   function openTutorial(firstRun){
@@ -5509,7 +5579,7 @@ const Game = (() => {
   }
   function renderTut(){
     const p=TUT_PAGES[tutPage];
-    $('tutIcon').textContent=p.icon;
+    $('tutIcon').innerHTML=licSvg(p.icon);
     $('tutTitle').textContent=p.title;
     $('tutBody').innerHTML = typeof p.body==='function'?p.body():p.body;
     // dots
@@ -6033,7 +6103,8 @@ const Game = (() => {
     hideFFAFinal();
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    // 팀전(빠른 매칭)만 별도 승/패 기록 — 랭킹전 RP/전적에는 영향 없음. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
+    // 팀전(빠른 매칭)만 별도 승/패 기록. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
+    let showRank=false;
     if(Net.teamMode && !Net.party) Stats.recordTeam(won);
     if(Net.teamMode){
       $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료';
@@ -6041,7 +6112,13 @@ const Game = (() => {
       $('winStandings').style.display='flex';
     }
     else if(Net.ffa){ $('winSub').textContent='개인전 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
-    else { $('winSub').textContent=(player?player.kills:0)+' : '+(Net.opp?Net.opp.kills:0); $('winStandings').style.display='none'; }
+    else {
+      // 1대1 온라인 대전: 승/패 기록 + 통합 랭크 경험치
+      const oppK=Net.opp?Net.opp.kills:0;
+      if(!trainingMode){ Stats.record(won?'win':'loss', player?player.kills:0, oppK, {ranked:rankedMode, margin:Math.abs((player?player.kills:0)-oppK)}); showRank=rankedMode; }
+      $('winSub').textContent=(player?player.kills:0)+' : '+oppK; $('winStandings').style.display='none';
+    }
+    showRankGain(showRank);
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     won?Sfx.win():Sfx.lose();
@@ -6171,7 +6248,7 @@ const Game = (() => {
     if(matching) return;
     const txt=document.querySelector('#lbPlay .mTxt'); if(!txt) return;
     const qm=findQueueMode(selectedQueueMode);
-    if(TP.code && qm.size>1 && !TP.isHost) txt.textContent = tpAmIReady() ? '준비완료 ✓' : '준비하기';
+    if(TP.code && qm.size>1 && !TP.isHost) txt.innerHTML = tpAmIReady() ? ('준비완료 '+licSvg('check')) : '준비하기';
     else txt.textContent='PLAY';
   }
   function startBotFallback(gm,size){
