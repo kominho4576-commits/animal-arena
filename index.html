@@ -4732,7 +4732,8 @@ const Game = (() => {
       chars=[player,bot];
     }
     Pickups.init();
-    time=0; running=true; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
+    time=0; running=true; paused=false; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.remove('layout-edit'); $('pauseOvl').style.display='none';
     document.body.classList.add('playing'); BGM.start('battle'); BGM.setScene('battle');
     document.body.classList.add('unlocked');
     // profile: name + avatar (실제 동물 초상화) + 클래스
@@ -4765,7 +4766,9 @@ const Game = (() => {
     chars=[player,bot];
     // spawn ALL weapons around the player for testing
     Pickups.initTraining();
-    time=0; running=true; pvpMode=false; trainingMode=true; killCam=null; document.body.classList.remove('killcam');
+    time=0; running=true; paused=false; pvpMode=false; trainingMode=true; killCam=null; document.body.classList.remove('killcam');
+    // 새 게임은 절대 일시정지/버튼편집 상태로 태어나면 안 됨(이전 판에서 남은 좀비 상태 방지)
+    document.body.classList.remove('layout-edit'); $('pauseOvl').style.display='none';
     document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
@@ -4811,7 +4814,8 @@ const Game = (() => {
     Game.player=player; Game.bot=bot;
     chars=[player,...aiBots];
     Pickups.init();
-    time=0; running=true; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
+    time=0; running=true; paused=false; pvpMode=false; trainingMode=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.remove('layout-edit'); $('pauseOvl').style.display='none';
     document.body.classList.add('playing'); BGM.start('battle'); BGM.setScene('battle');
     document.body.classList.add('unlocked');
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
@@ -5891,7 +5895,13 @@ const Game = (() => {
   bindBtn('lbExit',exitGame);
   bindBtn('keysBack',()=>{ refreshKeyGuide(); refreshAbilityKeys(); showScreen('lobby'); });
   bindBtn('keysReset',()=>{ KeyBinds.reset(); buildKeyList(); refreshKeyGuide(); refreshAbilityKeys(); });
-  bindBtn('loBack',()=>{ document.body.classList.remove('layout-edit'); showScreen('lobby'); });
+  bindBtn('loBack',()=>{
+    document.body.classList.remove('layout-edit');
+    // 게임 중(일시정지) 설정에서 '버튼 위치 설정'에 들어왔다 나오는 경우: 로비로 나가므로
+    // 남아있는 판을 깨끗이 종료해야 좀비 포즈 게임(paused=true)이 다음 판으로 새지 않는다.
+    if(running){ running=false; paused=false; trainingMode=false; document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; BGM.setScene('menu'); }
+    showScreen('lobby');
+  });
   bindBtn('loReset',()=>{ resetBtnLayout(); });
 
   /* ===== 타이틀: 아무 키나 눌러 시작 ===== */
@@ -6381,7 +6391,8 @@ const Game = (() => {
     Net.opp=Net.peers[0]||Net.myBotList[0]||null; bot=Net.opp; Game.player=player; Game.bot=bot;
     chars=[player, ...Net.peers, ...Net.myBotList];
     Pickups.init(Net.seed);
-    time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    time=0; running=true; paused=false; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.remove('layout-edit'); $('pauseOvl').style.display='none';
     document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
@@ -6415,7 +6426,8 @@ const Game = (() => {
     else { player.pos.set(14,0,0); Net.opp.pos.set(-14,0,0); Net.opp.netPos.set(-14,0,0); }
     chars=[player,Net.opp];
     Pickups.init(Net.seed); // 동일 시드로 양쪽 같은 무기 배치
-    time=0; running=true; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    time=0; running=true; paused=false; pvpMode=true; trainingMode=false; Net.ended=false; killCam=null; document.body.classList.remove('killcam');
+    document.body.classList.remove('layout-edit'); $('pauseOvl').style.display='none';
     document.body.classList.add('playing'); document.body.classList.add('unlocked'); BGM.start('battle'); BGM.setScene('battle');
     const pfName=$('pfName'); if(pfName) pfName.textContent=nickOrDefault(pSpec);
     setProfileAvatar(pSpec);
