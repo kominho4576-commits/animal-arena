@@ -6206,7 +6206,8 @@ const Game = (() => {
     // 팀전 전용 상태
     Net.teamMode=false; Net.myTeam=null;
     // 봇 채움 매치(호스트가 봇 시뮬레이션) 전용 상태
-    Net.party=false; Net.myBotList=null; Net.myBotIdx=null; Net._botDeaths=null; Net._botStateTimer=0; }
+    Net.party=false; Net.myBotList=null; Net.myBotIdx=null; Net._botDeaths=null; Net._botStateTimer=0;
+    Net._myWipeT=0; Net._theirWipeT=0; }
 
   function getDeviceToken(){ try{ return localStorage.getItem('aa_token')||''; }catch(e){ return ''; } }
   function saveDeviceIdentity(id,token){ try{ if(id) localStorage.setItem('aa_uid',id); if(token) localStorage.setItem('aa_token',token); }catch(e){} }
@@ -7204,6 +7205,8 @@ const Game = (() => {
     const theirKills=theirs.reduce((s,c)=>s+(c.kills||0),0);
     const target=CFG.killTarget;
     if(gameMode==='deathmatch'){
+      // 데스매치는 리스폰이 있으므로 "팀 전멸"로는 절대 끝내지 않는다.
+      // (순간적인 동시 사망이 lag로 인한 오심 종료를 유발하던 버그) — 오직 팀 처치 합계가 목표에 도달할 때만 종료.
       if(myKills>=target){
         if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:Net.myTeam})); }catch(e){} }
         pvpWin(true); return;
@@ -7213,20 +7216,26 @@ const Game = (() => {
         if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:otherTeam})); }catch(e){} }
         pvpWin(false); return;
       }
+      Net._myWipeT=0; Net._theirWipeT=0;
+      return; // 데스매치는 여기서 종료 판정 끝 (전멸 조건 미적용)
     }
-    // 전멸 조건 (양 모드 공통 백업)
+    // 전멸 조건 (타임어택 등 비-데스매치 전용) — 양쪽 모두 순간 전멸 오심을 막기 위해 짧게 디바운스
     const myAlive=mine.filter(c=>!c.dead).length, theirAlive=theirs.filter(c=>!c.dead).length;
-    if(theirAlive===0){
-      if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:Net.myTeam})); }catch(e){} }
-      pvpWin(true);
-    } else if(myAlive===0){
+    if(theirAlive===0 && myAlive>0){
+      if(!Net._theirWipeT) Net._theirWipeT=performance.now();
+      if(performance.now()-Net._theirWipeT>600){
+        if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:Net.myTeam})); }catch(e){} }
+        pvpWin(true);
+      }
+    } else if(myAlive===0 && theirAlive>0){
+      Net._theirWipeT=0;
       if(!Net._myWipeT) Net._myWipeT=performance.now();
       if(performance.now()-Net._myWipeT>600){ // 상대 쪽 gameover 브로드캐스트가 늦으면(동시 전멸 등) 스스로도 통지
         const otherTeam = Net.myTeam==='red' ? 'blue' : 'red';
         if(Net.ws&&Net.ws.readyState===1){ try{ Net.ws.send(JSON.stringify({type:'gameover', winnerTeam:otherTeam})); }catch(e){} }
         pvpWin(false);
       }
-    } else { Net._myWipeT=0; }
+    } else { Net._myWipeT=0; Net._theirWipeT=0; }
   }
 
   /* ---- pause / settings ---- */
