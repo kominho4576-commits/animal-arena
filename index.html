@@ -3542,6 +3542,16 @@ class Character {
       if(Game.pvpActive && Game.pvpActive()) Game.netPickupTake(pk.idx); }
     return true;
   }
+  // 봇이 근처 무기를 '주울 가치'가 있는지 판단.
+  // 총을 이미 든 상태에서 또 다른 총을 주우면 기존 무기를 앞으로 던지고 다시 줍는 무한 픽업 루프가 생겨
+  // (무기를 밀면서 다가오고 픽업/드롭 소리가 반복됨) — 그래서 총→총 스왑은 금지한다.
+  _wantSwap(pk){
+    if(!pk||!pk.active) return false;
+    const W=WEAPONS[pk.id]; if(!W||W.type==='item') return false; // 회복 아이템은 스왑 대상 아님
+    if(!this.weapon) return true;                                 // 맨손 → 어떤 총이든 업그레이드
+    const cur=WEAPONS[this.weapon];
+    return !!(cur && cur.melee && !W.melee);                      // 근접 무기 → 원거리 총만 업그레이드
+  }
   weaponDef(){ return WEAPONS[this.weapon||'fists']; }
   canFire(){ return !this.dead && !this.rolling && this.fireCd<=0; }
   /* returns true if a shot happened */
@@ -4337,6 +4347,7 @@ class AIBot extends Character {
     this.repathT=0;
     this.lastPos=new THREE.Vector3(); this.stuckT=0;
     this.noProgressT=0; this.lastEnemyHp=CFG.maxHP; this.rushT=0;
+    this.pickupCd=0; // 무기 획득 직후 재-탐색 쿨다운(픽업/드롭 반복 방지)
   }
   // 가장 가까운 생존 적 선택 (개인전: 전부 적 / 팀전: 같은 팀은 제외)
   pickTarget(){
@@ -4385,7 +4396,7 @@ class AIBot extends Character {
       return;
     }
     const P=this.pickTarget();
-    this.stateT-=dt; this.reactT-=dt; this.strafeT-=dt; this.repathT-=dt;
+    this.stateT-=dt; this.reactT-=dt; this.strafeT-=dt; this.repathT-=dt; this.pickupCd-=dt;
     // 봇도 궁극기 사용 (근접 상황에서, 쿨다운 준비되면)
     if(this.ultCharge>=this.ultMax && !P.dead){
       const distP=Math.hypot(P.pos.x-this.pos.x,P.pos.z-this.pos.z);
@@ -4438,7 +4449,7 @@ class AIBot extends Character {
         moveTarget=new THREE.Vector3(this.targetPk.x,0,this.targetPk.z);
         wantSprint=true;
         const d=Math.hypot(this.targetPk.x-this.pos.x,this.targetPk.z-this.pos.z);
-        if(d<CFG.pickupRange*0.9){ this.tryPickup(); this.targetPk=null; this.state='ATTACK'; this.stateT=0.4; }
+        if(d<CFG.pickupRange*0.9){ this.tryPickup(); this.pickupCd=2.5; this.targetPk=null; this.state='ATTACK'; this.stateT=0.4; }
       } else this.state='ATTACK';
       // defend self while seeking
       if(distP<2.2 && !armed && !P.dead) this.faceAndMelee(P,chars,dt);
@@ -4487,7 +4498,7 @@ class AIBot extends Character {
           if(distP<w.range*0.92) this.faceAndMelee(P,chars,dt);
           // if a weapon is nearby, prefer grabbing it
           const pk=Pickups.nearest(this.pos,7);
-          if(pk && distP>3){ this.state='SEEK'; this.targetPk=pk; }
+          if(pk && distP>3 && this.pickupCd<=0 && this._wantSwap(pk)){ this.state='SEEK'; this.targetPk=pk; }
         } else {
           // maintain preferred range + strafe
           const to=new THREE.Vector3(P.pos.x-this.pos.x,0,P.pos.z-this.pos.z).normalize();
@@ -4497,7 +4508,7 @@ class AIBot extends Character {
             // watchdog rush: get in close and grab any nearer weapon
             moveTarget=P.pos.clone(); wantSprint=true;
             const pk=Pickups.nearest(this.pos,6);
-            if(pk && distP>4){ this.state='SEEK'; this.targetPk=pk; }
+            if(pk && distP>4 && this.pickupCd<=0 && this._wantSwap(pk)){ this.state='SEEK'; this.targetPk=pk; }
           }
           else if(distP>effective+1.2){ moveTarget=P.pos.clone(); wantSprint=distP>effective+5; }
           else if(distP<effective-2.5){ moveTarget=this.pos.clone().addScaledVector(to,-3); }
@@ -4956,11 +4967,11 @@ const Game = (() => {
       const mine=chars.filter(c=>c.team===myTeam), theirs=chars.filter(c=>c.team!=null && c.team!==myTeam);
       const mk=mine.reduce((s,c)=>s+(c.kills||0),0), tk=theirs.reduce((s,c)=>s+(c.kills||0),0);
       won=mk>tk; draw=mk===tk;
-      if(Net.teamMode && !Net.party) Stats.recordTeam(won);
+      if(Net.teamMode && !Net.party){ Stats.recordTeam(won); showRank=true; }
       $('winSub').textContent=(draw?'무승부':(won?'우리 팀 승리!':'우리 팀 패배'))+' · 타임어택 종료';
       renderTeamStandings($('winStandings'), buildTeamStandings(), false); $('winStandings').style.display='flex';
     } else {
-      if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk, {ranked:rankedMode, margin:Math.abs(pk-bk)}); showRank=rankedMode; }
+      if(!trainingMode){ Stats.record(draw?'draw':(won?'win':'loss'), pk, bk, {ranked:rankedMode, margin:Math.abs(pk-bk)}); showRank=true; }
       if(aiBots.length>1){ $('winSub').textContent='타임어택 종료'; renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
       else { $('winSub').textContent=`${pk} : ${bk}  ·  타임어택 종료`; $('winStandings').style.display='none'; }
     }
@@ -5051,7 +5062,7 @@ const Game = (() => {
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
     if(aiBots.length>1){ $('winSub').textContent=fmtTime(time); renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`; $('winStandings').style.display='none'; }
-    showRankGain(rankedMode && !trainingMode);
+    showRankGain(!trainingMode);
     $('respawnOvl').classList.remove('show');
     $('winOvl').style.display='flex';
     won?Sfx.win():Sfx.lose();
@@ -6534,7 +6545,7 @@ const Game = (() => {
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
     // 팀전(빠른 매칭)만 별도 승/패 기록. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
     let showRank=false;
-    if(Net.teamMode && !Net.party) Stats.recordTeam(won);
+    if(Net.teamMode && !Net.party){ Stats.recordTeam(won); showRank=true; }
     if(Net.teamMode){
       $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료';
       renderTeamStandings($('winStandings'), buildTeamStandings(), false);
@@ -6544,7 +6555,7 @@ const Game = (() => {
     else {
       // 1대1 온라인 대전: 승/패 기록 + 통합 랭크 경험치
       const oppK=Net.opp?Net.opp.kills:0;
-      if(!trainingMode){ Stats.record(won?'win':'loss', player?player.kills:0, oppK, {ranked:rankedMode, margin:Math.abs((player?player.kills:0)-oppK)}); showRank=rankedMode; }
+      if(!trainingMode){ Stats.record(won?'win':'loss', player?player.kills:0, oppK, {ranked:rankedMode, margin:Math.abs((player?player.kills:0)-oppK)}); showRank=true; }
       $('winSub').textContent=(player?player.kills:0)+' : '+oppK; $('winStandings').style.display='none';
     }
     showRankGain(showRank);
