@@ -274,7 +274,7 @@ body.has-touch #abilityRow{display:none!important}
 .tpAdd:hover{border-color:var(--cy);transform:scale(1.05)}
 .tpAdd:active{transform:scale(.94)}
 .tpPortrait{width:64px;height:64px;border-radius:50%;border:2px solid rgba(125,243,255,.35);box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.tpModelWrap{width:100px;height:112px;border-radius:16px;border:2.5px solid rgba(125,243,255,.55);background:linear-gradient(160deg,rgba(20,34,54,.9),rgba(8,15,26,.95));box-shadow:0 4px 16px rgba(0,0,0,.45),inset 0 0 18px rgba(49,230,255,.12),0 0 0 1px rgba(125,243,255,.15);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.tpModelWrap{width:100px;height:118px;border-radius:0;border:none;background:none;box-shadow:none;overflow:visible;display:flex;align-items:flex-end;justify-content:center}
 .tpModel{width:100%;height:100%;display:block}
 .tpName{font-size:12px;color:#cfe0ee;font-weight:700;max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tpReady{font-size:9px;color:#8fb2cc;font-weight:700;letter-spacing:.5px}
@@ -893,6 +893,9 @@ body.has-touch #lobby #lbModeChange .mTxt{width:86px;min-width:86px;height:44px;
 /* PLAY 텍스트는 매칭 상태에서도 항상 한 줄로만 표시 (모드 변경 버튼의 2줄 라벨과 별개) */
 body.has-touch #lobby #lbPlay .mTxt{flex-direction:row;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.has-touch #lobby #lbPlay .mTxt small{display:none}
+/* 모드 변경 버튼: 버튼 크기(86px)는 고정한 채, 라벨/서브텍스트가 넘치지 않게 안쪽으로 맞춤 */
+body.has-touch #lobby #lbModeChange .mTxt{overflow:hidden;justify-content:center;padding:6px 6px}
+body.has-touch #lobby #lbModeChange .mTxt small{font-size:7.5px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 body.has-touch #lobby #lbPlay{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
 body.has-touch #lobby #lbModeChange{right:106px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
 /* 좌하단: 캐릭터 선택 */
@@ -5911,7 +5914,7 @@ const Game = (() => {
     window.__pvResize=pvResize;
     pvScene=new THREE.Scene();
     // 로비: 옆모습(총 보이게), 잘리지 않게 여유있게 프레이밍
-    pvCam=new THREE.PerspectiveCamera(38,320/380,0.1,50); pvCam.position.set(0,1.05,3.4); pvCam.lookAt(0,0.85,0);
+    pvCam=new THREE.PerspectiveCamera(38,320/380,0.1,50); pvCam.position.set(0,1.12,3.75); pvCam.lookAt(0,0.98,0);
     pvScene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.1));
     const dl=new THREE.DirectionalLight(0xffffff,0.6); dl.position.set(3,5,4); pvScene.add(dl);
     setTimeout(pvResize,60); addEventListener('resize',pvResize);
@@ -6196,8 +6199,16 @@ const Game = (() => {
     pendingInviteCode=null;
   });
 
+  /* 매치 종료 후 로비 복귀: 파티/넷코드 상태를 완전히 초기화 (한 판 뒤 파티가 stale해져 재초대가 안 되던 문제) */
+  function cleanupPvpSession(){
+    try{ stopMatchmaking(); }catch(e){}
+    if(TP.ws){ try{ TP.ws.close(); }catch(e){} }
+    tpReset(); tpInviteState.clear();
+    resetNet();
+    try{ renderTeamPartySlots(); refreshPlayButtonLabel(); }catch(e){}
+  }
   /* restart -> back to lobby */
-  $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; rankedMode=false; BGM.setScene('menu'); showScreen('lobby'); });
+  $('restart').addEventListener('click',()=>{ $('winOvl').style.display='none'; rankedMode=false; BGM.setScene('menu'); cleanupPvpSession(); showScreen('lobby'); });
 
   /* ===== PVP: 매치메이킹 + 넷코드 ===== */
   let mmTimer=null, mmWs=null;
@@ -6347,12 +6358,15 @@ const Game = (() => {
         if(Net.party && d.to!==undefined && Net.myBotIdx && Net.myBotIdx.has(d.to)){ applyBotKillCredit(d); break; }
         if(Net.ffa){
           if(d.to!==undefined && d.to!==Net.myIdx) break;
-          const key=(d.from||0)+':'+(d.did||0);
+          // 죽은 대상 식별자로 중복키 생성 — 봇 사망은 발신자가 항상 호스트(d.from 동일)라
+          // d.from만 쓰면 서로 다른 봇이 같은 죽음번호(did)일 때 키가 충돌해 두 번째 킬이 무시되던 버그.
+          const deadKey=(d.fromBot!==undefined)?('b'+d.fromBot):(d.from||0);
+          const key=deadKey+':'+(d.did||0);
           if(!Net._seenDeaths) Net._seenDeaths={};
-          if(d.did && Net._seenDeaths[key]) break; // 중복 방지 (발신자별 죽음번호)
+          if(d.did && Net._seenDeaths[key]) break; // 중복 방지 (대상별 죽음번호)
           if(d.did) Net._seenDeaths[key]=true;
           player.kills++; updateScore(); killBanner('처치!','#3ef58a'); Sfx.kill();
-          const victim=Net.peerByIdx[d.from];
+          const victim=Net.peerByIdx[(d.fromBot!==undefined)?d.fromBot:d.from];
           if(victim) addKillFeed(player.kind, victim.kind, weaponDisplayName(d.cause, player));
           if(!Net.teamMode && player.kills>=CFG.killTarget){
             // 승자가 전체에 종료 브로드캐스트 (팀전은 전멸 조건으로 별도 처리하므로 제외)
@@ -7281,7 +7295,7 @@ const Game = (() => {
   }
   bindBtn('bPause',()=>{ if(running) setPause(true); });
   bindBtn('pResume',()=>setPause(false));
-  bindBtn('pQuit',()=>{ hideFFAFinal(); setPause(false); running=false; trainingMode=false; if(pvpMode){ pvpMode=false; if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} } } document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; $('respawnOvl').classList.remove('show'); BGM.setScene('menu'); showScreen('lobby'); });
+  bindBtn('pQuit',()=>{ hideFFAFinal(); setPause(false); running=false; trainingMode=false; if(pvpMode){ pvpMode=false; if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} } } document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; $('respawnOvl').classList.remove('show'); BGM.setScene('menu'); cleanupPvpSession(); showScreen('lobby'); });
   bindBtn('pSettings',()=>{ $('pauseOvl').style.display='none'; openSettings(true); });
   bindBtn('sClose',()=>{ Settings.save(); $('settingsOvl').style.display='none'; if(paused) $('pauseOvl').style.display='flex'; });
   // 커스텀 확인 팝업
