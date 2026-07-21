@@ -267,16 +267,16 @@ body.has-touch #abilityRow{display:none!important}
 /* 캐릭터(pvCanvas)가 항상 가로 정중앙에 오도록: 표시되는 슬롯과 반대편에 동일 폭 스페이서를 둔다.
    -> 친구 초대(+) 버튼/파티원 슬롯이 생겨도 플레이어 캐릭터 기준 중앙 정렬이 유지됨 */
 .pvRow #pvCanvas{flex:0 0 auto}
-.tpSlot,.tpSpacer{flex:0 0 84px;width:84px}
+.tpSlot,.tpSpacer{flex:0 0 108px;width:108px}
 .tpSpacer{visibility:hidden;pointer-events:none}
-.tpSlot{display:flex;flex-direction:column;align-items:center;gap:3px;width:84px;padding-bottom:8px}
-.tpAdd{width:64px;height:64px;border-radius:50%;border:2px dashed rgba(125,243,255,.4);background:rgba(10,19,34,.4);color:var(--cy2);font-size:26px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:transform .12s,border-color .12s}
+.tpSlot{display:flex;flex-direction:column;align-items:center;gap:4px;width:108px;padding-bottom:8px}
+.tpAdd{width:74px;height:74px;border-radius:50%;border:2px dashed rgba(125,243,255,.4);background:rgba(10,19,34,.4);color:var(--cy2);font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;transition:transform .12s,border-color .12s}
 .tpAdd:hover{border-color:var(--cy);transform:scale(1.05)}
 .tpAdd:active{transform:scale(.94)}
 .tpPortrait{width:64px;height:64px;border-radius:50%;border:2px solid rgba(125,243,255,.35);box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.tpModelWrap{width:72px;height:78px;border-radius:14px;border:2px solid rgba(125,243,255,.3);background:linear-gradient(160deg,rgba(20,34,54,.85),rgba(8,15,26,.9));box-shadow:0 4px 14px rgba(0,0,0,.4);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.tpModelWrap{width:100px;height:112px;border-radius:16px;border:2.5px solid rgba(125,243,255,.55);background:linear-gradient(160deg,rgba(20,34,54,.9),rgba(8,15,26,.95));box-shadow:0 4px 16px rgba(0,0,0,.45),inset 0 0 18px rgba(49,230,255,.12),0 0 0 1px rgba(125,243,255,.15);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
 .tpModel{width:100%;height:100%;display:block}
-.tpName{font-size:11px;color:#cfe0ee;font-weight:700;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpName{font-size:12px;color:#cfe0ee;font-weight:700;max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tpReady{font-size:9px;color:#8fb2cc;font-weight:700;letter-spacing:.5px}
 .tpReady.on{color:var(--gn)}
 .tpHostTag{font-size:8px;color:var(--yl);font-weight:700;letter-spacing:.5px}
@@ -591,6 +591,9 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .friendRow .frId{color:#8fb2cc;font-size:10px;font-weight:600}
 .friendRow button{background:none;border:1px solid rgba(125,243,255,.3);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);color:var(--cy2);font-size:11px;font-weight:700;padding:4px 9px}
 .friendEmpty{color:#5a7085;font-size:12px;text-align:center;padding:8px 0}
+.friendRow .frReqAccept{border-color:rgba(62,245,138,.5)!important;color:var(--gn)!important}
+.friendRow .frReqDecline{border-color:rgba(255,107,122,.5)!important;color:#ff8a97!important}
+.frReqBadge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:#ff5a6a;color:#fff;font-size:11px;font-weight:900;box-shadow:0 0 8px rgba(255,90,106,.6)}
 /* 친구 초대 목록: 온라인/오프라인 그룹 헤더 + 상태 버튼 */
 .friendGroupHdr{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:1px;color:var(--cy2);text-transform:uppercase;padding:6px 4px 2px;border-bottom:1px solid rgba(125,243,255,.12);margin-top:4px}
 .friendGroupHdr .fgCount{color:#8fb2cc;background:rgba(125,243,255,.1);border-radius:8px;padding:1px 6px;font-size:9px}
@@ -600,6 +603,21 @@ body.playing #fpsBox,body.playing #killFeed,body.playing #profileBox,body.playin
 .frInviteBtn.invited{border-color:rgba(255,216,61,.5);color:var(--yl);background:rgba(255,216,61,.08)}
 .frInviteBtn.joined{border-color:rgba(62,245,138,.5);color:var(--gn);background:rgba(62,245,138,.1)}
 .frInviteBtn:disabled{opacity:.55}
+/* 파티 초대 오버레이: 전체 화면 폭 배너가 아닌 가운데 정렬된 카드로 (가시성/가로폭 개선) */
+#tpInviteOvl{background:rgba(3,8,16,.72);backdrop-filter:blur(3px)}
+#tpInviteOvl .cfBanner{width:min(420px,92vw);max-width:420px;border-radius:18px;padding:22px 22px 20px;
+  background:linear-gradient(165deg,rgba(18,30,48,.98),rgba(9,16,28,.98));color:#eaf4ff;
+  box-shadow:0 18px 60px rgba(0,0,0,.6),0 0 0 1.5px rgba(125,243,255,.35),inset 0 1px 0 rgba(125,243,255,.15)}
+#tpInviteOvl .cfIconSvg{color:var(--cy2);font-size:34px;margin-bottom:6px}
+#tpInviteOvl .cfTitle{font-size:26px;letter-spacing:2px;color:#eaf4ff;text-shadow:2px 2px 0 rgba(49,230,255,.35)}
+#tpInviteOvl .cfSub{font-size:11.5px;color:#9fc4dc;margin-top:6px;padding:0 6px;line-height:1.5;letter-spacing:.3px}
+#tpInviteOvl #tpInviteList{max-height:min(46vh,320px);margin-top:14px;padding:4px}
+#tpInviteOvl .friendRow{background:rgba(125,243,255,.05);border:1px solid rgba(125,243,255,.1);border-radius:10px;padding:8px 10px;margin-bottom:2px}
+#tpInviteOvl .friendRow .frName{font-size:13px}
+#tpInviteOvl .friendGroupHdr{border-bottom-color:rgba(125,243,255,.18)}
+#tpInviteOvl .cfBtns{margin-top:16px}
+#tpInviteOvl .cfBtn{min-width:120px;background:rgba(125,243,255,.12);border-color:rgba(125,243,255,.4);color:#bff0ff}
+#tpInviteOvl .cfBtn:hover{background:var(--cy2);color:#08131f}
 
 #rotate{position:absolute;inset:0;background:var(--bg0);z-index:99;display:none;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800;text-align:center;pointer-events:auto}
 @media (orientation:portrait){#rotate{display:flex}}
@@ -1258,6 +1276,10 @@ body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabe
     </div>
     <div id="friendSearchResults" class="friendList"></div>
   </div>
+  <div class="setPanel friendReqPanel" id="friendReqPanel" style="display:none">
+    <div class="friendListTitle">받은 친구 요청 <span class="fgCount" id="friendReqCount">0</span></div>
+    <div id="friendReqBody" class="friendList"></div>
+  </div>
   <div class="setPanel friendListPanel">
     <div class="friendListTitle">친구 목록</div>
     <div id="friendListBody" class="friendList"></div>
@@ -1338,7 +1360,7 @@ body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabe
         <button class="mItem" id="lbModeChange"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">모드 변경<small id="lbModeChangeSub">데스매치 1vs1</small></span></button>
         <button class="mItem" id="lbChar"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">캐릭터 선택</span></button>
         <button class="mItem mKeysOnly" id="lbKeys"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">조작키 설정</span></button>
-        <button class="mItem" id="lbFriends"><span class="mArrow" data-ic="chevron-right"></span><span class="mIcon" data-ic="users"></span><span class="mTxt">친구</span></button>
+        <button class="mItem" id="lbFriends"><span class="mArrow" data-ic="chevron-right"></span><span class="mIcon" data-ic="users"></span><span class="mTxt">친구</span><span class="frReqBadge" id="lbFriendsBadge" style="display:none">0</span></button>
         <button class="mItem" id="lbSettings"><span class="mArrow" data-ic="chevron-right"></span><span class="mIcon" data-ic="settings"></span><span class="mTxt">환경설정</span></button>
         <button class="mItem" id="lbTutorial"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">튜토리얼</span></button>
         <button class="mItem mExitOnly" id="lbExit"><span class="mArrow" data-ic="chevron-right"></span><span class="mTxt">게임 종료</span></button>
@@ -5832,6 +5854,10 @@ const Game = (() => {
         const n1=$('pvName'); if(n1) n1.textContent=S.name;
         const cn=$('csName'); if(cn) cn.textContent=S.name;
         updateCharInfo(key);
+        // 파티(초대)에 들어가 있으면 바뀐 캐릭터를 파티원들에게 실시간 반영
+        if(TP.code && TP.ws && TP.ws.readyState===WebSocket.OPEN){
+          try{ TP.ws.send(JSON.stringify({type:'team_party_update', species:selectedSpecies, nick:playerNick})); }catch(e){}
+        }
       };
       b.addEventListener('click',pick);
       row.appendChild(b);
@@ -6199,7 +6225,7 @@ const Game = (() => {
       mmWs=new WebSocket(MM_URL);
       Net.ws=mmWs;
       mmWs.onopen=()=>{
-        try{ mmWs.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){}
+        try{ mmWs.send(JSON.stringify({type:'identify',token:getDeviceToken(),nick:playerNick})); }catch(e){}
         if(queueMode.size===1) mmWs.send(JSON.stringify({type:'queue',gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
         else mmWs.send(JSON.stringify({type:'queue_team',size:queueMode.size,gameMode:queueMode.gameMode,species:selectedSpecies,nick:playerNick}));
       };
@@ -6761,7 +6787,7 @@ const Game = (() => {
     try{
       const ws=new WebSocket(MM_URL);
       TP.ws=ws;
-      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){} onOpenSend(); };
+      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken(),nick:playerNick})); }catch(e){} onOpenSend(); };
       ws.onmessage=(ev)=>{
         let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; }
         if(d.type==='identified' || (d.type||'').indexOf('team_party_')===0){ handleTeamPartyMessage(d); return; }
@@ -6955,7 +6981,7 @@ const Game = (() => {
     renderer.setSize(cv.width, cv.height, false);
     const scene=new THREE.Scene();
     const cam=new THREE.PerspectiveCamera(34, cv.width/cv.height, 0.1, 50);
-    cam.position.set(0,1.05,3.2); cam.lookAt(0,0.9,0);
+    cam.position.set(0,1.0,2.55); cam.lookAt(0,0.92,0);
     scene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.15));
     const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(2,4,3); scene.add(dl);
     const built=buildAnimal(spec); const char=built.group; char.position.y=0; scene.add(char);
@@ -7003,7 +7029,7 @@ const Game = (() => {
     try{
       const ws=new WebSocket(MM_URL);
       FR.ws=ws;
-      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken()})); }catch(e){} onOpenSend(); };
+      ws.onopen=()=>{ try{ ws.send(JSON.stringify({type:'identify',token:getDeviceToken(),nick:playerNick})); }catch(e){} onOpenSend(); };
       ws.onmessage=(ev)=>{ let d={}; try{ d=JSON.parse(ev.data); }catch(e){ return; } handleFriendMessage(d); };
       ws.onerror=()=>{};
       ws.onclose=()=>{ if(FR.ws===ws) FR.ws=null; };
@@ -7019,12 +7045,19 @@ const Game = (() => {
         break;
       case 'friend_search_result': renderFriendSearchResults(d.results||[]); break;
       case 'friend_add_result':
-        if(d.ok){ Game.msg && Game.msg((d.nickname||'친구')+' 님을 추가했습니다'); frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); }); }
-        else Game.msg && Game.msg(d.reason||'추가에 실패했습니다');
+        if(d.ok){
+          if(d.accepted) Game.msg && Game.msg((d.nickname||'친구')+' 님과 친구가 되었습니다');
+          else Game.msg && Game.msg((d.nickname||'친구')+' 님에게 친구 요청을 보냈습니다');
+          frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+        }
+        else Game.msg && Game.msg(d.reason||'요청에 실패했습니다');
         break;
       case 'friend_list_result':
         renderFriendList(d.friends||[]);
         if(tpInvitePickerOpen) renderTpInviteList(d.friends||[]);
+        break;
+      case 'friend_requests_result':
+        renderFriendRequests(d.requests||[]);
         break;
       case 'team_party_invite_received': onTeamPartyInviteReceived(d); break;
       case 'nickname_set':
@@ -7044,8 +7077,26 @@ const Game = (() => {
     box.innerHTML='';
     results.forEach(r=>{
       const row=document.createElement('div'); row.className='friendRow';
-      row.innerHTML='<span class="frDot"></span><span class="frName">'+(r.nickname||'(닉네임 없음)')+'</span><span class="frId">'+r.id+'</span><button type="button">추가</button>';
-      const btn=row.querySelector('button'); bindBtn2(btn, ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_add', id:r.id})); }); });
+      row.innerHTML='<span class="frDot"></span><span class="frName">'+(r.nickname||'(닉네임 없음)')+'</span><span class="frId">'+r.id+'</span><button type="button">요청</button>';
+      const btn=row.querySelector('button'); bindBtn2(btn, ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_request', id:r.id})); }); });
+      box.appendChild(row);
+    });
+  }
+  // 받은 친구 요청 목록: 수락/거절 버튼
+  function renderFriendRequests(requests){
+    const panel=$('friendReqPanel'), box=$('friendReqBody'), cnt=$('friendReqCount');
+    if(!panel||!box) return;
+    if(cnt) cnt.textContent=requests.length;
+    panel.style.display = requests.length ? 'block' : 'none';
+    const badge=$('lbFriendsBadge');
+    if(badge){ badge.textContent=requests.length; badge.style.display = requests.length ? 'inline-flex' : 'none'; }
+    box.innerHTML='';
+    requests.forEach(r=>{
+      const row=document.createElement('div'); row.className='friendRow';
+      row.innerHTML='<span class="frDot"></span><span class="frName">'+(r.nickname||'(닉네임 없음)')+'</span><span class="frId">'+r.id+'</span>'
+        +'<button type="button" class="frReqAccept">수락</button><button type="button" class="frReqDecline">거절</button>';
+      bindBtn2(row.querySelector('.frReqAccept'), ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_accept', id:r.id})); }); });
+      bindBtn2(row.querySelector('.frReqDecline'), ()=>{ frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_decline', id:r.id})); }); });
       box.appendChild(row);
     });
   }
@@ -7076,7 +7127,7 @@ const Game = (() => {
   }
   // 파티 초대(team_party_invite_received)를 로비에 가만히 있어도 받을 수 있도록 접속을 상시 유지
   loadCachedFriends(); // 캐시 즉시 표시 (서버 응답 오면 갱신)
-  frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+  frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); FR.ws.send(JSON.stringify({type:'friend_requests'})); });
   setInterval(()=>{ if(!FR.ws || FR.ws.readyState!==WebSocket.OPEN) frConnect(()=>{}); }, 20000);
 
   // ===== 팀전(빠른 매칭) 시작: 기존 FFA 부트스트랩(_startFFAMatch) 그대로 재사용 =====
@@ -7338,7 +7389,7 @@ const Game = (() => {
     $('friendsOvl').style.display='flex';
     $('friendSearchResults').innerHTML='';
     $('friendSearchInput').value='';
-    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); });
+    frConnect(()=>{ FR.ws.send(JSON.stringify({type:'friend_list'})); FR.ws.send(JSON.stringify({type:'friend_requests'})); });
   });
   bindBtn('friendsClose',()=>{ $('friendsOvl').style.display='none'; });
   bindBtn('friendSearchBtn',()=>{
