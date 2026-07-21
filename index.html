@@ -7353,7 +7353,11 @@ const Game = (() => {
 // ===== PWA: 서비스 워커 등록 =====
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    // updateViaCache:'none' -> sw.js를 HTTP 캐시에서 재사용하지 않고 항상 네트워크로 확인
+    //  (기본값은 최대 24h 캐시라 배포해도 폰이 예전 버전을 계속 쓰는 원인이 됨)
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(reg => { reg.update(); })  // 방문할 때마다 새 버전 즉시 점검(skipWaiting+claim으로 바로 반영)
+      .catch(() => {});
   });
 }
 // ===== iOS "홈 화면에 추가" 안내 배너 =====
