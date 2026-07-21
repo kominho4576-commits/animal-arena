@@ -908,6 +908,16 @@ body.has-touch #lobby .lbNickWrap{margin-top:-6px}
 /* 드래그 가능한 버튼임을 알려주는 점선 테두리 */
 body.layout-edit .btn,body.layout-edit #bPause{outline:2px dashed rgba(255,255,255,.7);outline-offset:4px}
 body.layout-edit #joyHint{display:none}
+/* 버튼 위치 설정은 훈련장/게임과 완전히 분리된 화면이어야 한다.
+   투명한 #layoutScr(z-index:50, 버튼 z20보다 위)를 불투명하게 하면 버튼까지 가려지므로,
+   대신 3D 캔버스와 상태 HUD(TIME/SCORE·프로필·무기 등)를 감추고 드래그 대상 버튼만 남긴다.
+   -> 뒤에 훈련장 게임이 비쳐 두 화면이 '섞여' 보이던 문제 해결. */
+body.layout-edit{background:#0a0f18}
+body.layout-edit #c{visibility:hidden}
+body.layout-edit #topbar,body.layout-edit #profileBox,body.layout-edit #weaponBox,
+body.layout-edit #fpsBox,body.layout-edit #cross,body.layout-edit #scope,
+body.layout-edit #killFeed,body.layout-edit #enemyHpBar,body.layout-edit #myBuffs,
+body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabelLayer{display:none!important}
 
 /* ===== PVP 입장 확인 배너 ===== */
 /* PVP 화면: 세로 중앙 정렬 (맵 배경은 공통 적용) */
@@ -1169,7 +1179,6 @@ body.layout-edit #joyHint{display:none}
   <div class="pauseBtns">
     <button class="pBtn pResume" id="pResume">계속하기</button>
     <button class="pBtn" id="pSettings">설정</button>
-    <button class="pBtn" id="pRestart">다시 시작</button>
     <button class="pBtn pQuit" id="pQuit">메인으로</button>
   </div>
 </div>
@@ -2837,7 +2846,7 @@ function buildAnimal(kind){
 
 /* ---------------- FX: tracers, muzzle, explosions, flames ---------------- */
 const FX = (() => {
-  const tracers=[]; const parts=[]; const booms=[]; const flashes=[]; const slashes=[]; const rings=[];
+  const tracers=[]; const parts=[]; const booms=[]; const flashes=[]; const slashes=[]; const rings=[]; const beams=[];
   const pGeo=new THREE.SphereGeometry(.07,4,3);
   const traceMat=new THREE.LineBasicMaterial({color:0xfff2a0,transparent:true,opacity:.95,linewidth:2});
   function tracer(a,b,color){
@@ -7139,7 +7148,6 @@ const Game = (() => {
   }
   bindBtn('bPause',()=>{ if(running) setPause(true); });
   bindBtn('pResume',()=>setPause(false));
-  bindBtn('pRestart',()=>{ if(pvpMode) return; setPause(false); if(lastDiff==='train') startTraining(); else start(lastDiff); });
   bindBtn('pQuit',()=>{ hideFFAFinal(); setPause(false); running=false; trainingMode=false; if(pvpMode){ pvpMode=false; if(Net.ws){ try{ Net.ws.send(JSON.stringify({type:'leave'})); Net.ws.close(); }catch(e){} } } document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; $('respawnOvl').classList.remove('show'); BGM.setScene('menu'); showScreen('lobby'); });
   bindBtn('pSettings',()=>{ $('pauseOvl').style.display='none'; openSettings(true); });
   bindBtn('sClose',()=>{ Settings.save(); $('settingsOvl').style.display='none'; if(paused) $('pauseOvl').style.display='flex'; });
