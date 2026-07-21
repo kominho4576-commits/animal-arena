@@ -801,6 +801,9 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 body.has-touch .mKeysOnly{display:none}
 body.has-touch .mExitOnly{display:block}
 body.has-touch .mTouchOnly{display:block}
+/* .setRow(진동 등)은 mTouchOnly라도 라벨-왼쪽/컨트롤-오른쪽 flex 정렬을 유지해야
+   위 행(화면 흔들림)의 체크박스 열과 오른쪽 끝이 맞는다. block이면 정렬이 깨짐. */
+body.has-touch .setRow.mTouchOnly{display:flex}
 .mExitOnly .mTxt{color:#ff7a8a}
 .mExitOnly:hover::before{background:linear-gradient(90deg,#ff5c6c,rgba(255,92,108,.85))}
 .mItem.play:hover .mTxt{color:#0a0f18}
@@ -855,7 +858,7 @@ body.has-touch.aa-matching #lobby .mItem.play .mTxt{color:var(--cy)}
 body.has-touch #lobby #lbPlay .mTxt,
 body.has-touch #lobby #lbModeChange .mTxt{width:86px;min-width:86px;height:44px;box-sizing:border-box}
 /* PLAY 텍스트는 매칭 상태에서도 항상 한 줄로만 표시 (모드 변경 버튼의 2줄 라벨과 별개) */
-body.has-touch #lobby #lbPlay .mTxt{flex-direction:row;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.has-touch #lobby #lbPlay .mTxt{flex-direction:row;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.has-touch #lobby #lbPlay .mTxt small{display:none}
 body.has-touch #lobby #lbPlay{right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
 body.has-touch #lobby #lbModeChange{right:106px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:3}
@@ -1745,6 +1748,9 @@ KeyBinds.load();
 /* ---------------- 데이터 백업/복원 (로컬 저장소 → 코드 문자열) ---------------- */
 const BackupCode = {
   PREFIX:'aa_', VERSION:'AA1:',
+  // 플레이어 신원 키: 고유 ID(표시용)와 device token(복원 시 같은 계정으로 재접속하는 핵심).
+  // 접두사(aa_) 스캔으로 이미 잡히지만, 계정이 백업에서 절대 누락되지 않도록 명시적으로 보강한다.
+  IDENTITY_KEYS:['aa_uid','aa_token'],
   _encode(str){ const bytes=new TextEncoder().encode(str); let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b)); return btoa(bin); },
   _decode(b64){ const bin=atob(b64); const bytes=Uint8Array.from(bin, c=>c.charCodeAt(0)); return new TextDecoder().decode(bytes); },
   build(){
@@ -1753,6 +1759,8 @@ const BackupCode = {
       const k=localStorage.key(i);
       if(k && k.indexOf(this.PREFIX)===0) data[k]=localStorage.getItem(k);
     }
+    // 신원(ID·토큰) 명시적 보강: prefix 규칙이 바뀌더라도 플레이어 계정은 항상 백업에 포함
+    for(const k of this.IDENTITY_KEYS){ const v=localStorage.getItem(k); if(v!=null) data[k]=v; }
     return this.VERSION+this._encode(JSON.stringify(data));
   },
   parse(code){
