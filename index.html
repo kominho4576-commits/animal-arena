@@ -747,6 +747,21 @@ body.aa-matching .mItem.play .mTxt{color:var(--cy)}
 .wrpBarFill{height:100%;width:0%;border-radius:7px;box-shadow:0 0 10px rgba(125,243,255,.4)}
 .wrpBarTier{font-size:12px;font-weight:800;letter-spacing:1px;color:#fff;text-align:left;margin-bottom:3px}
 .wrpBarNext{font-size:10px;font-weight:700;letter-spacing:.5px;color:#8fb2cc;text-align:right;margin-top:3px}
+/* 결과창 랭크: 현재 티어 헤더 + 경기 전/후 점수 + 승급/강등 배너 */
+.wrpTierHead{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.wrpTierIcon{width:38px;height:38px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.wrpTierIcon::before{content:"";position:absolute;inset:0;background:var(--tierCol,#cd7f4d);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);box-shadow:0 0 14px var(--tierGlow,rgba(205,127,77,.5))}
+.wrpTierIcon::after{content:"";position:absolute;inset:6px;background:rgba(8,15,28,.7);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%)}
+.wrpTierIcon span{position:relative;z-index:1;font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--tierCol,#cd7f4d);text-shadow:0 0 8px var(--tierGlow)}
+.wrpTierName{font-family:'Black Han Sans',sans-serif;font-size:18px;letter-spacing:1px;line-height:1.15}
+.wrpTierSub{font-size:10px;color:#8fb2cc;font-weight:700;letter-spacing:1px}
+.wrpScore{display:flex;align-items:center;gap:8px;font-size:12px;color:#cfe0ee;font-weight:700;letter-spacing:.5px;margin-top:3px}
+.wrpScore b{color:#fff;font-size:14px}
+.wrpArrow{color:#8fb2cc}
+.wrpPromo{margin-top:9px;font-family:'Black Han Sans',sans-serif;font-size:16px;letter-spacing:2px;padding:5px 18px;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);animation:wrpPromoIn .55s cubic-bezier(.2,.9,.3,1.3)}
+.wrpPromo.up{color:#0a1320;background:linear-gradient(135deg,#ffe083,#ffd24a);box-shadow:0 0 26px rgba(255,210,74,.6)}
+.wrpPromo.down{color:#fff;background:linear-gradient(135deg,#7a2b2b,#c23a3a);box-shadow:0 0 20px rgba(255,82,82,.5)}
+@keyframes wrpPromoIn{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
 /* iOS 홈화면 추가 안내 배너 */
 #iosInstall{position:fixed;left:0;right:0;bottom:0;z-index:10000;display:flex;justify-content:center;padding:10px;pointer-events:none;animation:iosUp .4s ease}
 @keyframes iosUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -4961,51 +4976,67 @@ const Game = (() => {
   // 승리/패배 화면의 랭크(경험치) 획득 표시 — 통합 랭크 시스템(경험치=랭크) + 애니메이션
   function showRankGain(show){
     const rpEl=$('winRp'); if(!rpEl) return;
-    if(!show){ rpEl.style.display='none'; return; }
+    if(!show){ rpEl.style.display='none'; rpEl.innerHTML=''; return; }
     const res=Rank._lastGain||{delta:0,before:Rank.xp,after:Rank.xp,tierBefore:Rank.tier(),tierAfter:Rank.tier()};
     const up=res.delta>=0;
-    const curTier=res.tierAfter;
-    const nxt=(function(){ const i=TIERS.indexOf(curTier); return i<TIERS.length-1?TIERS[i+1]:null; })();
-    // 시작/끝 진행률 계산 (티어 내 0~1)
-    const progAt=(xp)=>{ const t=tierAt(xp); const i=TIERS.indexOf(t); const nx=i<TIERS.length-1?TIERS[i+1]:null; if(!nx) return 1; return Math.max(0,Math.min(1,(xp-t.min)/(nx.min-t.min))); };
-    const startProg=progAt(res.before), endProg=progAt(res.after);
-    const tierUp = res.tierAfter.key!==res.tierBefore.key;
+    const curTier=res.tierAfter;            // 결과 화면에 표시하는 '현재 랭크' = 경기 후 티어
+    const ci=TIERS.indexOf(curTier);
+    const nxt=ci<TIERS.length-1?TIERS[ci+1]:null;
+    const tierUp   = res.tierAfter.min > res.tierBefore.min; // 승급
+    const tierDown = res.tierAfter.min < res.tierBefore.min; // 강등
+    // 특정 티어 기준 진행률(0~1)
+    const progInTier=(xp,tier)=>{ const i=TIERS.indexOf(tier); const nx=i<TIERS.length-1?TIERS[i+1]:null; if(!nx) return 1; return Math.max(0,Math.min(1,(xp-tier.min)/(nx.min-tier.min))); };
+    const endProg=progInTier(res.after,curTier);
     rpEl.style.display='flex';
     rpEl.innerHTML=
-      '<span class="wrpDelta '+(up?'up':'down')+'">'+(up?'+':'')+res.delta+' XP</span>'
-     +'<div class="wrpBarWrap"><div class="wrpBarTier" id="wrpTierName">'+curTier.name+'</div>'
+      '<div class="wrpTierHead"><div class="wrpTierIcon" style="--tierCol:'+curTier.color+';--tierGlow:'+curTier.glow+'"><span>'+curTier.name.charAt(0)+'</span></div>'
+     +'<div><div class="wrpTierName" style="color:'+curTier.color+'">'+curTier.name+'</div><div class="wrpTierSub">현재 랭크</div></div></div>'
+     +'<div class="wrpDelta '+(up?'up':'down')+'">'+(up?'+':'')+res.delta+' XP</div>'
+     +'<div class="wrpBarWrap"><div class="wrpBarTier">'+curTier.name+'</div>'
      +'<div class="wrpBar"><div class="wrpBarFill" id="wrpBarFill" style="background:linear-gradient(90deg,'+curTier.color+','+(nxt?nxt.color:curTier.color)+')"></div></div>'
-     +'<div class="wrpBarNext">'+(nxt?('다음 '+nxt.name):'최고 랭크')+'</div></div>'
-     +'<span class="wrpTotal" id="wrpTotal">'+res.before+' XP</span>';
+     +'<div class="wrpBarNext">'+(nxt?('다음 '+nxt.name+' · '+nxt.min+' XP'):'최고 랭크')+'</div></div>'
+     +'<div class="wrpScore"><span>경기 전 <b>'+res.before+'</b></span><span class="wrpArrow" data-ic="arrow-right"></span><span>경기 후 <b id="wrpTotal">'+res.before+'</b> XP</span></div>'
+     +((tierUp||tierDown)?('<div class="wrpPromo '+(tierUp?'up':'down')+'">'+(tierUp?'승급! '+curTier.name+' 달성':'강등 · '+curTier.name)+'</div>'):'');
+    hydrateIcons(rpEl);
     const fill=$('wrpBarFill'), totalEl=$('wrpTotal');
-    // 초기 상태 (애니메이션 시작점)
+    // 진행 바 애니메이션 시작점
+    let startProg;
+    if(tierUp)        startProg=progInTier(res.before,res.tierBefore); // 이전(낮은) 티어 진행률에서 출발
+    else if(tierDown) startProg=1;                                     // 위 티어에서 가득 찬 상태로 내려옴
+    else              startProg=progInTier(res.before,curTier);
     if(fill){ fill.style.transition='none'; fill.style.width=(startProg*100)+'%'; }
     // 다음 프레임에 목표치로 트랜지션
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      if(fill){
-        if(tierUp && up){
-          // 티어 상승: 바가 100%까지 찼다가 다음 티어 0%에서 목표까지 다시 참
-          fill.style.transition='width .5s cubic-bezier(.3,.9,.3,1)';
-          fill.style.width='100%';
-          setTimeout(()=>{ if(fill){ fill.style.transition='none'; fill.style.width='0%';
-            requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition='width .6s cubic-bezier(.3,.9,.3,1)'; fill.style.width=(endProg*100)+'%'; })); } }, 520);
-        } else {
-          fill.style.transition='width .7s cubic-bezier(.3,.9,.3,1)';
-          fill.style.width=(endProg*100)+'%';
-        }
+      if(!fill) return;
+      if(tierUp){
+        // 승급: 바가 100%까지 찼다가 다음 티어 0%에서 목표까지 다시 참
+        fill.style.transition='width .5s cubic-bezier(.3,.9,.3,1)';
+        fill.style.width='100%';
+        setTimeout(()=>{ if(fill){ fill.style.transition='none'; fill.style.width='0%';
+          requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition='width .6s cubic-bezier(.3,.9,.3,1)'; fill.style.width=(endProg*100)+'%'; })); } }, 520);
+      } else if(tierDown){
+        // 강등: 가득 찬 바가 0으로 빠졌다가 아래 티어 100%에서 목표까지 다시 감소
+        fill.style.transition='width .5s cubic-bezier(.3,.9,.3,1)';
+        fill.style.width='0%';
+        setTimeout(()=>{ if(fill){ fill.style.transition='none'; fill.style.width='100%';
+          requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition='width .6s cubic-bezier(.3,.9,.3,1)'; fill.style.width=(endProg*100)+'%'; })); } }, 520);
+      } else {
+        fill.style.transition='width .7s cubic-bezier(.3,.9,.3,1)';
+        fill.style.width=(endProg*100)+'%';
       }
     }));
-    // XP 숫자 카운트업 애니메이션
+    // 경기 후 XP 숫자 카운트업/다운 애니메이션
     const from=res.before, to=res.after, dur=700, t0=performance.now();
     (function tick(now){
       const k=Math.min(1,(now-t0)/dur);
       const ease=1-Math.pow(1-k,3);
       const v=Math.round(from+(to-from)*ease);
-      if(totalEl) totalEl.textContent=v+' XP';
+      if(totalEl) totalEl.textContent=v;
       if(k<1) requestAnimationFrame(tick);
-      else if(totalEl) totalEl.textContent=to+' XP';
+      else if(totalEl) totalEl.textContent=to;
     })(t0);
-    if(tierUp && up){ setTimeout(()=>{ Sfx.win&&Sfx.win(); Game.msg&&Game.msg('랭크 상승! '+res.tierAfter.name); }, 600); }
+    if(tierUp)        setTimeout(()=>{ Sfx.win&&Sfx.win();  Game.msg&&Game.msg('랭크 상승! '+res.tierAfter.name); }, 600);
+    else if(tierDown) setTimeout(()=>{ Sfx.lose&&Sfx.lose(); Game.msg&&Game.msg('랭크 강등 · '+res.tierAfter.name); }, 600);
   }
   function finishGame(){
     running=false;
