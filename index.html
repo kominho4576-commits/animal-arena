@@ -478,7 +478,7 @@ body.pc #keyGuide{display:block}
 .diffBtn small{display:block;font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:600;opacity:.7;margin-top:2px;letter-spacing:.5px}
 
 /* ===== win/lose ===== */
-#winOvl{display:none;background:rgba(4,8,16,.86);backdrop-filter:blur(6px)}
+#winOvl{display:none;background:rgba(4,8,16,.86);backdrop-filter:blur(6px);justify-content:safe center;padding:16px 0}
 #winTitle{font-family:'Black Han Sans',sans-serif;font-size:64px;letter-spacing:6px;animation:winPop .5s cubic-bezier(.2,.9,.3,1.3);text-shadow:0 6px 0 rgba(0,0,0,.45),0 0 40px currentColor}
 @keyframes winPop{from{opacity:0;transform:scale(.6)}60%{transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
 #winSub{color:#cfe8ff;font-size:17px;margin:12px 0 28px;letter-spacing:2px;font-weight:700}
@@ -969,6 +969,15 @@ body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabe
   #roomCodeInput{margin-top:8px;font-size:22px;padding:8px;width:180px}
   #roomCodeBox{margin-top:10px;padding:10px 20px}
   .rcCode{font-size:32px}
+  /* 결과창: 랭크 변동 블록이 추가돼도 짧은 화면에서 잘리지 않게 컴팩트화 */
+  #winTitle{font-size:44px;letter-spacing:4px}
+  #winSub{margin:6px 0 12px;font-size:15px}
+  #winRp{margin:2px 0 8px;gap:2px}
+  .wrpDelta{font-size:24px}
+  .wrpBarWrap{margin:3px 0 1px}
+  .wrpTierIcon{width:32px;height:32px}
+  .wrpPromo{margin-top:5px;font-size:14px;padding:4px 14px}
+  #restart{padding:11px 40px;font-size:16px}
 }
 @media (max-width:560px){
   .cfTitle{font-size:32px;letter-spacing:2px}
@@ -3374,6 +3383,9 @@ const Summons = (() => {
 })();
 const Pickups = (() => {
   const list=[];
+  const MAX_ON_MAP=10;   // 맵에 동시에 존재하는 무기 최대 개수
+  let seqCounter=0;      // 생성 순서(오래된 것부터 제거하기 위한 FIFO 키)
+  let trainingLayout=false; // 훈련 모드는 모든 무기를 깔아두므로 상한 적용 제외
   let __pkRng = Math.random;
   function rr(){ return __pkRng(); }
   function randWeapon(){ return SPAWNABLE[Math.floor(rr()*SPAWNABLE.length)]; }
@@ -3387,11 +3399,26 @@ const Pickups = (() => {
     const beam=new THREE.Mesh(new THREE.CylinderGeometry(.03,.10,1.4,5), new THREE.MeshBasicMaterial({color:WEAPONS[id].color,transparent:true,opacity:.28}));
     beam.position.y=.7; g.add(beam);
     g.position.set(x,0,z); scene.add(g);
-    const pk={id,ammo,mesh:g,model,active:true,timer:0,x,z,spawnPoint:true,idx:list.length};
+    const pk={id,ammo,mesh:g,model,active:true,timer:0,x,z,spawnPoint:true,idx:list.length,seq:seqCounter++};
     list.push(pk); return pk;
+  }
+  // 활성(맵에 보이는) 무기 개수
+  function activeCount(){ let n=0; for(const p of list) if(p.active) n++; return n; }
+  // 무기 총합이 상한을 넘으면 가장 먼저 떨어진 '바닥 무기'부터 제거(FIFO).
+  // 스폰 지점 무기는 맵 구조이므로 남겨두고, 획득 안 된 드롭 무기만 정리한다.
+  function enforceCap(){
+    if(trainingLayout) return;
+    while(activeCount()>MAX_ON_MAP){
+      let oldest=null;
+      for(const p of list){ if(p.active && !p.spawnPoint && (!oldest || p.seq<oldest.seq)) oldest=p; }
+      if(!oldest) break; // 상한 초과가 스폰 지점만으로 이뤄진 경우(정상적으론 발생 안 함) 보존
+      scene.remove(oldest.mesh);
+      const i=list.indexOf(oldest); if(i>=0) list.splice(i,1);
+    }
   }
   function init(seed){
     clear();
+    trainingLayout=false;
     __pkRng = (seed!==undefined && seed!==null) ? makeSeededRng(seed^0x9e3779b9) : Math.random;
     const shuffled=[...SPAWN_POINTS].map(p=>p).sort(()=>rr()-.5);
     const n=Math.min(7,Math.max(4,SPAWN_POINTS.length-1));
@@ -3402,6 +3429,7 @@ const Pickups = (() => {
   // training: lay out ALL weapons in a grid so every weapon can be tested
   function initTraining(){
     clear();
+    trainingLayout=true;
     __pkRng = Math.random;
     const ids=SPAWNABLE.slice();
     // 아레나(x:-20~20, z:-11~11) 안쪽에 안전하게 배치: 5개씩 4줄, 가로로 넓게
@@ -3417,7 +3445,7 @@ const Pickups = (() => {
   }
   function dropAt(x,z,id,ammo){
     // dropped weapon: doesn't auto-respawn as random
-    const pk=makeAt(x,z,id,ammo); pk.spawnPoint=false; return pk;
+    const pk=makeAt(x,z,id,ammo); pk.spawnPoint=false; enforceCap(); return pk;
   }
   function take(pk){
     pk.active=false; pk.mesh.visible=false;
@@ -3445,6 +3473,7 @@ const Pickups = (() => {
   // network: force a pickup to respawn as a specific weapon (host-driven)
   function respawnByIdx(i,id,ammo){ const p=list[i]; if(!p)return; p.id=id; p.ammo=ammo; refreshVisual(p,id); p.active=true; p.mesh.visible=true; p.timer=0; }
   function update(dt,time){
+    let respawned=false;
     for(const p of list){
       // 픽업(바닥 무기)은 고정 위치를 유지 — 캐릭터/충돌에 의해 절대 밀리지 않도록 매 프레임 좌표를 고정한다.
       if(p.mesh && (p.mesh.position.x!==p.x || p.mesh.position.z!==p.z)){ p.mesh.position.x=p.x; p.mesh.position.z=p.z; }
@@ -3457,10 +3486,12 @@ const Pickups = (() => {
           if(Game.pvpActive && Game.pvpActive() && !Game.isHost()){ p.timer=1; continue; }
           const id=randWeapon(); p.id=id; p.ammo=randAmmo(id);
           refreshVisual(p,id);
-          p.active=true; p.mesh.visible=true;
+          p.active=true; p.mesh.visible=true; respawned=true;
           if(Game.pvpActive && Game.pvpActive() && Game.isHost()) Game.netPickupRespawn(p.idx,id,p.ammo);
         } }
     }
+    // 스폰 지점 재생성으로 상한을 넘었으면 순회가 끝난 뒤 한 번만 정리(순회 중 splice 방지)
+    if(respawned) enforceCap();
   }
   function clear(){ for(const p of list) scene.remove(p.mesh); list.length=0; }
   return {init,initTraining,update,nearest,take,dropAt,anyActive,list,byIdx,takeByIdx,respawnByIdx};
