@@ -5897,9 +5897,11 @@ const Game = (() => {
   bindBtn('keysReset',()=>{ KeyBinds.reset(); buildKeyList(); refreshKeyGuide(); refreshAbilityKeys(); });
   bindBtn('loBack',()=>{
     document.body.classList.remove('layout-edit');
-    // 게임 중(일시정지) 설정에서 '버튼 위치 설정'에 들어왔다 나오는 경우: 로비로 나가므로
-    // 남아있는 판을 깨끗이 종료해야 좀비 포즈 게임(paused=true)이 다음 판으로 새지 않는다.
-    if(running){ running=false; paused=false; trainingMode=false; document.body.classList.remove('playing'); $('pauseOvl').style.display='none'; BGM.setScene('menu'); }
+    $('layoutScr').style.display='none';
+    // 게임 중(일시정지)에 설정→버튼 위치 설정으로 들어온 경우: 로비로 튕기지 말고
+    // 일시정지 화면으로 복귀(게임을 그대로 유지). 이걸 안 하면 paused=true인 판이
+    // 로비에 남아 다음 체험하기가 멈춘 채로 시작되는 버그가 생긴다.
+    if(running){ $('pauseOvl').style.display='flex'; return; }
     showScreen('lobby');
   });
   bindBtn('loReset',()=>{ resetBtnLayout(); });
