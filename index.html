@@ -478,7 +478,10 @@ body.pc #keyGuide{display:block}
 .diffBtn small{display:block;font-family:'Noto Sans KR',sans-serif;font-size:10px;font-weight:600;opacity:.7;margin-top:2px;letter-spacing:.5px}
 
 /* ===== win/lose ===== */
-#winOvl{display:none;background:rgba(4,8,16,.86);backdrop-filter:blur(6px);justify-content:safe center;padding:16px 0}
+#winOvl{display:none;background:rgba(4,8,16,.86);backdrop-filter:blur(6px);justify-content:flex-start;align-items:center;overflow-y:auto;overscroll-behavior:contain;padding:16px 0}
+/* 내용이 화면보다 길어도 위/아래가 잘리지 않도록: 여유가 있으면 margin auto로 중앙, 넘치면 스크롤 */
+#winInner{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;margin:auto 0;max-width:100%;padding:0 12px}
+#winInner>*{flex:0 0 auto;max-width:100%}
 #winTitle{font-family:'Black Han Sans',sans-serif;font-size:64px;letter-spacing:6px;animation:winPop .5s cubic-bezier(.2,.9,.3,1.3);text-shadow:0 6px 0 rgba(0,0,0,.45),0 0 40px currentColor}
 @keyframes winPop{from{opacity:0;transform:scale(.6)}60%{transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
 #winSub{color:#cfe8ff;font-size:17px;margin:12px 0 28px;letter-spacing:2px;font-weight:700}
@@ -653,7 +656,7 @@ body.killcam #killCamLabel{opacity:1}
 #ffaFinal .ffaRow .fn{max-width:130px}
 #ffaFinal .ffaRow .fk{font-size:16px}
 /* 결과창 순위 목록 */
-#winStandings{display:none;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 20px;border:1px solid var(--pnb);border-radius:6px;background:rgba(8,15,28,.6)}
+#winStandings{display:none;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 20px;border:1px solid var(--pnb);border-radius:6px;background:rgba(8,15,28,.6);max-height:42vh;overflow-y:auto;overscroll-behavior:contain}
 #winStandings .ffaRow{font-size:14px;line-height:1.7;gap:10px}
 /* 팀전 순위(팀별 헤더 + 합산 킬) — #winStandings, #ffaFinalRows 양쪽에서 공용 */
 .ffaTeamHdr{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;letter-spacing:1px;margin:8px 0 3px;padding-bottom:2px;border-bottom:1px solid rgba(255,255,255,.15);color:#cfe0ee}
@@ -993,6 +996,9 @@ body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabe
   /* 결과창: 랭크 변동 블록이 추가돼도 짧은 화면에서 잘리지 않게 컴팩트화 */
   #winTitle{font-size:44px;letter-spacing:4px}
   #winSub{margin:6px 0 12px;font-size:15px}
+  #winStandings{margin:4px 0 2px;padding:6px 14px;max-height:34vh}
+  #winStandings .ffaRow{font-size:12.5px;line-height:1.45}
+  .ffaTeamHdr{margin:5px 0 2px;font-size:10px}
   #winRp{margin:2px 0 8px;gap:2px}
   .wrpDelta{font-size:24px}
   .wrpBarWrap{margin:3px 0 1px}
@@ -1534,11 +1540,13 @@ body.layout-edit #respawnOvl,body.layout-edit #dmgVig,body.layout-edit #nickLabe
 <div class="ovl" id="menu" style="display:none"></div>
 <div id="ffaFinal"><div class="ffLbl">최종 순위</div><div id="ffaFinalRows"></div></div>
 <div class="ovl" id="winOvl">
-  <div id="winTitle">VICTORY</div>
-  <div id="winSub"></div>
-  <div id="winStandings"></div>
-  <div id="winRp" style="display:none"></div>
-  <button id="restart">다시 하기</button>
+  <div id="winInner">
+    <div id="winTitle">VICTORY</div>
+    <div id="winSub"></div>
+    <div id="winStandings"></div>
+    <div id="winRp" style="display:none"></div>
+    <button id="restart">다시 하기</button>
+  </div>
 </div>
 <div id="rotate">가로 모드로<br>돌려주세요</div>
 <script>
@@ -2872,17 +2880,19 @@ function buildAnimal(kind){
   if(S.tail==='puff'){ const t=sphere(0.14,kind==='pig'?main:0xffffff); if(kind==='pig'){t.scale.set(0.55,0.55,0.55);} t.position.set(0,0.6,-bodyR-0.06); g.add(t); parts.tail=t; }
   else if(S.tail==='bushy'){ const t=sphere(0.15,main); t.scale.set(1,1,2.0); t.position.set(0,0.62,-bodyR-0.12); g.add(t); parts.tail=t;
     const tip=sphere(0.1,S.face==='sly'?0xfff2e0:belly); tip.position.set(0,0.62,-bodyR-0.42); g.add(tip); }
-  else if(S.tail==='long'){ const t=sphere(0.09,main); t.scale.set(1,1,3.0); t.position.set(0,0.66,-bodyR-0.12); t.rotation.x=0.3; g.add(t); parts.tail=t;
+  else if(S.tail==='long'){
+    // 꼬리를 그룹으로 감싸 z 스케일이 자식(줄무늬 링)에 전파되지 않게 한다.
+    const t=new THREE.Group(); t.position.set(0,0.66,-bodyR-0.12); t.rotation.x=0.3; g.add(t); parts.tail=t;
+    const TR=0.09, TL=TR*3.0; // 꼬리 단면 반지름 / z축 반길이
+    const tb=sphere(TR,main); tb.scale.set(1,1,3.0); t.add(tb);
     if(S.stripes){
-      // 호랑이 꼬리 줄무늬: 꼬리에 부착해 꼬리와 함께 움직이고, 꼬리 길이(로컬 z축)를 따라 균등 배치.
-      // 꼬리가 z로 3배 늘어나 있으므로 자식은 로컬 z로 넣되 부모 스케일을 상쇄(1/3)해 자연스러운 두께 유지.
+      // 호랑이 꼬리 줄무늬: 꼬리 표면을 감싸는 링. 꼬리 단면 반지름을 따라 끝으로 갈수록 얇아진다.
       for(let i=0;i<4;i++){
-        const st=new THREE.Mesh(new THREE.TorusGeometry(0.095,0.032,6,14), mat(0x2a1808));
-        // 로컬 z를 따라 꼬리 뿌리(-0.6)에서 끝(+0.85)까지 분포
-        const lz = -0.55 + i*0.48;
-        st.position.set(0,0,lz);
-        st.scale.set(1,1,1/3); // 부모의 z 3배 스케일 상쇄
-        st.rotation.y=Math.PI/2; // 링이 꼬리를 감싸도록
+        const lz = -TL*0.5 + i*(TL*0.4); // 뿌리 근처에서 끝쪽까지 균등 배치
+        const k = lz/TL;
+        const r = TR*Math.sqrt(Math.max(0.1, 1-k*k)); // 해당 z 위치의 꼬리 단면 반지름
+        const st=new THREE.Mesh(new THREE.TorusGeometry(r*1.06, TR*0.26, 6, 14), mat(0x2a1808));
+        st.position.set(0,0,lz); // 링 평면(XY)이 꼬리 축(z)과 수직 → 추가 회전 불필요
         t.add(st);
       }
     } }
