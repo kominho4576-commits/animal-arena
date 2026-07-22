@@ -1642,10 +1642,18 @@ const CFG = {
 };
 const DIFF = {
   // HP·데미지·이동속도는 모든 난이도 동일 — 오직 봇의 '지능'(명중률/반응속도/회피/조준안정성)만 차이
-  easy:   { acc: 0.28, react: 1.25, spd: 1.0, rollCh: 0.06, coverHp: 30, fireJit: 2.0,  dmgMult: 1.0, hpMult: 1.0 },
-  normal: { acc: 0.52, react: 0.62, spd: 1.0, rollCh: 0.28, coverHp: 30, fireJit: 1.35, dmgMult: 1.0, hpMult: 1.0 },
-  hard:   { acc: 0.82, react: 0.26, spd: 1.0, rollCh: 0.62, coverHp: 30, fireJit: 0.85, dmgMult: 1.0, hpMult: 1.0 },
+  easy:   { acc: 0.18, react: 1.60, spd: 1.0, rollCh: 0.04, coverHp: 30, fireJit: 2.5,  dmgMult: 1.0, hpMult: 1.0 },
+  normal: { acc: 0.36, react: 0.95, spd: 1.0, rollCh: 0.15, coverHp: 30, fireJit: 1.85, dmgMult: 1.0, hpMult: 1.0 },
+  hard:   { acc: 0.58, react: 0.50, spd: 1.0, rollCh: 0.35, coverHp: 30, fireJit: 1.25, dmgMult: 1.0, hpMult: 1.0 },
 };
+
+/* ===== 팀 판정 공용 헬퍼 =====
+   team이 없는 1vs1/개인전에서는 sameTeam()이 항상 false라 기존 동작과 동일하다.
+   조준/자동발사/소환수 타겟팅/관통 피해 등 모든 '적 판별'은 이 헬퍼를 거치게 해
+   아군을 적으로 오인하는 경로를 한 곳으로 모은다. */
+function sameTeam(a,b){ return !!(a && b && a.team && b.team && a.team===b.team); }
+function isFoeChar(self,c){ return !!(c && c!==self && !c.dead && !sameTeam(self,c)); }
+function isFoeSummon(self,s){ return !!(s && !s.ghost && s.owner!==self && !sameTeam(self,s.owner)); }
 
 /* ===== 봇을 진짜 유저처럼 보이게: 그럴듯한 닉네임 + 방장 랭크에 맞춘 실력 =====
    상대가 봇인지 티 나지 않도록 "여우 봇" 같은 표기 대신 실제 유저풍 닉네임을 붙인다. */
@@ -1665,9 +1673,9 @@ function pickBotNicks(n){
 // 방장(플레이어) 랭크 티어에 맞춰 봇 난이도 결정 — 낮은 티어는 약하게, 높은 티어는 강하게
 function botDiffForRank(){
   const key = (typeof Rank!=='undefined' && Rank.tier) ? Rank.tier().key : 'bronze';
-  if(key==='bronze' || key==='silver') return 'easy';
-  if(key==='gold' || key==='platinum') return 'normal';
-  return 'hard'; // diamond, master
+  if(key==='bronze' || key==='silver' || key==='gold') return 'easy';
+  if(key==='platinum' || key==='diamond') return 'normal';
+  return 'hard'; // master
 }
 
 /* ---------------- WEAPON DATABASE ---------------- */
@@ -3215,6 +3223,7 @@ const Projectiles = (() => {
       // char hit
       for(const c of chars){
         if(c===p.owner||c.dead||c.invuln>0) continue;
+        if(sameTeam(p.owner,c)) continue; // 아군은 투사체가 통과 (팀원이 총알받이가 되던 문제)
         const cy=c.crouching?0.6:0.9;
         const dx=pos.x-c.pos.x, dy=pos.y-(c.pos.y+cy), dz=pos.z-c.pos.z;
         if(dx*dx+dy*dy+dz*dz < 0.42){
@@ -3234,7 +3243,7 @@ const Projectiles = (() => {
       // summon hit (소환수 직격)
       if(!dead){
         for(const s of Summons.all()){
-          if(s.owner===p.owner || s.ghost) continue;
+          if(!isFoeSummon(p.owner,s)) continue;
           const r = s.kind==='hen'?0.72:0.55;
           const dx=pos.x-s.pos.x, dy=pos.y-(s.y+0.8), dz=pos.z-s.pos.z;
           if(dx*dx+dy*dy+dz*dz < r*r+0.15){
@@ -3334,7 +3343,7 @@ const Summons = (() => {
   function damageAt(x,z,radius,dmg,fromOwner){
     let hit=false;
     for(const s of list){
-      if(s.owner===fromOwner || s.ghost) continue; // 자기 주인 공격엔 안 맞음 / 유령 사본은 피격 대상 아님
+      if(!isFoeSummon(fromOwner,s)) continue; // 자기 주인/아군 소환수는 안 맞음 / 유령 사본은 피격 대상 아님
       const dd=Math.hypot(s.pos.x-x, s.pos.z-z);
       if(dd<radius+0.5){ s.hp-=dmg; hit=true; FX.impact(new THREE.Vector3(s.pos.x,s.y+0.8,s.pos.z),0xffffff,false); }
     }
@@ -3349,7 +3358,7 @@ const Summons = (() => {
   function rayHit(origin,dir,range,fromOwner,maxD){
     let best=null, bestD=(maxD!==undefined?maxD:range);
     for(const s of list){
-      if(s.owner===fromOwner || s.ghost) continue;
+      if(!isFoeSummon(fromOwner,s)) continue;
       const r = s.kind==='hen'?1.05:0.55, sy = s.kind==='hen'?1.25:0.8; // 어미닭 1.5배 스케일 반영
       const ox=s.pos.x-origin.x, oy=s.y+sy-origin.y, oz=s.pos.z-origin.z;
       const t=ox*dir.x+oy*dir.y+oz*dir.z;
@@ -3369,8 +3378,13 @@ const Summons = (() => {
         FX.spark(new THREE.Vector3(s.pos.x,s.y+0.6,s.pos.z), s.kind==='hen'?0xf5f5f5:0xff9950, 12,5,.5,1.2);
         scene.remove(s.m); list.splice(i,1); continue;
       }
-      // 타겟: 주인의 적
-      const target = chars.find(c=>c && !c.dead && c!==s.owner);
+      // 타겟: 주인의 적 중 가장 가까운 상대 (아군은 제외 — 소환수가 팀원에게 달려들던 문제)
+      let target=null, tbd=1e9;
+      for(const c of chars){
+        if(!isFoeChar(s.owner,c)) continue;
+        const ddx=c.pos.x-s.pos.x, ddz=c.pos.z-s.pos.z, d2=ddx*ddx+ddz*ddz;
+        if(d2<tbd){ tbd=d2; target=c; }
+      }
       if(!target){ continue; }
       const dx=target.pos.x-s.pos.x, dz=target.pos.z-s.pos.z;
       const dist=Math.hypot(dx,dz)||1e-6;
@@ -3533,10 +3547,15 @@ const Pickups = (() => {
 })();
 
 /* ---------------- CHARACTER BASE ---------------- */
+/* 지금까지 씬에 올라간 모든 캐릭터 group 등록부.
+   Net.opp/Net.peers 등의 참조는 로비 복귀 시 resetNet()에서 지워지므로, 참조를 통해서만
+   정리하면 이전 판의 시체가 맵에 그대로 남는다. 등록부는 참조와 무관하게 항상 정리 가능. */
+const ALL_CHAR_GROUPS=new Set();
 class Character {
   constructor(kind,name){
     const built=buildAnimal(kind);
     this.group=built.group; this.parts=built.parts; scene.add(this.group);
+    ALL_CHAR_GROUPS.add(this.group);
     this.name=name; this.kind=kind;
     this.pos=new THREE.Vector3(); this.velY=0; this.grounded=true;
     this.yaw=0; this.hp=CFG.maxHP; this.dead=false; this.deadT=0;
@@ -3635,7 +3654,7 @@ class Character {
       if(id!=='fists'){ const sc=WEAPONS[id].color||0xffffff; FX.slash(this.pos, this.yaw, sc); }
       // melee hit check
       for(const c of chars){
-        if(c===this||c.dead||c.invuln>0) continue;
+        if(c===this||c.dead||c.invuln>0||sameTeam(this,c)) continue;
         const dx=c.pos.x-this.pos.x, dz=c.pos.z-this.pos.z, d=Math.hypot(dx,dz);
         if(d<w.range){
           const ang=Math.atan2(dx,dz);
@@ -3651,7 +3670,7 @@ class Character {
       }
       // 소환수도 근접 범위에 들어오면 피격
       for(const s of Summons.all()){
-        if(s.owner===this || s.ghost) continue;
+        if(!isFoeSummon(this,s)) continue;
         const dx=s.pos.x-this.pos.x, dz=s.pos.z-this.pos.z, d=Math.hypot(dx,dz);
         if(d<w.range+0.4){
           const ang=Math.atan2(dx,dz);
@@ -3682,7 +3701,7 @@ class Character {
       for(let i=0;i<2;i++) FX.flame(muzzle,dir);
       // cone damage
       for(const c of chars){
-        if(c===this||c.dead||c.invuln>0) continue;
+        if(c===this||c.dead||c.invuln>0||sameTeam(this,c)) continue;
         const to=new THREE.Vector3(c.pos.x-this.pos.x,0,c.pos.z-this.pos.z);
         const d=to.length();
         if(d<w.range){
@@ -3695,7 +3714,7 @@ class Character {
       }
       // 소환수도 화염 콘 안이면 피격
       for(const s of Summons.all()){
-        if(s.owner===this || s.ghost) continue;
+        if(!isFoeSummon(this,s)) continue;
         const to=new THREE.Vector3(s.pos.x-this.pos.x,0,s.pos.z-this.pos.z);
         const d=to.length();
         if(d<w.range){
@@ -3727,6 +3746,7 @@ class Character {
     let bestC=null,bestD=wallD,bestHead=false;
     for(const c of chars){
       if(c===this||c.dead||c.invuln>0) continue;
+      if(sameTeam(this,c)) continue; // 아군은 총알이 관통 — 팀원이 총알을 막아 적이 안 맞던 문제
       // sphere test: body @ pos.y+0.85 r0.55, head @ pos.y+1.32 r0.36 (crouch lowers)
       const cy=c.crouching?0.55:0.85, hy=c.crouching?0.9:1.32;
       const parts=[[cy,0.55,false],[hy,0.36,true]]; // [높이, 반지름, 머리여부]
@@ -3771,6 +3791,9 @@ class Character {
     // 경로상 모든 적 판정 (관통)
     for(const c of chars){
       if(c===this||c.dead) continue; // 무적(invuln)도 관통해서 맞힘
+      // 이 경로는 takeDamage()를 거치지 않고 hp를 직접 깎으므로 팀 판정을 여기서 직접 해야 한다.
+      // (아군이 관통 빔에 죽으면 팀 처치 합계가 올라가 팀전 점수가 엉뚱하게 종료되던 원인)
+      if(sameTeam(this,c)) continue;
       const cy=c.crouching?0.7:0.9;
       const oc=new THREE.Vector3(c.pos.x-origin.x, c.pos.y+cy-origin.y, c.pos.z-origin.z);
       const t=oc.dot(dir);
@@ -3796,7 +3819,7 @@ class Character {
     }
     // 빔 경로상 소환수도 피격 (관통)
     for(const s of Summons.all()){
-      if(s.owner===this || s.ghost) continue;
+      if(!isFoeSummon(this,s)) continue;
       const ox=s.pos.x-origin.x, oy=s.y+0.8-origin.y, oz=s.pos.z-origin.z;
       const t=ox*dir.x+oy*dir.y+oz*dir.z;
       if(t<0||t>w.range) continue;
@@ -4213,6 +4236,25 @@ class Player extends Character {
     this.hp=CFG.maxHP*this.maxHpMult;
     this.baseSpd=this.clsSpd||1;
   }
+  /* 에임 보정/모바일 자동발사가 대상으로 삼을 '적' 목록.
+     예전엔 [Game.bot, Net.opp] 두 명만 봤다 —
+       · 2vs2/3vs3에서 그 자리에 아군이 들어오면 아군을 조준해도 자동발사가 나갔고,
+       · 그 둘 외의 진짜 적을 조준하면 자동발사가 아예 안 나갔다.
+     이제 전체 캐릭터에서 아군을 제외해 뽑는다. */
+  foeList(includeSummons){
+    const src=(Game.chars&&Game.chars.length)?Game.chars:[Game.player,Game.bot,(typeof Net!=='undefined'&&Net.opp)];
+    const out=[];
+    for(const c of src){ if(isFoeChar(this,c)) out.push(c); }
+    if(includeSummons && typeof Summons!=='undefined'){
+      // 적 소환체(어미닭/여우 분신)도 조준 대상 — 단 아군 소환체는 제외
+      for(const s of Summons.all()){
+        if(!isFoeSummon(this,s)) continue;
+        const sy=(s.kind==='hen'?1.25:0.8);
+        out.push({ pos:{ x:s.pos.x, y:s.y+sy-0.85, z:s.pos.z }, dead:false });
+      }
+    }
+    return out;
+  }
   update(dt,chars){
     Input.pollKeys();
     const st=Input.st;
@@ -4227,7 +4269,7 @@ class Player extends Character {
     if(lookingActive){ this._aimIdle=0; }
     else { this._aimIdle=(this._aimIdle||0)+dt; }
     if(document.body.classList.contains('has-touch') && !this.dead && !lookingActive && this._aimIdle>0.12){
-      const foes=[Game.bot, (typeof Net!=='undefined'&&Net.opp)].filter(c=>c&&!c.dead&&c!==this);
+      const foes=this.foeList();
       // 카메라가 현재 바라보는 방향 (총알이 나가는 방향)
       const camDir=new THREE.Vector3(); camera.getWorldDirection(camDir);
       const camYawNow=Math.atan2(camDir.x, camDir.z);
@@ -4321,15 +4363,7 @@ class Player extends Character {
       const cd2=new THREE.Vector3(); camera.getWorldDirection(cd2);
       const camY=Math.atan2(cd2.x,cd2.z), camP=Math.asin(Math.max(-1,Math.min(1,cd2.y)));
       const eye=new THREE.Vector3(this.pos.x,this.pos.y+this.eyeY,this.pos.z);
-      const foes=[Game.bot,(typeof Net!=='undefined'&&Net.opp)].filter(c=>c&&!c.dead&&c!==this);
-      // 적 소환체(어미닭/여우 분신)도 조준 대상에 포함 — 소환체를 공격할 수 없던 문제 수정
-      if(typeof Summons!=='undefined'){
-        for(const s of Summons.all()){
-          if(s.owner===this) continue; // 내 소환체는 제외
-          const sy=(s.kind==='hen'?1.25:0.8);
-          foes.push({ pos:{ x:s.pos.x, y:s.y+sy-0.85, z:s.pos.z }, dead:false });
-        }
-      }
+      const foes=this.foeList(true);
       let inAim=false;
       for(const c of foes){
         const vx=c.pos.x-eye.x, vy=(c.pos.y+0.85)-eye.y, vz=c.pos.z-eye.z;
@@ -4478,10 +4512,10 @@ class AIBot extends Character {
       if(P.hp < this.lastEnemyHp-0.5){ this.lastEnemyHp=P.hp; this.noProgressT=0; this.rushT=0; }
       else if(this.state==='ATTACK'||this.state==='COVER'){ this.noProgressT+=dt; }
       if(P.hp>this.lastEnemyHp) this.lastEnemyHp=P.hp; // enemy respawned/healed
-      if(this.noProgressT>4){ this.rushT=3; this.noProgressT=0; this.coverSpot=null; } // rush for 3s
+      if(this.noProgressT>6){ this.rushT=2.2; this.noProgressT=0; this.coverSpot=null; } // rush for 2.2s
       if(this.rushT>0) this.rushT-=dt;
       // finish-him: when enemy is low, press the attack regardless of HP caution
-      if(P.hp<35){ this.rushT=Math.max(this.rushT,dt*2); }
+      if(P.hp<25){ this.rushT=Math.max(this.rushT,dt*2); }
     }
     // stuck detection
     this.stuckT += dt;
@@ -4672,12 +4706,14 @@ class AIBot extends Character {
       P.pos.x-this.pos.x,
       (P.pos.y+ (P.crouching?0.6:0.95)) - (this.pos.y+this.eyeY-0.12),
       P.pos.z-this.pos.z).normalize();
-    const err=(1-this.d.acc)*0.14;
+    // 거리가 멀수록 조준 오차를 더 키운다 — 봇이 맵 반대편에서 정확히 맞히던 문제 완화
+    const err=(1-this.d.acc)*0.20*(1+Math.min(1,dist/28)*0.6);
     dir.x+=(Math.random()-.5)*err*2; dir.y+=(Math.random()-.5)*err*1.4; dir.z+=(Math.random()-.5)*err*2;
     dir.normalize();
     if(w.type==='arc'){ dir.y+=dist*0.012; dir.normalize(); }
     if(this.fire(dir,chars)){
-      this.reactT=w.rate*this.d.fireJit + (Math.random()<0.25 ? 0.4 : 0);
+      // 사격 간 '숨 고르는' 텀을 더 자주/길게 — 끊김 없는 압박 사격 완화
+      this.reactT=w.rate*this.d.fireJit + (Math.random()<0.35 ? 0.55 : 0);
     }
   }
   findCover(P){
@@ -4795,8 +4831,16 @@ const Game = (() => {
   // 어떤 매치 타입(오프라인/FFA/1:1 온라인/파티전)에서 왔든 상관없이 매치 시작 시 항상 전부 호출해
   // 이전 매치 참가자가 맵에 색깔 실루엣으로 남는 유령 버그를 막는다.
   function disposeAllChars(){
+    // 1) 등록부 기준으로 전부 제거 — 참조가 이미 끊긴(resetNet 이후) 이전 판 시체까지 확실히 정리
+    for(const g of ALL_CHAR_GROUPS){ try{ scene.remove(g); }catch(e){} }
+    ALL_CHAR_GROUPS.clear();
+    // 2) 안전망: 현재 참조 중인 캐릭터도 한 번 더 제거 + 죽음 연출로 눕혀진 트랜스폼 원복
     const seen=new Set();
-    const rm=(c)=>{ if(c && c.group && !seen.has(c.group)){ seen.add(c.group); scene.remove(c.group); } };
+    const rm=(c)=>{
+      if(!c || !c.group || seen.has(c.group)) return;
+      seen.add(c.group); scene.remove(c.group);
+      c.group.rotation.set(0,0,0); c.group.scale.set(1,1,1); c.group.visible=true;
+    };
     rm(player); rm(bot);
     for(const b of aiBots) rm(b);
     if(Net.peers) Net.peers.forEach(rm);
@@ -4943,14 +4987,25 @@ const Game = (() => {
     updateScore();
     // 오프라인 AI 개인전/1:1 전용 킬타겟 종료 체크 — 네트워크 매치(PVP/커스텀/팀전)는
     // handleNetMessage의 'kill'/전멸 체크에서 별도로 처리하므로 여기서는 건너뜀(중복 종료 방지)
-    if(!trainingMode && !pvpMode && gameMode==='deathmatch' && killer.kills>=CFG.killTarget){
-      // 데스매치: 마지막 킬 -> 킬캠(슬로우모션 + 죽는 캐릭터 클로즈업)
-      const won=killer.isPlayer;
-      killCam={ t:0, dur:2.6, victim:victim, killer:killer, won:won, shown:false };
-      if(aiBots.length>1) showFFAFinal(); // AI 개인전: 킬캠 중 최종 순위 표시
-      $('respawnOvl').classList.remove('show');
-      const kl=$('killCamLabel'); if(kl) kl.textContent = won?'ELIMINATED':'DEFEATED';
-      document.body.classList.add('killcam');
+    if(!trainingMode && !pvpMode && gameMode==='deathmatch' && !killCam){
+      // 팀전(봇으로 채운 2vs2/3vs3)은 개인 킬이 아니라 '팀 합계'가 목표에 도달할 때 종료해야 한다.
+      // 예전엔 개인 킬 기준이라 팀 점수판과 종료 시점이 어긋났다.
+      let ended=false, won=false;
+      if(isTeamGame()){
+        const ts=teamSplit();
+        if(ts.myKills>=ts.target){ ended=true; won=true; }
+        else if(ts.theirKills>=ts.target){ ended=true; won=false; }
+      } else if(killer.kills>=CFG.killTarget){
+        ended=true; won=killer.isPlayer;
+      }
+      if(ended){
+        // 데스매치: 마지막 킬 -> 킬캠(슬로우모션 + 죽는 캐릭터 클로즈업)
+        killCam={ t:0, dur:2.6, victim:victim, killer:killer, won:won, shown:false };
+        if(aiBots.length>1) showFFAFinal(); // AI 개인전: 킬캠 중 최종 순위 표시
+        $('respawnOvl').classList.remove('show');
+        const kl=$('killCamLabel'); if(kl) kl.textContent = won?'ELIMINATED':'DEFEATED';
+        document.body.classList.add('killcam');
+      }
     }
     // 커스텀 대전(개인전, 봇 포함)에서 내 봇이 목표 킬 수에 도달 -> 승리 브로드캐스트 (팀전은 전멸 조건으로 별도 처리)
     if(pvpMode && Net.party && !Net.teamMode && !trainingMode && gameMode==='deathmatch' && killer.isPartyBot && killer.kills>=CFG.killTarget){
@@ -5029,11 +5084,10 @@ const Game = (() => {
     const bk = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : (bot?bot.kills:0);
     let won = pk>bk, draw = pk===bk, showRank=false;
     if(isTeamGame()){
-      const myTeam=myTeamKey();
-      const mine=chars.filter(c=>c.team===myTeam), theirs=chars.filter(c=>c.team!=null && c.team!==myTeam);
-      const mk=mine.reduce((s,c)=>s+(c.kills||0),0), tk=theirs.reduce((s,c)=>s+(c.kills||0),0);
-      won=mk>tk; draw=mk===tk;
-      if(Net.teamMode && !Net.party){ Stats.recordTeam(won); showRank=true; }
+      const ts=teamSplit();
+      won=ts.myKills>ts.theirKills; draw=ts.myKills===ts.theirKills;
+      // 온라인 팀전이든 봇으로 채워진 2vs2/3vs3이든 팀 전적을 남긴다 (체험하기만 제외)
+      if(!trainingMode && !draw){ Stats.recordTeam(won); showRank=true; }
       $('winSub').textContent=(draw?'무승부':(won?'우리 팀 승리!':'우리 팀 패배'))+' · 타임어택 종료';
       renderTeamStandings($('winStandings'), buildTeamStandings(), false); $('winStandings').style.display='flex';
     } else {
@@ -5123,10 +5177,20 @@ const Game = (() => {
     const won=killCam?killCam.won:false;
     hideFFAFinal();
     const topBotK = aiBots.length>1 ? aiBots.reduce((m,b)=>Math.max(m,b.kills||0),0) : (bot?bot.kills:0);
-    if(!trainingMode){ Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0, {ranked:rankedMode, margin:Math.abs(player.kills-topBotK)}); }
+    const teamGame = isTeamGame();
+    // 팀전이면 팀 전적으로 기록 (봇으로 채워진 2vs2/3vs3 데스매치가 개인 승패로만 남던 문제)
+    if(!trainingMode){
+      if(teamGame) Stats.recordTeam(won);
+      else Stats.record(won?'win':'loss', player.kills, Net.myDeaths||topBotK||0, {ranked:rankedMode, margin:Math.abs(player.kills-topBotK)});
+    }
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    if(aiBots.length>1){ $('winSub').textContent=fmtTime(time); renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
+    if(teamGame){
+      const ts=teamSplit();
+      $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+` · ${ts.myKills} : ${ts.theirKills} · ${fmtTime(time)}`;
+      renderTeamStandings($('winStandings'), buildTeamStandings(), false); $('winStandings').style.display='flex';
+    }
+    else if(aiBots.length>1){ $('winSub').textContent=fmtTime(time); renderStandings($('winStandings'), buildStandings(), false); $('winStandings').style.display='flex'; }
     else { $('winSub').textContent=`${player.kills} : ${topBotK}  ·  ${fmtTime(time)}`; $('winStandings').style.display='none'; }
     showRankGain(!trainingMode);
     $('respawnOvl').classList.remove('show');
@@ -5140,6 +5204,20 @@ const Game = (() => {
     if(typeof Net!=='undefined' && Net.teamMode) return true;
     return !!(player && player.team!=null && chars && chars.some(c=>c!==player && c.team!=null));
   }
+  /* 팀전 점수 계산 한 곳으로 통일 (updateScore / 종료판정 / 결과화면이 서로 다른 기준을 쓰다
+     2vs2·3vs3에서 점수와 종료 조건이 어긋나던 문제).
+     목표 처치 수는 팀 인원수에 비례 — 팀 합계에 1인분(CFG.killTarget)만 적용하면
+     3vs3이 1vs1보다 3배 빨리 끝나 "갑자기 종료"처럼 보였다. */
+  function teamSplit(){
+    const myTeam=myTeamKey();
+    const mine=(chars||[]).filter(c=>c && c.team===myTeam);
+    const theirs=(chars||[]).filter(c=>c && c.team!=null && c.team!==myTeam);
+    const size=Math.max(1, mine.length, theirs.length);
+    return { myTeam, mine, theirs,
+      myKills: mine.reduce((s,c)=>s+(c.kills||0),0),
+      theirKills: theirs.reduce((s,c)=>s+(c.kills||0),0),
+      size, target: CFG.killTarget*size };
+  }
   function updateScore(){
     if(!player) return;
     const ffa = typeof Net!=='undefined' && Net.ffa;
@@ -5151,16 +5229,14 @@ const Game = (() => {
     $('scoreChip').style.display='';
     { const fb=$('ffaBoard'); if(fb) fb.style.display='none'; }
     { const tb=$('teamBoard'); if(tb) tb.style.display='none'; }
-    // 점수 라벨: 모드 + (팀전이면 TEAM 표기)
-    const modeLbl = (gameMode==='timeattack') ? '시간내 최다 처치' : (CFG.killTarget+'킬 승리');
+    // 점수 라벨: 모드 + (팀전이면 TEAM 표기 + 팀 목표 처치 수)
+    const ts = team ? teamSplit() : null;
+    const killLbl = (team ? ts.target : CFG.killTarget)+'킬 승리';
+    const modeLbl = (gameMode==='timeattack') ? '시간내 최다 처치' : killLbl;
     const scl=$('scoreChipLbl'); if(scl){ const lbl=(team?'TEAM · ':'SCORE · ')+modeLbl; if(scl.textContent!==lbl) scl.textContent=lbl; }
     let mine, theirs;
     if(team){
-      const myTeam=myTeamKey();
-      const myList=chars.filter(c=>c.team===myTeam);
-      const thList=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==myTeam);
-      mine=myList.reduce((s,c)=>s+(c.kills||0),0);
-      theirs=thList.reduce((s,c)=>s+(c.kills||0),0);
+      mine=ts.myKills; theirs=ts.theirKills;
     } else if(ffa){
       mine=player.kills; let top=0; for(const p of Net.peers){ top=Math.max(top,p.kills||0); } theirs=top;
     } else if(aiBots.length>1){
@@ -6625,9 +6701,10 @@ const Game = (() => {
     hideFFAFinal();
     $('winTitle').textContent=won?'VICTORY!':'DEFEAT';
     $('winTitle').style.color=won?'#3ef58a':'#ff5252';
-    // 팀전(빠른 매칭)만 별도 승/패 기록. 커스텀 대전은 기존 win/loss 기록 경로를 그대로 사용.
+    // 팀전 승/패 기록. 예전엔 !Net.party 조건이 걸려 있었는데, Net.party는 "매치에 봇이 섞여 있음"을
+    // 뜻하도록 바뀌어(정원 미달 시 서버가 봇으로 채움) 2vs2/3vs3 대부분에서 전적이 아예 안 오르고 있었다.
     let showRank=false;
-    if(Net.teamMode && !Net.party){ Stats.recordTeam(won); showRank=true; }
+    if(Net.teamMode && !trainingMode){ Stats.recordTeam(won); showRank=true; }
     if(Net.teamMode){
       $('winSub').textContent=(won?'우리 팀 승리!':'우리 팀 패배')+' · 팀전 종료';
       renderTeamStandings($('winStandings'), buildTeamStandings(), false);
@@ -6986,7 +7063,9 @@ const Game = (() => {
     }
     // 종이 바뀌었거나 첫 렌더: 새 캔버스 마운트
     tpDisposeMini(el);
-    el.innerHTML='<div class="tpModelWrap"><canvas class="tpModel" width="140" height="150"></canvas></div>'
+    // 캔버스 백버퍼 비율(120:142)을 CSS 박스(.tpModelWrap 100x118)와 맞춘다 —
+    // 비율이 어긋나면 카메라 aspect와 표시 영역이 달라져 캐릭터 머리/발이 잘려 보였음
+    el.innerHTML='<div class="tpModelWrap"><canvas class="tpModel" width="120" height="142"></canvas></div>'
       +'<div class="tpName">'+(info.nick||spName)+'</div>'
       +'<div class="tpReady '+(info.ready?'on':'')+'">'+(info.ready?'준비완료':'대기중')+'</div>'
       +(info.isHost?'<div class="tpHostTag">파티장</div>':'');
@@ -7005,11 +7084,14 @@ const Game = (() => {
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));
     renderer.setSize(cv.width, cv.height, false);
     const scene=new THREE.Scene();
-    const cam=new THREE.PerspectiveCamera(34, cv.width/cv.height, 0.1, 50);
-    cam.position.set(0,1.0,2.55); cam.lookAt(0,0.92,0);
+    // 로비 메인 프리뷰(fov38/dist3.75)와 같은 여유 프레이밍 — 머리끝~발끝이 모두 들어오게
+    const cam=new THREE.PerspectiveCamera(38, cv.width/cv.height, 0.1, 50);
+    cam.position.set(0,0.95,3.9); cam.lookAt(0,0.88,0);
     scene.add(new THREE.HemisphereLight(0xffffff,0x556655,1.15));
     const dl=new THREE.DirectionalLight(0xffffff,0.55); dl.position.set(2,4,3); scene.add(dl);
-    const built=buildAnimal(spec); const char=built.group; char.position.y=0; scene.add(char);
+    const built=buildAnimal(spec); const char=built.group; char.position.y=0;
+    char.scale.setScalar(0.84); // 파티원은 내 메인 프리뷰보다 살짝 작게
+    scene.add(char);
     const rec={renderer,scene,cam,char,parts:built.parts,spec,t:Math.random()*6,raf:0,alive:true};
     _tpMinis.set(cv, rec);
     (function loop(){
@@ -7219,15 +7301,14 @@ const Game = (() => {
   // 팀전 승리 조건: 상대 팀 전원이 dead면 승리, 우리 팀 전원이 dead면 패배 (기존 리스폰 타이머는 그대로 둠)
   function checkTeamWipe(){
     if(!Net.teamMode || killCam || Net.ended || !running) return;
-    const mine=chars.filter(c=>c.team===Net.myTeam);
-    const theirs=chars.filter(c=>c.team!==undefined && c.team!==null && c.team!==Net.myTeam);
+    const ts=teamSplit();
+    const mine=ts.mine, theirs=ts.theirs;
     if(!mine.length || !theirs.length) return;
     // 팀 승리 조건 (팀 단위):
     //  1) 데스매치 → 팀 처치 합계가 목표 킬 수에 먼저 도달한 팀 승리 (리스폰 있으므로 전멸만으로는 잘 안 끝남)
     //  2) 타임어택/공통 → 한 팀이 전멸(생존 0명)하면 상대 팀 승리
-    const myKills=mine.reduce((s,c)=>s+(c.kills||0),0);
-    const theirKills=theirs.reduce((s,c)=>s+(c.kills||0),0);
-    const target=CFG.killTarget;
+    const myKills=ts.myKills, theirKills=ts.theirKills;
+    const target=ts.target; // 팀 인원수에 비례한 목표 (updateScore 표시와 동일 기준)
     if(gameMode==='deathmatch'){
       // 데스매치는 리스폰이 있으므로 "팀 전멸"로는 절대 끝내지 않는다.
       // (순간적인 동시 사망이 lag로 인한 오심 종료를 유발하던 버그) — 오직 팀 처치 합계가 목표에 도달할 때만 종료.
